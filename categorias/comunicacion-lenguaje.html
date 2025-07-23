@@ -1047,7 +1047,7 @@
         function speakText(text) {
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'es-ES';
+                utterance.lang = 'es-MX';
                 utterance.rate = 0.8;
                 utterance.pitch = 1.1;
                 speechSynthesis.speak(utterance);

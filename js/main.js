@@ -16,7 +16,7 @@ function speakText(text) {
     if (!JuegoTEA.settings.soundEnabled || !window.speechSynthesis) return;
     
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'es-ES';
+    utterance.lang = 'es-MX';
     utterance.rate = JuegoTEA.settings.speechRate;
     utterance.pitch = 1.1;
     speechSynthesis.speak(utterance);

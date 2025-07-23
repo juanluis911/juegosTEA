@@ -765,14 +765,15 @@
             
             setTimeout(() => {
                 hideLoading();
-                // In production, this would redirect to the communication page
-                // window.location.href = './categorias/comunicacion-lenguaje.html';
+                
                 
                 // For demo purposes, we'll show a message
                 if (confirm('¿Quieres ir a la página de Comunicación y Lenguaje?\n\n• 6 juegos interactivos\n• Adaptados por edades\n• Consejos para padres\n• Seguimiento de progreso')) {
                     showNotification('¡Redirigiendo a Comunicación y Lenguaje! 💬');
                     // Simulate navigation
                     setTimeout(() => {
+                        // In production, this would redirect to the communication page
+                        window.location.href = './categorias/comunicacion-lenguaje.html';
                         alert('En la versión completa, esto abriría:\n./categorias/comunicacion-lenguaje.html\n\n¡La página está lista para usar!');
                     }, 1000);
                 } else {
@@ -1164,7 +1165,7 @@
         function speakText(text) {
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'es-ES';
+                utterance.lang = 'es-MX';
                 utterance.rate = 0.8;
                 utterance.pitch = 1.1;
                 speechSynthesis.speak(utterance);

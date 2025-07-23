@@ -1,21 +1,719 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📚 Aprende a Leer - JuegoTEA</title>
-    <link rel="stylesheet" href="../css/games.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #4299e1 0%, #63b3ed 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(66, 153, 225, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Game Container */
+        .game-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* Progress Bar */
+        .progress-section {
+            margin-bottom: 2rem;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 15px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .level-info {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .score-info {
+            font-size: 1.1rem;
+            color: #4299e1;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #48bb78, #68d391);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        /* Game Area */
+        .game-area {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .sentence-display {
+            font-size: 2rem;
+            line-height: 1.6;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: #f7fafc;
+            border-radius: 15px;
+            border: 3px solid #e2e8f0;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .word {
+            display: inline-block;
+            margin: 0 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .word:hover {
+            background: #bee3f8;
+            transform: translateY(-2px);
+        }
+
+        .word.highlighted {
+            background: #4299e1;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .word.clicked {
+            background: #48bb78;
+            color: white;
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            80% { transform: translateY(-5px); }
+        }
+
+        /* Word Definition Popup */
+        .definition-popup {
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border: 2px solid #4299e1;
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .definition-popup.show {
+            opacity: 1;
+            pointer-events: all;
+            top: -90px;
+        }
+
+        .definition-popup::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: #4299e1;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4299e1, #63b3ed);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #48bb78, #68d391);
+            color: white;
+        }
+
+        .btn-accent {
+            background: linear-gradient(45deg, #ed8936, #f6ad55);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Image Display */
+        .image-container {
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .word-image {
+            width: 200px;
+            height: 200px;
+            background: #f7fafc;
+            border: 3px solid #e2e8f0;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            transition: all 0.3s ease;
+        }
+
+        .word-image.animate {
+            transform: scale(1.1);
+            border-color: #4299e1;
+            background: #bee3f8;
+        }
+
+        /* Feedback Messages */
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .feedback.success {
+            border: 3px solid #48bb78;
+        }
+
+        .feedback.error {
+            border: 3px solid #e53e3e;
+        }
+
+        .feedback-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .feedback-message {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        /* Level Complete */
+        .level-complete {
+            background: linear-gradient(135deg, #48bb78, #68d391);
+            color: white;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            margin: 2rem 0;
+            display: none;
+        }
+
+        .level-complete.show {
+            display: block;
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .level-complete h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .level-complete p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+            transition: right 0.3s ease;
+            z-index: 200;
+            overflow-y: auto;
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .settings-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .close-settings {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .setting-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .setting-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .setting-slider {
+            width: 100%;
+        }
+
+        .setting-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9rem;
+            color: #2d3748;
+        }
+
+        .setting-select:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .setting-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle {
+            width: 50px;
+            height: 25px;
+            background: #cbd5e0;
+            border-radius: 25px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle.active {
+            background: #4299e1;
+        }
+
+        .toggle-knob {
+            width: 21px;
+            height: 21px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s ease;
+        }
+
+        .toggle.active .toggle-knob {
+            left: 27px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .game-container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+
+            .sentence-display {
+                font-size: 1.5rem;
+                padding: 1rem;
+            }
+
+            .word {
+                margin: 4px;
+                padding: 6px 10px;
+            }
+
+            .game-controls {
+                gap: 0.5rem;
+            }
+
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+
+            .word-image {
+                width: 150px;
+                height: 150px;
+                font-size: 3rem;
+            }
+
+            .settings-panel {
+                width: 250px;
+            }
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .high-contrast {
+            filter: contrast(1.5);
+        }
+
+        .large-text .sentence-display {
+            font-size: 2.5rem;
+        }
+
+        .large-text .word {
+            font-size: 1.2rem;
+            padding: 10px 15px;
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4299e1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>📚 Aprende a Leer</h1>
-        <button onclick="history.back()">← Volver</button>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">
+                📚 Aprende a Leer
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button class="btn btn-secondary" onclick="toggleSettings()" title="Configuración">
+                    ⚙️ Configuración
+                </button>
+                <button class="back-btn" onclick="goBack()">
+                    ← Volver
+                </button>
+            </div>
+        </nav>
     </header>
-    <main>
-        <div id="gameContainer">
-            <p>Juego en desarrollo...</p>
+
+    <!-- Main Game Container -->
+    <div class="game-container">
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <div class="progress-info">
+                <div class="level-info">
+                    <span id="levelDisplay">Nivel 1</span>
+                    <span style="margin-left: 1rem; color: #718096;">Oraciones Simples</span>
+                </div>
+                <div class="score-info">
+                    ⭐ Puntos: <span id="scoreDisplay">0</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div style="margin-top: 0.5rem; text-align: center; color: #718096; font-size: 0.9rem;">
+                <span id="progressText">Progreso: 0/5 oraciones completadas</span>
+            </div>
         </div>
-    </main>
-    <script src="../js/games.js"></script>
+
+        <!-- Game Area -->
+        <div class="game-area">
+            <div class="sentence-display" id="sentenceDisplay">
+                <div class="word" data-word="gato" data-definition="Animal doméstico que hace 'miau'">gato</div>
+                <div class="word" data-word="come" data-definition="Acción de alimentarse">come</div>
+                <div class="word" data-word="pescado" data-definition="Animal que vive en el agua">pescado</div>
+            </div>
+
+            <!-- Image Container -->
+            <div class="image-container">
+                <div class="word-image" id="wordImage">🐱</div>
+            </div>
+
+            <!-- Game Controls -->
+            <div class="game-controls">
+                <button class="btn btn-primary" onclick="readSentence()" id="readBtn">
+                    🔊 Leer Oración
+                </button>
+                <button class="btn btn-secondary" onclick="readSlowly()" id="slowBtn">
+                    🐌 Leer Despacio
+                </button>
+                <button class="btn btn-accent" onclick="nextSentence()" id="nextBtn">
+                    ➡️ Siguiente
+                </button>
+            </div>
+
+            <!-- Instructions -->
+            <div style="margin-top: 1rem; color: #718096; font-size: 0.9rem;">
+                💡 Haz clic en cualquier palabra para escuchar su definición
+            </div>
+        </div>
+
+        <!-- Level Complete Message -->
+        <div class="level-complete" id="levelComplete">
+            <h2>🎉 ¡Nivel Completado!</h2>
+            <p>Has completado todas las oraciones de este nivel.</p>
+            <button class="btn btn-primary" onclick="nextLevel()">
+                🚀 Siguiente Nivel
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h3 class="settings-title">⚙️ Configuración</h3>
+            <button class="close-settings" onclick="toggleSettings()">✕</button>
+        </div>
+
+        <div class="setting-item">
+            <label class="setting-label">Velocidad de Voz</label>
+            <input type="range" min="0.5" max="1.5" step="0.1" value="0.8" 
+                   class="setting-slider" id="speechRate" onchange="updateSpeechRate()">
+            <div style="font-size: 0.8rem; color: #718096;">Actual: <span id="rateValue">0.8</span>x</div>
+        </div>
+
+        <div class="setting-item">
+            <label class="setting-label">Volumen</label>
+            <input type="range" min="0" max="1" step="0.1" value="1" 
+                   class="setting-slider" id="volume" onchange="updateVolume()">
+            <div style="font-size: 0.8rem; color: #718096;">Actual: <span id="volumeValue">100</span>%</div>
+        </div>
+
+        <div class="setting-item">
+            <label class="setting-label">Sonidos del Juego</label>
+            <div class="setting-toggle">
+                <div class="toggle active" id="soundToggle" onclick="toggleSound()">
+                    <div class="toggle-knob"></div>
+                </div>
+                <span>Activado</span>
+            </div>
+        </div>
+
+        <div class="setting-item">
+            <label class="setting-label">Texto Grande</label>
+            <div class="setting-toggle">
+                <div class="toggle" id="textSizeToggle" onclick="toggleTextSize()">
+                    <div class="toggle-knob"></div>
+                </div>
+                <span>Normal</span>
+            </div>
+        </div>
+
+        <div class="setting-item">
+            <label class="setting-label">Alto Contraste</label>
+            <div class="setting-toggle">
+                <div class="toggle" id="contrastToggle" onclick="toggleContrast()">
+                    <div class="toggle-knob"></div>
+                </div>
+                <span>Normal</span>
+            </div>
+        </div>
+
+        <div class="setting-item">
+            <label class="setting-label">Repetición Automática</label>
+            <div class="setting-toggle">
+                <div class="toggle" id="autoRepeatToggle" onclick="toggleAutoRepeat()">
+                    <div class="toggle-knob"></div>
+                </div>
+                <span>Desactivado</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Messages -->
+    <div class="feedback" id="feedback">
+        <div class="feedback-icon" id="feedbackIcon">✅</div>
+        <div class="feedback-message" id="feedbackMessage">¡Excelente!</div>
+        <div id="feedbackSubtext"></div>
+    </div>
+
+    <script src="../js/lectura-game.js"></script>
 </body>
 </html>
