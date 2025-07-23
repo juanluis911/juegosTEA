@@ -1,0 +1,1192 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunicación y Lenguaje - JuegoTEA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #4299e1 0%, #63b3ed 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(66, 153, 225, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #4299e1 0%, #63b3ed 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+            animation: float 15s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+            color: #ffd700;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Games Grid */
+        .games-section {
+            padding: 80px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #718096;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .age-filters {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .age-filter {
+            background: white;
+            border: 2px solid #e2e8f0;
+            color: #4a5568;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .age-filter:hover, .age-filter.active {
+            background: #4299e1;
+            color: white;
+            border-color: #4299e1;
+            transform: translateY(-2px);
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid transparent;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(45deg, #4299e1, #63b3ed);
+            transition: height 0.3s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(66, 153, 225, 0.2);
+            border-color: #4299e1;
+        }
+
+        .game-card:hover::before {
+            height: 100%;
+            opacity: 0.05;
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #2d3748;
+            text-align: center;
+        }
+
+        .game-description {
+            color: #718096;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .game-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .game-features li {
+            padding: 0.3rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        .game-features li::before {
+            content: '✓';
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .game-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .age-badge {
+            background: #4299e1;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .difficulty {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .difficulty-star {
+            color: #ffd700;
+            font-size: 1rem;
+        }
+
+        .difficulty-star.empty {
+            color: #e2e8f0;
+        }
+
+        .play-button {
+            background: linear-gradient(45deg, #4299e1, #63b3ed);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-size: 1.1rem;
+        }
+
+        .play-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(66, 153, 225, 0.4);
+        }
+
+        .coming-soon {
+            background: #f7fafc;
+            color: #718096;
+            border: 2px dashed #cbd5e0;
+        }
+
+        .coming-soon .play-button {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .coming-soon .play-button:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Progress Section */
+        .progress-section {
+            background: white;
+            padding: 60px 0;
+            margin: 60px 0;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .progress-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .progress-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #4299e1;
+        }
+
+        .progress-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .progress-description {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* Tips Section */
+        .tips-section {
+            background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+            padding: 60px 0;
+            border-radius: 20px;
+            margin: 40px 0;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .tip-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tip-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #38b2ac;
+        }
+
+        .tip-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .tip-content {
+            color: #4a5568;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .age-filters {
+                gap: 0.5rem;
+            }
+
+            .age-filter {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4299e1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">
+                💬 Comunicación y Lenguaje
+            </div>
+            <button class="back-btn" onclick="goBack()">
+                ← Volver al Inicio
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>
+                <span style="font-size: 4rem;">💬</span>
+                Comunicación y Lenguaje
+            </h1>
+            <p>
+                Desarrolla habilidades de comunicación verbal y no verbal mediante juegos interactivos 
+                diseñados específicamente para niños con autismo.
+            </p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">95%</span>
+                    <span class="stat-label">Mejora en Comunicación</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">12</span>
+                    <span class="stat-label">Juegos Disponibles</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">4</span>
+                    <span class="stat-label">Grupos de Edad</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Games Section -->
+    <section class="games-section">
+        <div class="container">
+            <h2 class="section-title">Juegos Interactivos</h2>
+            <p class="section-subtitle">
+                Cada juego está diseñado con base en investigación científica para desarrollar 
+                diferentes aspectos de la comunicación y el lenguaje.
+            </p>
+
+            <!-- Age Filters -->
+            <div class="age-filters">
+                <button class="age-filter" data-age="all" onclick="filterByAge('all')">Todas las Edades</button>
+                <button class="age-filter active" data-age="preschool" onclick="filterByAge('preschool')">4-6 años</button>
+                <button class="age-filter" data-age="school" onclick="filterByAge('school')">6-12 años</button>
+                <button class="age-filter" data-age="teen" onclick="filterByAge('teen')">12+ años</button>
+            </div>
+
+            <!-- Games Grid -->
+            <div class="games-grid" id="gamesGrid">
+                <!-- Game 1: Reading Interactive -->
+                <div class="game-card" data-age="preschool school" data-game="reading">
+                    <div class="game-icon">📚</div>
+                    <h3 class="game-title">Aprende a Leer</h3>
+                    <p class="game-description">
+                        Juego interactivo de lectura con historias progresivas, vocabulario visual y síntesis de voz.
+                    </p>
+                    <div class="game-meta">
+                        <span class="age-badge">4-8 años</span>
+                        <div class="difficulty">
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star empty">★</span>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li>Oraciones progresivas</li>
+                        <li>Síntesis de voz en español</li>
+                        <li>Palabras con definiciones</li>
+                        <li>Sistema de recompensas</li>
+                    </ul>
+                    <button class="play-button" onclick="launchGame('reading')">
+                        🎮 Jugar Ahora
+                    </button>
+                </div>
+
+                <!-- Game 2: Colors and Positions -->
+                <div class="game-card" data-age="preschool" data-game="colors">
+                    <div class="game-icon">🌈</div>
+                    <h3 class="game-title">Colores y Posiciones</h3>
+                    <p class="game-description">
+                        Aprende colores básicos y conceptos espaciales como dentro, fuera, cerca y lejos.
+                    </p>
+                    <div class="game-meta">
+                        <span class="age-badge">3-6 años</span>
+                        <div class="difficulty">
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star empty">★</span>
+                            <span class="difficulty-star empty">★</span>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li>10 colores básicos</li>
+                        <li>Conceptos espaciales</li>
+                        <li>Objetos arrastrables</li>
+                        <li>Retroalimentación inmediata</li>
+                    </ul>
+                    <button class="play-button" onclick="launchGame('colors')">
+                        🎮 Jugar Ahora
+                    </button>
+                </div>
+
+                <!-- Game 3: Farm Animals -->
+                <div class="game-card" data-age="preschool school" data-game="animals">
+                    <div class="game-icon">🐄</div>
+                    <h3 class="game-title">Animales de la Granja</h3>
+                    <p class="game-description">
+                        Identifica animales, aprende sus sonidos y clasifica por tamaños de manera interactiva.
+                    </p>
+                    <div class="game-meta">
+                        <span class="age-badge">4-10 años</span>
+                        <div class="difficulty">
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star empty">★</span>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li>10 animales diferentes</li>
+                        <li>Sonidos reales de animales</li>
+                        <li>Clasificación por tamaños</li>
+                        <li>Datos curiosos de cada animal</li>
+                    </ul>
+                    <button class="play-button" onclick="launchGame('animals')">
+                        🎮 Jugar Ahora
+                    </button>
+                </div>
+
+                <!-- Game 4: Letter Learning -->
+                <div class="game-card" data-age="preschool" data-game="letters">
+                    <div class="game-icon">🔤</div>
+                    <h3 class="game-title">Aventura de las Letras</h3>
+                    <p class="game-description">
+                        Aprende el abecedario con animaciones, sonidos y actividades de trazado interactivo.
+                    </p>
+                    <div class="game-meta">
+                        <span class="age-badge">3-6 años</span>
+                        <div class="difficulty">
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star empty">★</span>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li>27 letras del abecedario</li>
+                        <li>Trazado guiado</li>
+                        <li>Palabras de ejemplo</li>
+                        <li>Pronunciación clara</li>
+                    </ul>
+                    <button class="play-button" onclick="launchGame('letters')">
+                        🎮 Jugar Ahora
+                    </button>
+                </div>
+
+                <!-- Game 5: Word Builder -->
+                <div class="game-card" data-age="school" data-game="words">
+                    <div class="game-icon">🧩</div>
+                    <h3 class="game-title">Constructor de Palabras</h3>
+                    <p class="game-description">
+                        Forma palabras arrastrando sílabas, mejora la ortografía y expande el vocabulario.
+                    </p>
+                    <div class="game-meta">
+                        <span class="age-badge">6-10 años</span>
+                        <div class="difficulty">
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star">★</span>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li>Construcción por sílabas</li>
+                        <li>500+ palabras disponibles</li>
+                        <li>Imágenes asociativas</li>
+                        <li>Niveles progresivos</li>
+                    </ul>
+                    <button class="play-button" onclick="launchGame('words')">
+                        🎮 Jugar Ahora
+                    </button>
+                </div>
+
+                <!-- Game 6: Story Time -->
+                <div class="game-card" data-age="school teen" data-game="stories">
+                    <div class="game-icon">📖</div>
+                    <h3 class="game-title">Hora del Cuento</h3>
+                    <p class="game-description">
+                        Crea y narra historias interactivas personalizadas con personajes y escenarios diversos.
+                    </p>
+                    <div class="game-meta">
+                        <span class="age-badge">7-15 años</span>
+                        <div class="difficulty">
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star">★</span>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li>Historias personalizables</li>
+                        <li>Múltiples personajes</li>
+                        <li>Narración con voces</li>
+                        <li>Secuencias lógicas</li>
+                    </ul>
+                    <button class="play-button" onclick="launchGame('stories')">
+                        🎮 Jugar Ahora
+                    </button>
+                </div>
+
+                <!-- Coming Soon Games -->
+                <div class="game-card coming-soon" data-age="preschool">
+                    <div class="game-icon">🎤</div>
+                    <h3 class="game-title">Karaoke Terapéutico</h3>
+                    <p class="game-description">
+                        Mejora la pronunciación y fluidez verbal cantando canciones adaptadas.
+                    </p>
+                    <div class="game-meta">
+                        <span class="age-badge">Próximamente</span>
+                        <div class="difficulty">
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star empty">★</span>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li>Canciones terapéuticas</li>
+                        <li>Reconocimiento de voz</li>
+                        <li>Ejercicios de respiración</li>
+                        <li>Ritmo y pronunciación</li>
+                    </ul>
+                    <button class="play-button">
+                        ⏳ Próximamente
+                    </button>
+                </div>
+
+                <div class="game-card coming-soon" data-age="teen">
+                    <div class="game-icon">💬</div>
+                    <h3 class="game-title">Conversaciones Virtuales</h3>
+                    <p class="game-description">
+                        Practica habilidades conversacionales con avatares inteligentes en situaciones reales.
+                    </p>
+                    <div class="game-meta">
+                        <span class="age-badge">Próximamente</span>
+                        <div class="difficulty">
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star">★</span>
+                            <span class="difficulty-star">★</span>
+                        </div>
+                    </div>
+                    <ul class="game-features">
+                        <li>IA conversacional</li>
+                        <li>Situaciones sociales</li>
+                        <li>Retroalimentación en tiempo real</li>
+                        <li>Progreso personalizado</li>
+                    </ul>
+                    <button class="play-button">
+                        ⏳ Próximamente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Section -->
+    <section class="progress-section">
+        <div class="container">
+            <h2 class="section-title">Cómo Funciona el Progreso</h2>
+            <p class="section-subtitle">
+                Nuestro sistema de seguimiento adapta la dificultad según el progreso individual de cada niño.
+            </p>
+            
+            <div class="progress-grid">
+                <div class="progress-item">
+                    <div class="progress-icon">📊</div>
+                    <h3 class="progress-title">Evaluación Inicial</h3>
+                    <p class="progress-description">
+                        El sistema evalúa el nivel actual del niño en cada área de comunicación.
+                    </p>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-icon">🎯</div>
+                    <h3 class="progress-title">Objetivos Personalizados</h3>
+                    <p class="progress-description">
+                        Se establecen metas específicas basadas en las necesidades individuales.
+                    </p>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-icon">📈</div>
+                    <h3 class="progress-title">Seguimiento Continuo</h3>
+                    <p class="progress-description">
+                        Monitoreo constante del progreso con reportes detallados para padres.
+                    </p>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-icon">🏆</div>
+                    <h3 class="progress-title">Logros y Recompensas</h3>
+                    <p class="progress-description">
+                        Sistema de reconocimiento que motiva y celebra cada avance conseguido.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tips Section -->
+    <section class="tips-section">
+        <div class="container">
+            <h2 class="section-title">Consejos para Padres</h2>
+            <p class="section-subtitle">
+                Maximiza el beneficio de los juegos con estas estrategias respaldadas por terapeutas.
+            </p>
+            
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-icon">⏰</div>
+                    <h3 class="tip-title">Sesiones Cortas y Regulares</h3>
+                    <p class="tip-content">
+                        Juega de 10-15 minutos diarios. La consistencia es más importante que la duración. 
+                        Establece una rutina diaria que el niño pueda anticipar.
+                    </p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">👥</div>
+                    <h3 class="tip-title">Participa Activamente</h3>
+                    <p class="tip-content">
+                        Juega junto a tu hijo, haz preguntas, celebra sus logros y convierte cada sesión 
+                        en una experiencia social positiva.
+                    </p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">🔄</div>
+                    <h3 class="tip-title">Repite y Refuerza</h3>
+                    <p class="tip-content">
+                        Practica las mismas palabras y conceptos en diferentes contextos. La repetición 
+                        ayuda a consolidar el aprendizaje y transferirlo a situaciones reales.
+                    </p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">📱</div>
+                    <h3 class="tip-title">Extiende más allá de la Pantalla</h3>
+                    <p class="tip-content">
+                        Usa las palabras y conceptos aprendidos en los juegos durante actividades 
+                        cotidianas como comer, pasear o jugar con juguetes físicos.
+                    </p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">🎉</div>
+                    <h3 class="tip-title">Celebra Todos los Intentos</h3>
+                    <p class="tip-content">
+                        Reconoce y celebra cada esfuerzo, no solo los éxitos. El refuerzo positivo 
+                        aumenta la motivación y la autoestima del niño.
+                    </p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">🎨</div>
+                    <h3 class="tip-title">Personaliza la Experiencia</h3>
+                    <p class="tip-content">
+                        Ajusta la velocidad, dificultad y tipo de contenido según los intereses 
+                        específicos de tu hijo para mantener su atención y motivación.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 JuegoTEA - Comunicación y Lenguaje</p>
+            <p>Desarrollado con ❤️ para familias con autismo</p>
+        </div>
+    </footer>
+
+    <script>
+        // Global variables
+        let currentAgeFilter = 'preschool';
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            filterByAge('preschool');
+            addInteractivity();
+        });
+
+        // Age filtering
+        function filterByAge(age) {
+            currentAgeFilter = age;
+            
+            // Update active filter button
+            document.querySelectorAll('.age-filter').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-age="${age}"]`).classList.add('active');
+            
+            // Filter game cards
+            const gameCards = document.querySelectorAll('.game-card');
+            gameCards.forEach(card => {
+                const cardAges = card.dataset.age;
+                if (age === 'all' || cardAges.includes(age)) {
+                    card.style.display = 'block';
+                    card.style.animation = 'fadeInUp 0.5s ease-out';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Update visible games count
+            const visibleGames = document.querySelectorAll('.game-card[style*="block"]').length;
+            showNotification(`Mostrando ${visibleGames} juegos para ${getAgeLabel(age)}`);
+        }
+
+        // Get age label
+        function getAgeLabel(age) {
+            const labels = {
+                'all': 'todas las edades',
+                'preschool': '4-6 años',
+                'school': '6-12 años',
+                'teen': '12+ años'
+            };
+            return labels[age] || labels.preschool;
+        }
+
+        // Launch game
+        function launchGame(gameType) {
+            showLoading();
+            
+            // Game URLs mapping
+            const gameUrls = {
+                'reading': '../juegos/lectura-interactiva.html',
+                'colors': '../juegos/colores-posiciones.html',
+                'animals': '../juegos/animales-granja.html',
+                'letters': '../juegos/letras-abecedario.html',
+                'words': '../juegos/constructor-palabras.html',
+                'stories': '../juegos/hora-cuento.html'
+            };
+            
+            // Get game info
+            const gameInfo = getGameInfo(gameType);
+            
+            // Simulate loading time
+            setTimeout(() => {
+                hideLoading();
+                
+                if (gameUrls[gameType]) {
+                    // In a real implementation, you would navigate to the game
+                    if (confirm(`¿Quieres jugar "${gameInfo.title}"?\n\n${gameInfo.description}\n\n¡Prepárate para divertirte y aprender!`)) {
+                        showNotification(`Cargando ${gameInfo.title}...`);
+                        // window.location.href = gameUrls[gameType];
+                        
+                        // For demo purposes, show message
+                        setTimeout(() => {
+                            alert(`¡Genial! Aquí se cargaría "${gameInfo.title}".\n\nEn la versión completa, esto abriría el juego interactivo.`);
+                        }, 1000);
+                    }
+                } else {
+                    alert('Este juego estará disponible próximamente. ¡Mantente atento a las actualizaciones!');
+                }
+            }, 1500);
+        }
+
+        // Get game information
+        function getGameInfo(gameType) {
+            const games = {
+                'reading': {
+                    title: 'Aprende a Leer',
+                    description: 'Juego interactivo de lectura con historias progresivas y vocabulario visual.'
+                },
+                'colors': {
+                    title: 'Colores y Posiciones',
+                    description: 'Aprende colores básicos y conceptos espaciales de manera divertida.'
+                },
+                'animals': {
+                    title: 'Animales de la Granja',
+                    description: 'Identifica animales, aprende sus sonidos y clasifica por tamaños.'
+                },
+                'letters': {
+                    title: 'Aventura de las Letras',
+                    description: 'Aprende el abecedario con animaciones y actividades de trazado.'
+                },
+                'words': {
+                    title: 'Constructor de Palabras',
+                    description: 'Forma palabras arrastrando sílabas y mejora la ortografía.'
+                },
+                'stories': {
+                    title: 'Hora del Cuento',
+                    description: 'Crea y narra historias interactivas personalizadas.'
+                }
+            };
+            
+            return games[gameType] || { title: 'Juego', description: 'Juego educativo interactivo' };
+        }
+
+        // Go back to main page
+        function goBack() {
+            if (confirm('¿Quieres volver a la página principal?')) {
+                // window.location.href = '../index.html';
+                showNotification('Regresando a la página principal...');
+                setTimeout(() => {
+                    alert('En la versión completa, esto regresaría a la página principal.');
+                }, 1000);
+            }
+        }
+
+        // Add interactivity
+        function addInteractivity() {
+            // Add hover effects to game cards
+            const gameCards = document.querySelectorAll('.game-card:not(.coming-soon)');
+            gameCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key >= '1' && e.key <= '6') {
+                    const gameIndex = parseInt(e.key) - 1;
+                    const gameCards = document.querySelectorAll('.game-card[data-game]');
+                    if (gameCards[gameIndex]) {
+                        const gameType = gameCards[gameIndex].dataset.game;
+                        launchGame(gameType);
+                    }
+                }
+            });
+
+            // Add voice synthesis for titles when clicked
+            document.querySelectorAll('.game-title').forEach(title => {
+                title.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    speakText(this.textContent);
+                });
+            });
+        }
+
+        // Speech synthesis
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.8;
+                utterance.pitch = 1.1;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Loading functions
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        // Notification system
+        function showNotification(message) {
+            let notification = document.getElementById('notification');
+            if (!notification) {
+                notification = document.createElement('div');
+                notification.id = 'notification';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: linear-gradient(45deg, #4299e1, #63b3ed);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                    z-index: 1001;
+                    transform: translateX(400px);
+                    transition: transform 0.3s ease;
+                    font-weight: bold;
+                    max-width: 300px;
+                `;
+                document.body.appendChild(notification);
+            }
+
+            notification.textContent = message;
+            notification.style.transform = 'translateX(0)';
+
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+            }, 3000);
+        }
+
+        // Progress tracking (simulated)
+        function trackProgress(gameType, score) {
+            const progress = JSON.parse(localStorage.getItem('juegoTEAProgress') || '{}');
+            if (!progress.communication) progress.communication = {};
+            if (!progress.communication[gameType]) progress.communication[gameType] = [];
+            
+            progress.communication[gameType].push({
+                score: score,
+                date: new Date().toISOString(),
+                duration: Math.floor(Math.random() * 600) + 300 // 5-15 minutes
+            });
+            
+            localStorage.setItem('juegoTEAProgress', JSON.stringify(progress));
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            .game-card {
+                animation: fadeInUp 0.6s ease-out;
+            }
+            
+            .game-card:nth-child(1) { animation-delay: 0.1s; }
+            .game-card:nth-child(2) { animation-delay: 0.2s; }
+            .game-card:nth-child(3) { animation-delay: 0.3s; }
+            .game-card:nth-child(4) { animation-delay: 0.4s; }
+            .game-card:nth-child(5) { animation-delay: 0.5s; }
+            .game-card:nth-child(6) { animation-delay: 0.6s; }
+            
+            .game-card[data-game]:focus {
+                outline: 3px solid #4299e1;
+                outline-offset: 3px;
+            }
+            
+            @media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add welcome message
+        setTimeout(() => {
+            showNotification('¡Bienvenido a Comunicación y Lenguaje! 💬');
+        }, 1000);
+
+        // Add service worker registration for offline use
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registrado');
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker falló');
+                    });
+            });
+        }
+
+        // Initialize tooltips for accessibility
+        document.querySelectorAll('.game-card').forEach(card => {
+            const title = card.querySelector('.game-title').textContent;
+            const description = card.querySelector('.game-description').textContent;
+            card.setAttribute('title', `${title}: ${description}`);
+            card.setAttribute('role', 'button');
+            card.setAttribute('tabindex', '0');
+            
+            // Add keyboard support
+            card.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const gameType = this.dataset.game;
+                    if (gameType) {
+                        launchGame(gameType);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -551,19 +551,19 @@
 
             <div class="categories-grid">
                 <!-- Communication Games -->
-                <div class="category-card communication" onclick="selectCategory('communication')">
+                <div class="category-card communication" onclick="goToCommunication()">
                     <span class="card-icon">💬</span>
                     <h3 class="card-title">Comunicación y Lenguaje</h3>
                     <p class="card-description">
                         Desarrolla habilidades de comunicación verbal y no verbal mediante juegos interactivos de vocabulario, lectura y expresión.
                     </p>
                     <ul class="card-features">
-                        <li>Juegos de lectura interactiva</li>
-                        <li>Vocabulario con imágenes</li>
+                        <li>6 juegos interactivos disponibles</li>
+                        <li>Vocabulario con imágenes y sonidos</li>
                         <li>Sistemas AAC simplificados</li>
-                        <li>Narración de historias</li>
+                        <li>Narración de historias personalizadas</li>
                     </ul>
-                    <button class="card-button">Explorar Juegos</button>
+                    <button class="card-button">🎮 Explorar 6 Juegos</button>
                 </div>
 
                 <!-- Social Skills -->
@@ -579,7 +579,7 @@
                         <li>Situaciones sociales</li>
                         <li>Juegos cooperativos</li>
                     </ul>
-                    <button class="card-button">Explorar Juegos</button>
+                    <button class="card-button">⏳ Próximamente</button>
                 </div>
 
                 <!-- Cognitive Skills -->
@@ -595,7 +595,7 @@
                         <li>Memoria y concentración</li>
                         <li>Clasificación y patrones</li>
                     </ul>
-                    <button class="card-button">Explorar Juegos</button>
+                    <button class="card-button">⏳ Próximamente</button>
                 </div>
 
                 <!-- Sensory Integration -->
@@ -611,7 +611,7 @@
                         <li>Texturas virtuales</li>
                         <li>Ejercicios de relajación</li>
                     </ul>
-                    <button class="card-button">Explorar Juegos</button>
+                    <button class="card-button">⏳ Próximamente</button>
                 </div>
 
                 <!-- Motor Skills -->
@@ -627,7 +627,7 @@
                         <li>Movimientos dirigidos</li>
                         <li>Equilibrio virtual</li>
                     </ul>
-                    <button class="card-button">Explorar Juegos</button>
+                    <button class="card-button">⏳ Próximamente</button>
                 </div>
 
                 <!-- Emotional Regulation -->
@@ -643,7 +643,7 @@
                         <li>Autorregulación</li>
                         <li>Mindfulness para niños</li>
                     </ul>
-                    <button class="card-button">Explorar Juegos</button>
+                    <button class="card-button">⏳ Próximamente</button>
                 </div>
             </div>
         </div>
@@ -799,18 +799,30 @@
             }, 1500);
         }
 
-        // Launch specific game
+        // Launch specific game (updated for better UX)
         function launchGame(category, age) {
+            if (category === 'communication') {
+                goToCommunication();
+                return;
+            }
+
             const gameInfo = getGameInfo(category, age);
             
-            if (confirm(`¿Quieres comenzar con "${gameInfo.title}"?\n\n${gameInfo.description}`)) {
-                // Here you would redirect to the specific game
-                showNotification(`Cargando ${gameInfo.title}...`);
-                
-                // For demo purposes, we'll just show a message
-                setTimeout(() => {
-                    alert(`¡Aquí se cargaría el juego "${gameInfo.title}"!\n\nEn la implementación real, esto redirigiría a la página del juego específico.`);
-                }, 1000);
+            // For other categories, show coming soon message
+            const categoryNames = {
+                social: "Habilidades Sociales",
+                cognitive: "Habilidades Cognitivas",
+                sensory: "Integración Sensorial", 
+                motor: "Habilidades Motoras",
+                emotional: "Regulación Emocional"
+            };
+
+            const categoryName = categoryNames[category] || "Esta categoría";
+            
+            if (confirm(`${categoryName} estará disponible próximamente.\n\n¡Mientras tanto, puedes explorar Comunicación y Lenguaje que ya está completa!\n\n¿Quieres ir allí ahora?`)) {
+                goToCommunication();
+            } else {
+                showNotification('¡Gracias por tu interés! Te mantendremos informado 📬');
             }
         }
 
