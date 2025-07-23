@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐄 Animales de la Granja - JuegoTEA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #38b2ac 0%, #4fd1c7 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(56, 178, 172, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Game Container */
+        .game-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* Progress Section */
+        .progress-section {
+            margin-bottom: 2rem;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 15px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .level-info {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .score-info {
+            font-size: 1.1rem;
+            color: #38b2ac;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #38b2ac, #4fd1c7);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        /* Game Area */
+        .game-area {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .game-mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            border: 2px solid #38b2ac;
+            background: white;
+            color: #38b2ac;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .mode-btn.active {
+            background: #38b2ac;
+            color: white;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Animal Display */
+        .animal-display {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: #f7fafc;
+            border-radius: 15px;
+            border: 3px solid #e2e8f0;
+        }
+
+        .animal-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .animal-emoji {
+            font-size: 8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 1rem;
+            border-radius: 20px;
+        }
+
+        .animal-emoji:hover {
+            transform: scale(1.1);
+            background: #bee3f8;
+        }
+
+        .animal-info {
+            flex: 1;
+            min-width: 300px;
+            text-align: left;
+        }
+
+        .animal-name {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .animal-description {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .animal-facts {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 4px solid #38b2ac;
+        }
+
+        .animal-facts h4 {
+            color: #38b2ac;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Quiz Mode */
+        .quiz-container {
+            margin: 2rem 0;
+        }
+
+        .quiz-question {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: #2d3748;
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .quiz-option {
+            padding: 1.5rem;
+            border: 3px solid #e2e8f0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            text-align: center;
+        }
+
+        .quiz-option:hover {
+            border-color: #38b2ac;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .quiz-option.selected {
+            border-color: #38b2ac;
+            background: #e6fffa;
+        }
+
+        .quiz-option.correct {
+            border-color: #48bb78;
+            background: #f0fff4;
+            animation: correctPulse 0.6s ease-out;
+        }
+
+        .quiz-option.incorrect {
+            border-color: #e53e3e;
+            background: #fed7d7;
+            animation: shake 0.5s ease-out;
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .option-emoji {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-text {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        /* Size Sorting Mode */
+        .sorting-container {
+            margin: 2rem 0;
+        }
+
+        .sorting-instruction {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            color: #2d3748;
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+
+        .sorting-areas {
+            display: flex;
+            justify-content: space-around;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .sorting-area {
+            flex: 1;
+            min-width: 200px;
+            min-height: 200px;
+            border: 3px dashed #a0aec0;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .sorting-area.drop-zone {
+            border-color: #38b2ac;
+            background: rgba(56, 178, 172, 0.1);
+        }
+
+        .sorting-area h3 {
+            font-size: 1.2rem;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .sortable-animals {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .sortable-animal {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .sortable-animal:active {
+            cursor: grabbing;
+        }
+
+        .sortable-animal.dragging {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
+        /* Controls */
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #38b2ac, #4fd1c7);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #48bb78, #68d391);
+            color: white;
+        }
+
+        .btn-accent {
+            background: linear-gradient(45deg, #ed8936, #f6ad55);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Feedback Messages */
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .feedback.success {
+            border: 3px solid #48bb78;
+        }
+
+        .feedback.error {
+            border: 3px solid #e53e3e;
+        }
+
+        .feedback-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .feedback-message {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        /* Level Complete */
+        .level-complete {
+            background: linear-gradient(135deg, #48bb78, #68d391);
+            color: white;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            margin: 2rem 0;
+            display: none;
+        }
+
+        .level-complete.show {
+            display: block;
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .game-container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+
+            .animal-card {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .animal-emoji {
+                font-size: 6rem;
+            }
+
+            .animal-name {
+                font-size: 2rem;
+            }
+
+            .quiz-options {
+                grid-template-columns: 1fr;
+            }
+
+            .sorting-areas {
+                flex-direction: column;
+            }
+
+            .sortable-animals {
+                gap: 0.5rem;
+            }
+
+            .sortable-animal {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #38b2ac;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">
+                🐄 Animales de la Granja
+            </div>
+            <button class="back-btn" onclick="goBack()">
+                ← Volver
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Game Container -->
+    <div class="game-container">
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <div class="progress-info">
+                <div class="level-info">
+                    <span id="levelDisplay">Modo Exploración</span>
+                    <span style="margin-left: 1rem; color: #718096;">Conoce los Animales</span>
+                </div>
+                <div class="score-info">
+                    ⭐ Puntos: <span id="scoreDisplay">0</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div style="margin-top: 0.5rem; text-align: center; color: #718096; font-size: 0.9rem;">
+                <span id="progressText">Explora y aprende sobre los animales</span>
+            </div>
+        </div>
+
+        <!-- Game Mode Selector -->
+        <div class="game-mode-selector">
+            <button class="mode-btn active" onclick="setGameMode('explore')" id="exploreBtn">
+                🔍 Explorar
+            </button>
+            <button class="mode-btn" onclick="setGameMode('sounds')" id="soundsBtn">
+                🔊 Sonidos
+            </button>
+            <button class="mode-btn" onclick="setGameMode('quiz')" id="quizBtn">
+                ❓ Quiz
+            </button>
+            <button class="mode-btn" onclick="setGameMode('sorting')" id="sortingBtn">
+                📏 Clasificar
+            </button>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-area">
+            <!-- Exploration Mode -->
+            <div id="exploreMode" class="game-mode">
+                <div class="animal-display">
+                    <div class="animal-card" id="animalCard">
+                        <!-- Content will be generated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sounds Mode -->
+            <div id="soundsMode" class="game-mode" style="display: none;">
+                <div class="animal-display">
+                    <div style="text-align: center;">
+                        <h3 style="margin-bottom: 2rem; color: #2d3748;">Haz clic en el animal para escuchar su sonido</h3>
+                        <div id="soundsGrid">
+                            <!-- Animal sound buttons will be generated -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Mode -->
+            <div id="quizMode" class="game-mode" style="display: none;">
+                <div class="quiz-container">
+                    <div class="quiz-question" id="quizQuestion">
+                        ¿Qué animal hace este sonido: "Muu"?
+                    </div>
+                    <div class="quiz-options" id="quizOptions">
+                        <!-- Quiz options will be generated -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sorting Mode -->
+            <div id="sortingMode" class="game-mode" style="display: none;">
+                <div class="sorting-container">
+                    <div class="sorting-instruction">
+                        Arrastra los animales a la categoría correcta según su tamaño
+                    </div>
+                    <div class="sorting-areas">
+                        <div class="sorting-area" data-size="pequeño">
+                            <h3>🐣 Pequeños</h3>
+                            <div class="sorted-animals" id="small-animals"></div>
+                        </div>
+                        <div class="sorting-area" data-size="mediano">
+                            <h3>🐕 Medianos</h3>
+                            <div class="sorted-animals" id="medium-animals"></div>
+                        </div>
+                        <div class="sorting-area" data-size="grande">
+                            <h3>🐄 Grandes</h3>
+                            <div class="sorted-animals" id="large-animals"></div>
+                        </div>
+                    </div>
+                    <div class="sortable-animals" id="sortableAnimals">
+                        <!-- Sortable animals will be generated -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Controls -->
+            <div class="game-controls">
+                <button class="btn btn-primary" onclick="playAnimalSound()" id="soundBtn">
+                    🔊 Escuchar Sonido
+                </button>
+                <button class="btn btn-secondary" onclick="showAnimalFacts()" id="factsBtn">
+                    📚 Datos Curiosos
+                </button>
+                <button class="btn btn-accent" onclick="nextAnimal()" id="nextBtn">
+                    ➡️ Siguiente Animal
+                </button>
+            </div>
+
+            <!-- Instructions -->
+            <div style="margin-top: 1rem; color: #718096; font-size: 0.9rem;">
+                🐾 Explora diferentes modos para aprender sobre los animales de la granja
+            </div>
+        </div>
+
+        <!-- Level Complete Message -->
+        <div class="level-complete" id="levelComplete">
+            <h2>🎉 ¡Excelente Trabajo!</h2>
+            <p>Has explorado todos los animales de la granja.</p>
+            <button class="btn btn-primary" onclick="restartExploration()">
+                🔄 Explorar de Nuevo
+            </button>
+        </div>
+    </div>
+
+    <!-- Feedback Messages -->
+    <div class="feedback" id="feedback">
+        <div class="feedback-icon" id="feedbackIcon">✅</div>
+        <div class="feedback-message" id="feedbackMessage">¡Excelente!</div>
+        <div id="feedbackSubtext"></div>
+    </div>
+
+    <script src="../js/animales-game.js"></script>
+</body>
+</html>
