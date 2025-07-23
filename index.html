@@ -757,6 +757,105 @@
         let selectedAge = 'preschool';
         let selectedCategory = null;
 
+        // Navigation functions - PRIORITY FUNCTIONS
+        function goToCommunication() {
+            console.log('goToCommunication called'); // Debug
+            showLoading();
+            speakText("Entrando en Comunicación y Lenguaje");
+            
+            setTimeout(() => {
+                hideLoading();
+                // In production, this would redirect to the communication page
+                // window.location.href = './categorias/comunicacion-lenguaje.html';
+                
+                // For demo purposes, we'll show a message
+                if (confirm('¿Quieres ir a la página de Comunicación y Lenguaje?\n\n• 6 juegos interactivos\n• Adaptados por edades\n• Consejos para padres\n• Seguimiento de progreso')) {
+                    showNotification('¡Redirigiendo a Comunicación y Lenguaje! 💬');
+                    // Simulate navigation
+                    setTimeout(() => {
+                        alert('En la versión completa, esto abriría:\n./categorias/comunicacion-lenguaje.html\n\n¡La página está lista para usar!');
+                    }, 1000);
+                } else {
+                    showNotification('Puedes explorar otras categorías 🎮');
+                }
+            }, 1000);
+        }
+
+        // Enhanced category selection for other categories
+        function selectCategory(category) {
+            console.log('selectCategory called with:', category); // Debug
+            
+            if (category === 'communication') {
+                goToCommunication();
+                return;
+            }
+
+            selectedCategory = category;
+            showLoading();
+            
+            // Category names for feedback
+            const categoryNames = {
+                social: "Habilidades Sociales",
+                cognitive: "Habilidades Cognitivas", 
+                sensory: "Integración Sensorial",
+                motor: "Habilidades Motoras",
+                emotional: "Regulación Emocional"
+            };
+            
+            const categoryName = categoryNames[category];
+            speakText(`Has seleccionado ${categoryName}`);
+            
+            // Simulate loading and show status
+            setTimeout(() => {
+                hideLoading();
+                
+                // Show coming soon message for other categories
+                if (confirm(`¿Quieres acceder a "${categoryName}"?\n\nEsta sección estará disponible próximamente.\n¿Te gustaría ser notificado cuando esté lista?`)) {
+                    showNotification(`¡Te notificaremos cuando ${categoryName} esté disponible! 🔔`);
+                    
+                    // You could implement email subscription here
+                    setTimeout(() => {
+                        const email = prompt('Déjanos tu email para notificarte (opcional):');
+                        if (email && email.includes('@')) {
+                            showNotification('¡Gracias! Te contactaremos pronto 📧');
+                            // Here you would save the email for notifications
+                        }
+                    }, 1500);
+                } else {
+                    showNotification('Puedes probar Comunicación y Lenguaje mientras tanto 💬');
+                }
+            }, 1500);
+        }
+
+        // Launch specific game (updated for better UX)
+        function launchGame(category, age) {
+            console.log('launchGame called with:', category, age); // Debug
+            
+            if (category === 'communication') {
+                goToCommunication();
+                return;
+            }
+
+            const gameInfo = getGameInfo(category, age);
+            
+            // For other categories, show coming soon message
+            const categoryNames = {
+                social: "Habilidades Sociales",
+                cognitive: "Habilidades Cognitivas",
+                sensory: "Integración Sensorial", 
+                motor: "Habilidades Motoras",
+                emotional: "Regulación Emocional"
+            };
+
+            const categoryName = categoryNames[category] || "Esta categoría";
+            
+            if (confirm(`${categoryName} estará disponible próximamente.\n\n¡Mientras tanto, puedes explorar Comunicación y Lenguaje que ya está completa!\n\n¿Quieres ir allá ahora?`)) {
+                goToCommunication();
+            } else {
+                showNotification('¡Gracias por tu interés! Te mantendremos informado 📬');
+            }
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             animateCounters();
