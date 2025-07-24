@@ -172,6 +172,7 @@
                 <li><a href="#edades" class="nav-link">Por Edades</a></li>
                 <li><a href="#recursos" class="nav-link">Recursos</a></li>
                 <li><a href="#contacto" class="nav-link">Contacto</a></li>
+                <li><button id="installButton" style="display: none;">📲 Instalar App</button></li>
             </ul>
             <!-- Mobile menu button -->
             <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menú de navegación">
@@ -416,5 +417,38 @@
     <!-- JavaScript -->
     <script src="./js/main.js"></script>
     <script src="./js/index.js"></script>
+    <script>
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Evita que se muestre el banner automático
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Muestra el botón
+            const installBtn = document.getElementById('installButton');
+            installBtn.style.display = 'inline-block';
+
+            installBtn.addEventListener('click', async () => {
+                // Muestra el prompt de instalación
+                deferredPrompt.prompt();
+
+                // Espera la respuesta del usuario
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Instalación: ${outcome}`);
+
+                // Limpia el evento
+                deferredPrompt = null;
+                installBtn.style.display = 'none';
+            });
+        });
+
+        // Opcional: Oculta el botón si la app ya está instalada
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA instalada');
+            document.getElementById('installButton').style.display = 'none';
+        });
+    </script>
+
 </body>
 </html>
