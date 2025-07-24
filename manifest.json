@@ -1,25 +1,112 @@
 ﻿{
-  "name": "JuegoTEA - Juegos Interactivos para Autismo",
+  "name": "JuegoTEA - Herramientas Interactivas para Autismo",
   "short_name": "JuegoTEA",
-  "description": "Herramientas educativas interactivas para niños con autismo",
+  "description": "Plataforma educativa gratuita con juegos interactivos para niños con Trastorno del Espectro Autista (TEA)",
   "version": "1.0.0",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#667eea",
   "theme_color": "#4299e1",
-  "orientation": "portrait",
+  "categories": ["education", "games", "health", "medical"],
+  "lang": "es",
+  "dir": "ltr",
   "icons": [
     {
-      "src": "assets/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "/assets/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "assets/icons/icon-512x512.png", 
+      "src": "/assets/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "categories": ["education", "games", "accessibility"],
-  "lang": "es"
+  "shortcuts": [
+    {
+      "name": "Comunicación y Lenguaje",
+      "short_name": "Comunicación",
+      "description": "Acceso directo a juegos de comunicación",
+      "url": "/categorias/comunicacion-lenguaje.html",
+      "icons": [
+        {
+          "src": "/assets/icons/comunicacion-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Habilidades Sociales",
+      "short_name": "Social",
+      "description": "Acceso directo a juegos sociales",
+      "url": "/categorias/habilidades-sociales.html",
+      "icons": [
+        {
+          "src": "/assets/icons/social-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/screenshots/homepage-mobile.png",
+      "sizes": "320x640",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "Página principal en móvil"
+    },
+    {
+      "src": "/assets/screenshots/homepage-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Página principal en escritorio"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
 }

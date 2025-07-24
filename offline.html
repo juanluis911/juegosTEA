@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sin Conexión - JuegoTEA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .offline-container {
+            text-align: center;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .offline-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .features-list {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .features-list h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #ffd700;
+        }
+
+        .features-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .features-list li::before {
+            content: '✓';
+            color: #48bb78;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .retry-btn {
+            background: linear-gradient(45deg, #48bb78, #68d391);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .home-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .connection-status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .connection-status.online {
+            background: rgba(72, 187, 120, 0.2);
+            border: 1px solid rgba(72, 187, 120, 0.5);
+            display: block;
+        }
+
+        .connection-status.offline {
+            background: rgba(229, 62, 62, 0.2);
+            border: 1px solid rgba(229, 62, 62, 0.5);
+            display: block;
+        }
+
+        .tips {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        .tips h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 480px) {
+            .offline-container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .offline-icon {
+                font-size: 3rem;
+            }
+
+            .retry-btn, .home-btn {
+                display: block;
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon animation">📱💫</div>
+        <h1>¡Estás sin conexión!</h1>
+        <p>
+            No te preocupes, JuegoTEA funciona offline. Muchas funciones están disponibles 
+            incluso sin conexión a internet.
+        </p>
+
+        <div class="features-list">
+            <h3>🎮 Disponible sin conexión:</h3>
+            <ul>
+                <li>Navegación por la aplicación</li>
+                <li>Página principal completa</li>
+                <li>Información de categorías</li>
+                <li>Consejos para padres</li>
+                <li>Juegos ya visitados</li>
+            </ul>
+        </div>
+
+        <div class="connection-status" id="connectionStatus">
+            <span id="statusText">Verificando conexión...</span>
+        </div>
+
+        <div>
+            <button class="retry-btn" onclick="checkConnection()">
+                🔄 Verificar Conexión
+            </button>
+            <a href="/" class="home-btn">
+                🏠 Ir al Inicio
+            </a>
+        </div>
+
+        <div class="tips">
+            <h4>💡 Consejos:</h4>
+            <p>
+                • Verifica tu conexión WiFi o datos móviles<br>
+                • Intenta recargar la página en unos momentos<br>
+                • Los juegos visitados anteriormente funcionan offline<br>
+                • Instala la app para mejor experiencia offline
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Verificar estado de conexión
+        function updateConnectionStatus() {
+            const status = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('statusText');
+            
+            if (navigator.onLine) {
+                status.className = 'connection-status online';
+                statusText.textContent = '🟢 Conexión detectada - Puedes navegar normalmente';
+                
+                // Auto-redirigir después de 2 segundos si hay conexión
+                setTimeout(() => {
+                    if (navigator.onLine) {
+                        window.location.href = '/';
+                    }
+                }, 2000);
+            } else {
+                status.className = 'connection-status offline';
+                statusText.textContent = '🔴 Sin conexión - Modo offline activo';
+            }
+        }
+
+        function checkConnection() {
+            updateConnectionStatus();
+            
+            if (navigator.onLine) {
+                // Intentar recargar la página
+                window.location.reload();
+            } else {
+                // Mostrar mensaje
+                alert('Aún no hay conexión. Revisa tu WiFi o datos móviles e intenta de nuevo.');
+            }
+        }
+
+        // Escuchar cambios de conexión
+        window.addEventListener('online', function() {
+            console.log('🌐 Conexión restaurada');
+            updateConnectionStatus();
+        });
+
+        window.addEventListener('offline', function() {
+            console.log('📵 Conexión perdida');
+            updateConnectionStatus();
+        });
+
+        // Verificar conexión al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            updateConnectionStatus();
+            
+            // Verificar cada 5 segundos
+            setInterval(updateConnectionStatus, 5000);
+        });
+
+        // PWA: Detectar si está instalada
+        if (window.matchMedia('(display-mode: standalone)').matches || 
+            window.navigator.standalone === true) {
+            console.log('📱 Ejecutándose como PWA');
+            
+            // Añadir mensaje específico para PWA
+            const pwaMessage = document.createElement('div');
+            pwaMessage.style.cssText = `
+                background: rgba(255,255,255,0.1);
+                padding: 15px;
+                border-radius: 10px;
+                margin: 15px 0;
+                font-size: 0.9rem;
+                border: 1px solid rgba(255,255,255,0.2);
+            `;
+            pwaMessage.innerHTML = `
+                <strong>📱 App Instalada</strong><br>
+                Estás usando la versión instalada de JuegoTEA. 
+                Muchas funciones están disponibles sin conexión.
+            `;
+            
+            document.querySelector('.offline-container').insertBefore(
+                pwaMessage, 
+                document.querySelector('.features-list')
+            );
+        }
+
+        // Analytics para modo offline (si está disponible)
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'offline_page_view', {
+                event_category: 'PWA',
+                event_label: 'Offline Mode'
+            });
+        }
+
+        console.log('📱 Página offline cargada');
+    </script>
+</body>
+</html>
