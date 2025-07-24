@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q-CHAT - Evaluación Temprana TEA - JuegoTEA</title>
+    
+    <!-- Meta tags para SEO y PWA -->
+    <meta name="description" content="Q-CHAT: Herramienta científica de evaluación temprana para el espectro autista en niños de 18-24 meses">
+    <meta name="theme-color" content="#4299e1">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="./css/qchat-quiz.css">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Preparando evaluación...</div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">
+                🧠 Q-CHAT - Evaluación Temprana
+            </div>
+            <button class="back-btn" onclick="goBack()">
+                ← Volver
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <div class="quiz-container">
+        <!-- Introduction Section -->
+        <section class="intro-section" id="introSection">
+            <div class="intro-content">
+                <div class="intro-icon">🔬</div>
+                <h1>Q-CHAT - Evaluación Temprana del Desarrollo</h1>
+                <p class="intro-subtitle">
+                    Herramienta científica validada para evaluar el desarrollo en niños de 18-24 meses
+                </p>
+                
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-icon">⏱️</div>
+                        <h3>Duración</h3>
+                        <p>10-15 minutos</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-icon">📊</div>
+                        <h3>Preguntas</h3>
+                        <p>25 observaciones</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-icon">🎯</div>
+                        <h3>Edad</h3>
+                        <p>18-24 meses</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-icon">🔬</div>
+                        <h3>Validación</h3>
+                        <p>91-95% precisión</p>
+                    </div>
+                </div>
+
+                <div class="disclaimer">
+                    <div class="disclaimer-icon">⚠️</div>
+                    <div class="disclaimer-content">
+                        <h4>Importante:</h4>
+                        <p>
+                            Esta herramienta es únicamente para evaluación preliminar y <strong>NO constituye un diagnóstico médico</strong>. 
+                            Los resultados deben ser interpretados por un profesional de la salud especializado en desarrollo infantil.
+                        </p>
+                    </div>
+                </div>
+
+                <button class="start-btn" onclick="startQuiz()">
+                    🚀 Comenzar Evaluación
+                </button>
+            </div>
+        </section>
+
+        <!-- Age Verification Section -->
+        <section class="age-section" id="ageSection" style="display: none;">
+            <div class="section-content">
+                <h2>Información del Niño</h2>
+                <p>Por favor, proporciona información básica para personalizar la evaluación:</p>
+                
+                <div class="form-group">
+                    <label for="childAge">Edad del niño en meses:</label>
+                    <select id="childAge" required>
+                        <option value="">Seleccionar edad...</option>
+                        <option value="18">18 meses</option>
+                        <option value="19">19 meses</option>
+                        <option value="20">20 meses</option>
+                        <option value="21">21 meses</option>
+                        <option value="22">22 meses</option>
+                        <option value="23">23 meses</option>
+                        <option value="24">24 meses</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="childGender">Género del niño:</label>
+                    <select id="childGender">
+                        <option value="">Seleccionar...</option>
+                        <option value="male">Masculino</option>
+                        <option value="female">Femenino</option>
+                        <option value="other">Otro/Prefiero no especificar</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="previousConcerns">¿Tienes preocupaciones previas sobre el desarrollo?</label>
+                    <select id="previousConcerns">
+                        <option value="">Seleccionar...</option>
+                        <option value="none">No, ninguna preocupación</option>
+                        <option value="mild">Algunas dudas menores</option>
+                        <option value="moderate">Preocupaciones moderadas</option>
+                        <option value="significant">Preocupaciones significativas</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="relationship">Tu relación con el niño:</label>
+                    <select id="relationship" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="mother">Madre</option>
+                        <option value="father">Padre</option>
+                        <option value="caregiver">Cuidador principal</option>
+                        <option value="other">Otro familiar</option>
+                    </select>
+                </div>
+
+                <div class="navigation-buttons">
+                    <button class="btn-secondary" onclick="showIntro()">
+                        ← Volver
+                    </button>
+                    <button class="btn-primary" onclick="validateAndStartQuestions()">
+                        Continuar →
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Questions Section -->
+        <section class="questions-section" id="questionsSection" style="display: none;">
+            <div class="progress-header">
+                <div class="progress-info">
+                    <span class="progress-text">Pregunta <span id="currentQuestion">1</span> de <span id="totalQuestions">25</span></span>
+                    <span class="progress-percentage" id="progressPercentage">4%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="question-container">
+                <div class="question-card" id="questionCard">
+                    <div class="question-number" id="questionNumber">1</div>
+                    <h3 class="question-text" id="questionText">
+                        <!-- Question text will be inserted here -->
+                    </h3>
+                    <div class="question-help" id="questionHelp">
+                        <!-- Help text will be inserted here -->
+                    </div>
+                    
+                    <div class="answer-options" id="answerOptions">
+                        <!-- Answer options will be generated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation-buttons">
+                <button class="btn-secondary" onclick="previousQuestion()" id="prevBtn" disabled>
+                    ← Anterior
+                </button>
+                <button class="btn-primary" onclick="nextQuestion()" id="nextBtn" disabled>
+                    Siguiente →
+                </button>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-content">
+                <div class="results-header">
+                    <div class="results-icon" id="resultsIcon">📊</div>
+                    <h2 id="resultsTitle">Resultados de la Evaluación</h2>
+                    <p class="results-subtitle" id="resultsSubtitle">
+                        Basado en las observaciones proporcionadas
+                    </p>
+                </div>
+
+                <div class="results-summary" id="resultsSummary">
+                    <!-- Results summary will be inserted here -->
+                </div>
+
+                <div class="results-breakdown" id="resultsBreakdown">
+                    <!-- Detailed breakdown will be inserted here -->
+                </div>
+
+                <div class="recommendations" id="recommendations">
+                    <!-- Recommendations will be inserted here -->
+                </div>
+
+                <div class="next-steps" id="nextSteps">
+                    <!-- Next steps will be inserted here -->
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-primary" onclick="downloadResults()">
+                        📄 Descargar Reporte
+                    </button>
+                    <button class="btn-secondary" onclick="exploreGames()">
+                        🎮 Explorar Juegos Recomendados
+                    </button>
+                    <button class="btn-accent" onclick="restartQuiz()">
+                        🔄 Hacer Nueva Evaluación
+                    </button>
+                </div>
+
+                <div class="professional-recommendation">
+                    <div class="pro-rec-icon">👨‍⚕️</div>
+                    <div class="pro-rec-content">
+                        <h4>Recomendación Profesional</h4>
+                        <p id="professionalGuidance">
+                            <!-- Professional guidance will be inserted here -->
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer Disclaimer -->
+        <footer class="quiz-footer">
+            <div class="footer-content">
+                <div class="disclaimer-footer">
+                    <h5>📋 Información Importante</h5>
+                    <ul>
+                        <li>Esta evaluación está basada en el Q-CHAT validado científicamente</li>
+                        <li>Los resultados son orientativos y requieren interpretación profesional</li>
+                        <li>Un resultado atípico no confirma autismo, así como un resultado típico no lo descarta</li>
+                        <li>Consulta siempre con un pediatra o especialista en desarrollo infantil</li>
+                    </ul>
+                </div>
+                
+                <div class="contact-info">
+                    <p>¿Tienes dudas? <a href="mailto:info@juegotea.com">Contáctanos</a></p>
+                    <p>&copy; 2025 JuegoTEA - Herramientas basadas en evidencia científica</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="../js/main.js"></script>
+    <script src="./js/qchat-quiz.js"></script>
+</body>
+</html>

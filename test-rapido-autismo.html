@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Evaluación TEA, TDAH y CI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6C5CE7;
+      --primary-dark: #4834d4;
+      --secondary: #00cec9;
+      --bg: #f9f9f9;
+      --white: #fff;
+      --text: #2d3436;
+      --light: #dfe6e9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--bg);
+      margin: 0;
+      padding: 20px;
+      color: var(--text);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: var(--primary-dark);
+    }
+
+    form {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section {
+      background-color: var(--white);
+      margin-bottom: 30px;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+
+    .section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    }
+
+    .question {
+      margin-bottom: 20px;
+    }
+
+    .question p {
+      margin: 0 0 8px;
+      font-weight: 500;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--light);
+      background-color: #fafafa;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    select:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: block;
+      margin: 30px auto 0;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    #results {
+      display: none;
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 30px;
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    #results h3 {
+      margin-top: 0;
+      color: var(--primary-dark);
+    }
+
+    .high-score {
+      color: #d63031;
+      font-weight: bold;
+    }
+
+    .moderate-score {
+      color: #fdcb6e;
+      font-weight: bold;
+    }
+
+    .low-score {
+      color: #00b894;
+      font-weight: bold;
+    }
+
+    strong {
+      color: var(--primary-dark);
+    }
+.btn-back {
+  background-color: #b2bec3;
+  color: #2d3436;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 30px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-back:hover {
+  background-color: #636e72;
+  color: #fff;
+}
+
+    @media (max-width: 600px) {
+      .section {
+        padding: 15px;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<button class="btn-back" onclick="goBack()">⬅ Regresar</button>
+  <h1>Evaluación de TEA, TDAH y CI</h1>
+  <p style="text-align:center; max-width:700px; margin: 0 auto 30px;">Responde cada pregunta seleccionando la opción que mejor describa tu experiencia en los últimos 6 meses.</p>
+
+  <!-- Formulario -->
+  <form id="evaluationForm">
+   <div class="section">
+            <h2>1. Evaluación de TEA (Trastorno del Espectro Autista)</h2>
+            
+            <div class="question">
+                <p>¿Te cuesta entender ironías, sarcasmo o dobles sentidos?</p>
+                <select class="tea-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Prefieres actividades solitarias antes que eventos sociales?</p>
+                <select class="tea-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Te han dicho que tu contacto visual es escaso o incómodo?</p>
+                <select class="tea-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Te angustian los cambios inesperados en tus planes?</p>
+                <select class="tea-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Tienes intereses muy intensos que dominan tu tiempo?</p>
+                <select class="tea-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Te molestan mucho luces brillantes, ruidos fuertes o texturas de ropa?</p>
+                <select class="tea-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>2. Evaluación de TDAH (Trastorno por Déficit de Atención e Hiperactividad)</h2>
+            
+            <div class="question">
+                <p>¿Pierdes objetos clave (llaves, teléfono) con frecuencia?</p>
+                <select class="adhd-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Evitas tareas que requieren concentración prolongada?</p>
+                <select class="adhd-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Te distraes fácilmente incluso en conversaciones?</p>
+                <select class="adhd-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Te cuesta estar quieto en reuniones o colas?</p>
+                <select class="adhd-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Interrumpes a otros o respondes antes de que terminen de hablar?</p>
+                <select class="adhd-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Actúas por impulsos (ej., gastar dinero, cambiar de trabajo)?</p>
+                <select class="adhd-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3. Indicadores de CI (Cociente Intelectual)</h2>
+            
+            <div class="question">
+                <p>¿Aprendes rápido vocabulario nuevo o idiomas?</p>
+                <select class="iq-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Disfrutas debates abstractos (ej., filosofía, ciencia)?</p>
+                <select class="iq-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Resuelves problemas complejos con enfoques creativos?</p>
+                <select class="iq-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+            
+            <div class="question">
+                <p>¿Recuerdas detalles específicos de información aprendida hace años?</p>
+                <select class="iq-q">
+                    <option value="1">No</option>
+                    <option value="2">A veces</option>
+                    <option value="3">Sí</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="button" onclick="calculateResults()">Evaluar</button>  <!-- ← Nombre actualizado -->
+
+  </form>
+
+  <!-- Resultados -->
+  <div id="results">
+    <h2>Resultados de la Evaluación</h2>
+    <div id="tea-results">
+      <h3>TEA (Trastorno del Espectro Autista)</h3>
+      <p>Puntuación: <span id="tea-score">0</span>/18</p>
+      <p id="tea-interpretation"></p>
+    </div>
+
+    <div id="adhd-results">
+      <h3>TDAH (Trastorno por Déficit de Atención e Hiperactividad)</h3>
+      <p>Puntuación: <span id="adhd-score">0</span>/18</p>
+      <p id="adhd-interpretation"></p>
+    </div>
+
+    <div id="iq-results">
+      <h3>Indicadores de CI (Cociente Intelectual)</h3>
+      <p>Puntuación: <span id="iq-score">0</span>/12</p>
+      <p id="iq-interpretation"></p>
+    </div>
+
+    <div id="differential">
+      <h3>Observaciones</h3>
+      <p id="differential-notes"></p>
+    </div>
+
+    <p style="margin-top:20px;"><strong>Nota:</strong> Este test no sustituye un diagnóstico profesional. Si los resultados son altos, consulta a un especialista.</p>
+  </div>
+
+  <!-- Script de evaluación (igual que el tuyo actual) -->
+  <script>
+        function calculateResults() {
+            // Calcular puntuación TEA
+            const teaQuestions = document.querySelectorAll('.tea-q');
+    let teaScore = 0;
+    teaQuestions.forEach(q => {
+        teaScore += parseInt(q.value);
+    });
+            
+            // Calcular puntuación TDAH
+            const adhdQuestions = document.querySelectorAll('.adhd-q');
+            let adhdScore = 0;
+            adhdQuestions.forEach(q => {
+                adhdScore += parseInt(q.value);
+            });
+            
+            // Calcular puntuación CI
+            const iqQuestions = document.querySelectorAll('.iq-q');
+            let iqScore = 0;
+            iqQuestions.forEach(q => {
+                iqScore += parseInt(q.value);
+            });
+            
+            // Mostrar resultados
+            document.getElementById('tea-score').textContent = teaScore;
+            document.getElementById('adhd-score').textContent = adhdScore;
+            document.getElementById('iq-score').textContent = iqScore;
+            
+            // Interpretación TEA
+            let teaInterpretation = '';
+            if (teaScore >= 12) {
+                teaInterpretation = '<span class="high-score">Rasgos significativos de TEA. Recomendable evaluación profesional (ej., ADOS-2).</span>';
+            } else if (teaScore >= 8) {
+                teaInterpretation = '<span class="moderate-score">Rasgos leves/moderados. Podrían justificar más exploración.</span>';
+            } else {
+                teaInterpretation = '<span class="low-score">Baja probabilidad de TEA.</span>';
+            }
+            document.getElementById('tea-interpretation').innerHTML = teaInterpretation;
+            
+            // Interpretación TDAH
+            let adhdInterpretation = '';
+            if (adhdScore >= 12) {
+                adhdInterpretation = '<span class="high-score">Posible TDAH (inatento, hiperactivo o combinado). Consulta con un especialista (ej., prueba CAARS).</span>';
+            } else if (adhdScore >= 8) {
+                adhdInterpretation = '<span class="moderate-score">Síntomas leves. Podrían relacionarse con ansiedad u otros factores.</span>';
+            } else {
+                adhdInterpretation = '<span class="low-score">Baja probabilidad de TDAH.</span>';
+            }
+            document.getElementById('adhd-interpretation').innerHTML = adhdInterpretation;
+            
+            // Interpretación CI
+            let iqInterpretation = '';
+            if (iqScore >= 9) {
+                iqInterpretation = '<span class="high-score">Patrón cognitivo sugerente de alto CI. Pruebas como el WAIS-IV podrían confirmarlo.</span>';
+            } else if (iqScore >= 5) {
+                iqInterpretation = '<span class="moderate-score">CI probablemente dentro del rango promedio.</span>';
+            } else {
+                iqInterpretation = '<span class="low-score">Posibles dificultades cognitivas. Evaluación neuropsicológica recomendada.</span>';
+            }
+            document.getElementById('iq-interpretation').innerHTML = iqInterpretation;
+            
+            // Diagnóstico diferencial
+            let differentialNotes = '';
+            if (teaScore >= 12 && adhdScore >= 12) {
+                differentialNotes = '⚠️ <strong>Comorbilidad TEA + TDAH frecuente</strong>: Ambos puntajes son altos. Los adultos no diagnosticados en la infancia a menudo presentan esta combinación.';
+            } else if (teaScore >= 12) {
+                differentialNotes = '🔍 <strong>Perfil TEA</strong>: Dificultades sociales/rutinas, pero sin síntomas destacados de TDAH.';
+            } else if (adhdScore >= 12) {
+                differentialNotes = '⚡ <strong>Perfil TDAH</strong>: Inatención/impulsividad predominantes, sin rasgos autistas significativos.';
+            }
+            document.getElementById('differential-notes').innerHTML = differentialNotes;
+            
+            // Mostrar resultados
+            document.getElementById('results').style.display = 'block';
+
+        }
+
+        function goBack() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Si quieres redirigir a una ruta específica en tu app:
+            window.location.href = 'index.html'; 
+        }
+    </script>
+</body>
+</html>
