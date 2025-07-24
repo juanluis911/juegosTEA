@@ -2,11 +2,11 @@
 console.log('💬 Iniciando página de Comunicación y Lenguaje');
 
 // Global variables
-let currentAgeFilter = 'all';
+let currentAgeFilter = 'preschool';
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
-    filterByAge('all');
+    filterByAge('preschool');
     addInteractivity();
     showWelcomeMessage();
 });
@@ -47,7 +47,7 @@ function getAgeLabel(age) {
         'school': '6-12 años',
         'teen': '12+ años'
     };
-    return labels[age] || labels.all;
+    return labels[age] || labels.preschool;
 }
 
 // Launch game

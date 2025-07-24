@@ -448,6 +448,194 @@ function getGameInfo(category, age) {
     return games[category] || games.communication;
 }
 
+// === FUNCIONES DE LOADING ===
+
+/**
+ * Muestra el overlay de carga
+ */
+function showLoading() {
+    let loadingOverlay = document.getElementById('loading');
+    
+    // Si no existe, crear el overlay de loading
+    if (!loadingOverlay) {
+        loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'loading';
+        loadingOverlay.className = 'loading';
+        loadingOverlay.innerHTML = `
+            <div class="spinner"></div>
+            <div class="loading-text">Cargando...</div>
+        `;
+        
+        // Añadir estilos si no existen
+        if (!document.getElementById('loading-styles')) {
+            const styles = document.createElement('style');
+            styles.id = 'loading-styles';
+            styles.textContent = `
+                .loading {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(255, 255, 255, 0.95);
+                    backdrop-filter: blur(5px);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 9999;
+                    opacity: 0;
+                    visibility: hidden;
+                    transition: all 0.3s ease;
+                }
+                
+                .loading.show {
+                    opacity: 1;
+                    visibility: visible;
+                }
+                
+                .spinner {
+                    width: 50px;
+                    height: 50px;
+                    border: 5px solid #f3f3f3;
+                    border-top: 5px solid #667eea;
+                    border-radius: 50%;
+                    animation: spin 1s linear infinite;
+                    margin-bottom: 20px;
+                }
+                
+                .loading-text {
+                    font-size: 1.2rem;
+                    font-weight: 600;
+                    color: #2d3748;
+                    text-align: center;
+                }
+                
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                
+                /* Animación adicional para el texto */
+                .loading-text::after {
+                    content: '';
+                    animation: dots 1.5s steps(4, end) infinite;
+                }
+                
+                @keyframes dots {
+                    0%, 20% {
+                        content: '';
+                    }
+                    40% {
+                        content: '.';
+                    }
+                    60% {
+                        content: '..';
+                    }
+                    80%, 100% {
+                        content: '...';
+                    }
+                }
+                
+                /* Responsive */
+                @media (max-width: 480px) {
+                    .spinner {
+                        width: 40px;
+                        height: 40px;
+                        border-width: 4px;
+                    }
+                    
+                    .loading-text {
+                        font-size: 1rem;
+                    }
+                }
+            `;
+            document.head.appendChild(styles);
+        }
+        
+        document.body.appendChild(loadingOverlay);
+    }
+    
+    // Mostrar el loading
+    loadingOverlay.classList.add('show');
+    
+    // Prevenir scroll del body
+    document.body.style.overflow = 'hidden';
+    
+    console.log('🔄 Loading mostrado');
+}
+
+/**
+ * Oculta el overlay de carga
+ */
+function hideLoading() {
+    const loadingOverlay = document.getElementById('loading');
+    
+    if (loadingOverlay) {
+        loadingOverlay.classList.remove('show');
+        
+        // Restaurar scroll del body después de la animación
+        setTimeout(() => {
+            document.body.style.overflow = '';
+        }, 300);
+    }
+    
+    console.log('✅ Loading ocultado');
+}
+
+/**
+ * Muestra loading con mensaje personalizado
+ * @param {string} message - Mensaje a mostrar durante la carga
+ * @param {number} duration - Duración en ms (opcional, por defecto infinito)
+ */
+function showLoadingWithMessage(message = 'Cargando...', duration = 0) {
+    showLoading();
+    
+    const loadingText = document.querySelector('.loading-text');
+    if (loadingText) {
+        loadingText.textContent = message;
+    }
+    
+    // Si se especifica duración, ocultar automáticamente
+    if (duration > 0) {
+        setTimeout(() => {
+            hideLoading();
+        }, duration);
+    }
+}
+
+/**
+ * Muestra loading con progreso (para futuras implementaciones)
+ * @param {number} progress - Progreso de 0 a 100
+ * @param {string} message - Mensaje opcional
+ */
+function showLoadingWithProgress(progress = 0, message = 'Cargando...') {
+    showLoading();
+    
+    const loadingOverlay = document.getElementById('loading');
+    const loadingText = loadingOverlay.querySelector('.loading-text');
+    
+    // Actualizar mensaje
+    if (loadingText) {
+        loadingText.innerHTML = `
+            ${message}
+            <div style="margin-top: 15px; width: 200px; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                <div style="width: ${progress}%; height: 100%; background: linear-gradient(45deg, #667eea, #764ba2); transition: width 0.3s ease;"></div>
+            </div>
+            <div style="margin-top: 8px; font-size: 0.9rem; color: #718096;">${Math.round(progress)}%</div>
+        `;
+    }
+}
+
+// Exportar funciones si se usa módulos (opcional)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        showLoading,
+        hideLoading,
+        showLoadingWithMessage,
+        showLoadingWithProgress
+    };
+}
 // === EVENTOS ESPECIALES ===
 
 // Detectar cuando el usuario vuelve a la pestaña
