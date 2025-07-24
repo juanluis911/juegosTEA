@@ -661,11 +661,10 @@ window.addEventListener('offline', function() {
     showNotification('Sin conexión - Modo offline activado 📱');
 });
 
-window.addEventListener('DOMContentLoaded', () => {
-    const card = document.getElementById('communicationCard');
-    if (card) {
+document.addEventListener('DOMContentLoaded', () => {
+        const card = document.getElementById('communicationCard');
         card.addEventListener('click', goToCommunication);
-    }
-});
+        card.addEventListener('touchstart', goToCommunication); // por si acaso
+    });
 
 console.log('✅ Index.js inicializado completamente');
