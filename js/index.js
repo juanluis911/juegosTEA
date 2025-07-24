@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function goToCommunication() {
     console.log('🎯 Navegando a Comunicación y Lenguaje');
     showLoading();
-    speakText("Entrando en Comunicación y Lenguaje");
+    //speakText("Entrando en Comunicación y Lenguaje");
     
     setTimeout(() => {
         hideLoading();
