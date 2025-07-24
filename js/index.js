@@ -661,7 +661,7 @@ window.addEventListener('offline', function() {
     showNotification('Sin conexión - Modo offline activado 📱');
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', () => {
     const card = document.getElementById('communicationCard');
     if (card) {
         card.addEventListener('click', goToCommunication);
