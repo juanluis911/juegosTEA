@@ -62,7 +62,7 @@ function selectCategory(category) {
     };
     
     const categoryName = categoryNames[category];
-    speakText(`Has seleccionado ${categoryName}`);
+    //speakText(`Has seleccionado ${categoryName}`);
     
     setTimeout(() => {
         hideLoading();

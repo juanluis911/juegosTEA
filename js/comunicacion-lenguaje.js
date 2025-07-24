@@ -261,9 +261,9 @@ function announceGameStatus(gameType) {
     const availableGames = ['reading', 'colors', 'animals'];
     
     if (availableGames.includes(gameType)) {
-        speakText(`${gameInfo.title} está disponible para jugar`);
+        //speakText(`${gameInfo.title} está disponible para jugar`);
     } else {
-        speakText(`${gameInfo.title} estará disponible próximamente`);
+        //speakText(`${gameInfo.title} estará disponible próximamente`);
     }
 }
 
@@ -343,7 +343,7 @@ function trackProgress(gameType, score) {
 function showWelcomeMessage() {
     setTimeout(() => {
         showNotification('¡Bienvenido a Comunicación y Lenguaje! 💬');
-        speakText('Bienvenido a Comunicación y Lenguaje. Explora nuestros juegos interactivos.');
+        //speakText('Bienvenido a Comunicación y Lenguaje. Explora nuestros juegos interactivos.');
     }, 1000);
     
     // Check for returning users
@@ -386,7 +386,7 @@ function showHelp() {
     `;
     
     alert(helpContent);
-    speakText('Ayuda mostrada. Revisa los atajos de teclado disponibles.');
+    //speakText('Ayuda mostrada. Revisa los atajos de teclado disponibles.');
 }
 
 // Add help tooltip
