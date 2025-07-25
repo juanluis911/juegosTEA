@@ -830,6 +830,7 @@ class QChatAssessment {
         this.showQuestion();
     }
 
+    // === FUNCIÓN CORREGIDA PARA MOSTRAR PREGUNTAS ===
     showQuestion() {
         const questions = this.data.questions[this.selectedAgeGroup];
         
@@ -863,21 +864,28 @@ class QChatAssessment {
                     <h2 class="question-text">${question.text}</h2>
                     
                     <div class="options-container">
-                        ${question.options.map((option, index) => `
-                            <label class="option-label ${this.responses[question.id] === option.value ? 'selected' : ''}" for="option-${question.id}-${index}">
-                                <input type="radio" 
-                                       id="option-${question.id}-${index}" 
-                                       name="question-${question.id}" 
-                                       value="${option.value}"
-                                       ${this.responses[question.id] === option.value ? 'checked' : ''}
-                                       onchange="qchatApp.selectAnswer(${question.id}, ${option.value})">
-                                <div class="option-content">
-                                    <div class="option-text">${option.text}</div>
-                                    <div class="option-description">${option.description}</div>
-                                </div>
-                                <div class="option-indicator"></div>
-                            </label>
-                        `).join('')}
+                        ${question.options.map((option, index) => {
+                            // CORRECCIÓN: Usar IDs únicos por pregunta
+                            const uniqueId = `q${question.id}_option${index}`;
+                            const isSelected = this.responses[question.id] === option.value;
+                            
+                            return `
+                                <label class="option-label ${isSelected ? 'selected' : ''}" 
+                                    for="${uniqueId}">
+                                    <input type="radio" 
+                                        id="${uniqueId}" 
+                                        name="question_${question.id}" 
+                                        value="${option.value}"
+                                        ${isSelected ? 'checked' : ''}
+                                        onchange="qchatApp.selectAnswer(${question.id}, ${option.value})">
+                                    <div class="option-content">
+                                        <div class="option-text">${option.text}</div>
+                                        <div class="option-description">${option.description}</div>
+                                    </div>
+                                    <div class="option-indicator"></div>
+                                </label>
+                            `;
+                        }).join('')}
                     </div>
                 </div>
 
@@ -919,11 +927,15 @@ class QChatAssessment {
         return categoryNames[category] || `📋 ${category}`;
     }
 
+    // === FUNCIÓN CORREGIDA PARA SELECCIONAR RESPUESTA ===
     selectAnswer(questionId, value) {
         console.log(`📝 Respuesta seleccionada - Pregunta ${questionId}: ${value}`);
-        this.responses[questionId] = parseInt(value);
         
-        // Actualizar score de categoría
+        // CORRECCIÓN 1: Convertir value a número para consistencia
+        const numericValue = parseInt(value);
+        this.responses[questionId] = numericValue;
+        
+        // CORRECCIÓN 2: Actualizar score de categoría
         const questions = this.data.questions[this.selectedAgeGroup];
         const question = questions.find(q => q.id === questionId);
         
@@ -935,14 +947,10 @@ class QChatAssessment {
             }, 0);
         }
 
-        // Actualizar UI
-        const labels = document.querySelectorAll('.option-label');
-        labels.forEach(label => label.classList.remove('selected'));
-        
-        const selectedLabel = document.querySelector(`input[value="${value}"]`).closest('.option-label');
-        selectedLabel.classList.add('selected');
+        // CORRECCIÓN 3: Actualizar UI de manera más específica
+        this.updateOptionSelection(questionId, numericValue);
 
-        // Habilitar botón siguiente
+        // CORRECCIÓN 4: Habilitar botón siguiente
         const nextBtn = document.querySelector('.question-actions .btn-primary');
         if (nextBtn) {
             nextBtn.disabled = false;
@@ -951,15 +959,51 @@ class QChatAssessment {
         // Feedback visual
         this.showNotification('✅ Respuesta guardada', 'success');
     }
-
+    // === NUEVA FUNCIÓN PARA ACTUALIZAR SELECCIÓN UI ===
+    updateOptionSelection(questionId, selectedValue) {
+        // Remover selección previa de todas las opciones de esta pregunta
+        const allLabels = document.querySelectorAll(`input[name="question_${questionId}"]`);
+        
+        allLabels.forEach(input => {
+            const label = input.closest('.option-label');
+            const isCurrentSelection = parseInt(input.value) === selectedValue;
+            
+            // Actualizar input
+            input.checked = isCurrentSelection;
+            
+            // Actualizar label
+            if (isCurrentSelection) {
+                label.classList.add('selected');
+            } else {
+                label.classList.remove('selected');
+            }
+        });
+        
+        console.log(`✅ UI actualizada para pregunta ${questionId}, valor ${selectedValue}`);
+    }
+    // === FUNCIÓN ADICIONAL PARA DEBUG ===
+    debugCurrentState() {
+        console.log('=== ESTADO ACTUAL DEL Q-CHAT ===');
+        console.log('Pregunta actual:', this.currentQuestion);
+        console.log('Respuestas guardadas:', this.responses);
+        console.log('Grupo de edad:', this.selectedAgeGroup);
+        console.log('Total de preguntas:', this.data.questions[this.selectedAgeGroup]?.length);
+        console.log('=================================');
+    }
+    // === FUNCIÓN CORREGIDA PARA NAVEGACIÓN ===
     nextQuestion() {
         const questions = this.data.questions[this.selectedAgeGroup];
         const question = questions[this.currentQuestion];
         
+        // Verificar que hay respuesta
         if (this.responses[question.id] === undefined) {
             this.showNotification('Por favor, selecciona una respuesta antes de continuar', 'warning');
             return;
         }
+
+        // Debug para verificar estado
+        console.log(`➡️ Avanzando de pregunta ${this.currentQuestion + 1} a ${this.currentQuestion + 2}`);
+        console.log(`Respuesta guardada para pregunta ${question.id}:`, this.responses[question.id]);
 
         if (this.currentQuestion < questions.length - 1) {
             this.currentQuestion++;
@@ -971,6 +1015,7 @@ class QChatAssessment {
 
     previousQuestion() {
         if (this.currentQuestion > 0) {
+            console.log(`⬅️ Retrocediendo de pregunta ${this.currentQuestion + 1} a ${this.currentQuestion}`);
             this.currentQuestion--;
             this.showQuestion();
         }
@@ -1292,10 +1337,11 @@ window.addEventListener('beforeunload', function(e) {
     if (qchatApp && 
         Object.keys(qchatApp.responses).length > 0 && 
         qchatApp.currentQuestion < qchatApp.data?.questions[qchatApp.selectedAgeGroup]?.length) {
-        e.preventDefault();
-        e.returnValue = 'Tienes una evaluación en progreso. ¿Estás seguro de que quieres salir?';
+            e.preventDefault();
+            e.returnValue = 'Tienes una evaluación en progreso. ¿Estás seguro de que quieres salir?';
         return e.returnValue;
     }
 });
 
+window.debugQChat = () => this.debugCurrentState();
 console.log('✅ Q-CHAT JavaScript v2.0 cargado correctamente - Auto-contenido y listo para producción');
