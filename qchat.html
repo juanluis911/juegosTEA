@@ -1,1536 +1,84 @@
-// Variables globales para el cuestionario
-        let currentQuestionIndex = 0;
-        let responses = {};
-        let startTime = Date.now();
-
-        // Datos completos del Q-CHAT
-        const qchatData = {
-            questions: [
-                {
-                    id: 1,
-                    text: "¿Su hijo/a le mira cuando le habla?",
-                    category: "social",
-                    options: [
-                        { value: 0, text: "Siempre", description: "Mi hijo/a siempre me mira cuando le hablo" },
-                        { value: 0, text: "Casi siempre", description: "Mi hijo/a me mira la mayoría de las veces" },
-                        { value: 0, text: "A veces", description: "Mi hijo/a me mira algunas veces" },
-                        { value: 1, text: "Raramente", description: "Mi hijo/a raramente me mira cuando le hablo" },
-                        { value: 1, text: "Nunca", description: "Mi hijo/a nunca me mira cuando le hablo" }
-                    ]
-                },
-                {
-                    id: 2,
-                    text: "¿Qué tan fácil es para usted hacer contacto visual con su hijo/a?",
-                    category: "social",
-                    options: [
-                        { value: 0, text: "Muy fácil", description: "Es muy fácil establecer contacto visual" },
-                        { value: 0, text: "Bastante fácil", description: "Generalmente es fácil hacer contacto visual" },
-                        { value: 0, text: "Bastante difícil", description: "A veces es difícil hacer contacto visual" },
-                        { value: 1, text: "Muy difícil", description: "Es muy difícil establecer contacto visual" },
-                        { value: 1, text: "Imposible", description: "No logro hacer contacto visual con mi hijo/a" }
-                    ]
-                },
-                {
-                    id: 3,
-                    text: "¿Su hijo/a señala para pedir algo (por ejemplo, un juguete que está fuera de su alcance)?",
-                    category: "communication",
-                    options: [
-                        { value: 0, text: "Muchas veces al día", description: "Mi hijo/a señala frecuentemente para pedir cosas" },
-                        { value: 0, text: "Algunas veces al día", description: "Mi hijo/a señala varias veces durante el día" },
-                        { value: 0, text: "Algunas veces a la semana", description: "Mi hijo/a señala ocasionalmente durante la semana" },
-                        { value: 1, text: "Menos de una vez a la semana", description: "Mi hijo/a señala muy raramente" },
-                        { value: 1, text: "Nunca", description: "Mi hijo/a nunca señala para pedir algo" }
-                    ]
-                },
-                {
-                    id: 4,
-                    text: "¿Su hijo/a señala para mostrarle algo interesante?",
-                    category: "communication",
-                    options: [
-                        { value: 0, text: "Muchas veces al día", description: "Mi hijo/a señala frecuentemente para mostrar cosas" },
-                        { value: 0, text: "Algunas veces al día", description: "Mi hijo/a señala varias veces para mostrar cosas" },
-                        { value: 0, text: "Algunas veces a la semana", description: "Mi hijo/a ocasionalmente señala para mostrar cosas" },
-                        { value: 1, text: "Menos de una vez a la semana", description: "Mi hijo/a raramente señala para mostrar cosas" },
-                        { value: 1, text: "Nunca", description: "Mi hijo/a nunca señala para mostrar algo" }
-                    ]
-                },
-                {
-                    id: 5,
-                    text: "¿Su hijo/a finge (por ejemplo, cuidar muñecas, hablar por teléfono)?",
-                    category: "play",
-                    options: [
-                        { value: 0, text: "Muchas veces al día", description: "Mi hijo/a juega de manera imaginativa frecuentemente" },
-                        { value: 0, text: "Algunas veces al día", description: "Mi hijo/a tiene varios episodios de juego imaginativo" },
-                        { value: 0, text: "Algunas veces a la semana", description: "Mi hijo/a ocasionalmente juega de manera imaginativa" },
-                        { value: 1, text: "Menos de una vez a la semana", description: "Mi hijo/a raramente juega de manera imaginativa" },
-                        { value: 1, text: "Nunca", description: "Mi hijo/a nunca juega de manera imaginativa" }
-                    ]
-                },
-                {
-                    id: 6,
-                    text: "¿Su hijo/a usa el dedo índice para señalar, para PEDIR algo?",
-                    category: "communication",
-                    options: [
-                        { value: 0, text: "Muchas veces al día", description: "Usa el dedo índice frecuentemente para pedir" },
-                        { value: 0, text: "Algunas veces al día", description: "Usa el dedo índice varias veces para pedir" },
-                        { value: 0, text: "Algunas veces a la semana", description: "Ocasionalmente usa el dedo índice para pedir" },
-                        { value: 1, text: "Menos de una vez a la semana", description: "Raramente usa el dedo índice para pedir" },
-                        { value: 1, text: "Nunca", description: "Nunca usa el dedo índice para pedir" }
-                    ]
-                },
-                {
-                    id: 7,
-                    text: "¿Su hijo/a usa el dedo índice para señalar, para mostrar INTERÉS en algo?",
-                    category: "communication",
-                    options: [
-                        { value: 0, text: "Muchas veces al día", description: "Usa el dedo índice frecuentemente para mostrar interés" },
-                        { value: 0, text: "Algunas veces al día", description: "Usa el dedo índice varias veces para mostrar interés" },
-                        { value: 0, text: "Algunas veces a la semana", description: "Ocasionalmente usa el dedo índice para mostrar interés" },
-                        { value: 1, text: "Menos de una vez a la semana", description: "Raramente usa el dedo índice para mostrar interés" },
-                        { value: 1, text: "Nunca", description: "Nunca usa el dedo índice para mostrar interés" }
-                    ]
-                },
-                {
-                    id: 8,
-                    text: "¿Puede su hijo/a jugar adecuadamente con juguetes pequeños (por ejemplo, coches o bloques) sin solo llevárselos a la boca, manosearlos o tirarlos?",
-                    category: "play",
-                    options: [
-                        { value: 0, text: "Siempre", description: "Siempre juega adecuadamente con juguetes pequeños" },
-                        { value: 0, text: "Casi siempre", description: "Generalmente juega adecuadamente con juguetes pequeños" },
-                        { value: 0, text: "A veces", description: "A veces juega adecuadamente con juguetes pequeños" },
-                        { value: 1, text: "Raramente", description: "Raramente juega adecuadamente con juguetes pequeños" },
-                        { value: 1, text: "Nunca", description: "Nunca juega adecuadamente con juguetes pequeños" }
-                    ]
-                },
-                {
-                    id: 9,
-                    text: "¿Su hijo/a le trae objetos para MOSTRARLE algo?",
-                    category: "social",
-                    options: [
-                        { value: 0, text: "Muchas veces al día", description: "Frecuentemente me trae objetos para mostrarme" },
-                        { value: 0, text: "Algunas veces al día", description: "Varias veces al día me trae objetos" },
-                        { value: 0, text: "Algunas veces a la semana", description: "Ocasionalmente me trae objetos para mostrar" },
-                        { value: 1, text: "Menos de una vez a la semana", description: "Raramente me trae objetos para mostrar" },
-                        { value: 1, text: "Nunca", description: "Nunca me trae objetos para mostrarme" }
-                    ]
-                },
-                {
-                    id: 10,
-                    text: "¿Cuánto tiempo puede su hijo/a mantener contacto visual con usted?",
-                    category: "social",
-                    options: [
-                        { value: 0, text: "2-3 segundos", description: "Mantiene contacto visual por 2-3 segundos" },
-                        { value: 0, text: "1-2 segundos", description: "Mantiene contacto visual por 1-2 segundos" },
-                        { value: 1, text: "Menos de 1 segundo", description: "Mantiene contacto visual menos de 1 segundo" },
-                        { value: 1, text: "No mantiene contacto visual", description: "No logra mantener contacto visual" }
-                    ]
-                },
-                {
-                    id: 11,
-                    text: "¿Alguna vez su hijo/a ha parecido hipersensible al ruido (por ejemplo, taparse los oídos)?",
-                    category: "sensory",
-                    options: [
-                        { value: 1, text: "Siempre", description: "Siempre parece hipersensible al ruido" },
-                        { value: 1, text: "A menudo", description: "Frecuentemente parece hipersensible al ruido" },
-                        { value: 0, text: "A veces", description: "A veces parece hipersensible al ruido" },
-                        { value: 0, text: "Raramente", description: "Raramente parece hipersensible al ruido" },
-                        { value: 0, text: "Nunca", description: "Nunca parece hipersensible al ruido" }
-                    ]
-                },
-                {
-                    id: 12,
-                    text: "¿Su hijo/a sonríe en respuesta a su cara o a su sonrisa?",
-                    category: "social",
-                    options: [
-                        { value: 0, text: "Siempre", description: "Siempre sonríe en respuesta a mi sonrisa" },
-                        { value: 0, text: "Casi siempre", description: "Casi siempre sonríe en respuesta" },
-                        { value: 0, text: "A veces", description: "A veces sonríe en respuesta" },
-                        { value: 1, text: "Raramente", description: "Raramente sonríe en respuesta" },
-                        { value: 1, text: "Nunca", description: "Nunca sonríe en respuesta a mi cara" }
-                    ]
-                },
-                {
-                    id: 13,
-                    text: "¿Qué tan fácil es para su hijo/a adaptarse cuando su rutina cambia o cuando las cosas están fuera de lugar?",
-                    category: "behavioral",
-                    options: [
-                        { value: 0, text: "Muy fácil", description: "Se adapta muy fácilmente a los cambios" },
-                        { value: 0, text: "Bastante fácil", description: "Generalmente se adapta bien a los cambios" },
-                        { value: 0, text: "Bastante difícil", description: "Le cuesta trabajo adaptarse a los cambios" },
-                        { value: 1, text: "Muy difícil", description: "Le es muy difícil adaptarse a los cambios" },
-                        { value: 1, text: "Imposible", description: "No puede adaptarse a los cambios de rutina" }
-                    ]
-                },
-                {
-                    id: 14,
-                    text: "¿Su hijo/a tiene algún problema visual?",
-                    category: "sensory",
-                    options: [
-                        { value: 0, text: "No", description: "No tiene problemas visuales conocidos" },
-                        { value: 1, text: "Sí", description: "Tiene problemas visuales conocidos" }
-                    ]
-                },
-                {
-                    id: 15,
-                    text: "¿Su hijo/a imita (por ejemplo, hace una mueca después de que usted la hace)?",
-                    category: "social",
-                    options: [
-                        { value: 0, text: "Muchas veces al día", description: "Imita frecuentemente mis acciones" },
-                        { value: 0, text: "Algunas veces al día", description: "Imita varias veces durante el día" },
-                        { value: 0, text: "Algunas veces a la semana", description: "Ocasionalmente imita mis acciones" },
-                        { value: 1, text: "Menos de una vez a la semana", description: "Raramente imita mis acciones" },
-                        { value: 1, text: "Nunca", description: "Nunca imita mis acciones" }
-                    ]
-                },
-                {
-                    id: 16,
-                    text: "¿Su hijo/a responde a su nombre cuando le llama?",
-                    category: "communication",
-                    options: [
-                        { value: 0, text: "Siempre", description: "Siempre responde cuando le llamo por su nombre" },
-                        { value: 0, text: "Casi siempre", description: "Casi siempre responde a su nombre" },
-                        { value: 0, text: "A veces", description: "A veces responde cuando le llamo" },
-                        { value: 1, text: "Raramente", description: "Raramente responde a su nombre" },
-                        { value: 1, text: "Nunca", description: "Nunca responde cuando le llamo por su nombre" }
-                    ]
-                },
-                {
-                    id: 17,
-                    text: "Si usted o alguien más en la familia está visiblemente molesto, ¿su hijo/a muestra signos de querer consolarlo (por ejemplo, acariciándolo o abrazándolo)?",
-                    category: "social",
-                    options: [
-                        { value: 0, text: "Siempre", description: "Siempre muestra signos de querer consolar" },
-                        { value: 0, text: "Casi siempre", description: "Casi siempre intenta consolar" },
-                        { value: 0, text: "A veces", description: "A veces muestra signos de querer consolar" },
-                        { value: 1, text: "Raramente", description: "Raramente intenta consolar" },
-                        { value: 1, text: "Nunca", description: "Nunca muestra signos de querer consolar" }
-                    ]
-                },
-                {
-                    id: 18,
-                    text: "¿Diría que su hijo/a tiene sus primeras palabras?",
-                    category: "communication",
-                    options: [
-                        { value: 0, text: "Sí, tiene muchas palabras", description: "Tiene un vocabulario amplio para su edad" },
-                        { value: 0, text: "Sí, tiene al menos 15 palabras", description: "Dice al menos 15 palabras diferentes" },
-                        { value: 0, text: "Sí, tiene algunas palabras", description: "Dice algunas palabras (menos de 15)" },
-                        { value: 1, text: "Tiene menos de 5 palabras", description: "Solo dice menos de 5 palabras" },
-                        { value: 1, text: "No tiene palabras", description: "Aún no dice palabras reconocibles" }
-                    ]
-                },
-                {
-                    id: 19,
-                    text: "¿Su hijo/a usa gestos simples (por ejemplo, agitar la mano para decir adiós)?",
-                    category: "communication",
-                    options: [
-                        { value: 0, text: "Siempre", description: "Siempre usa gestos apropiados" },
-                        { value: 0, text: "Casi siempre", description: "Casi siempre usa gestos simples" },
-                        { value: 0, text: "A veces", description: "A veces usa gestos simples" },
-                        { value: 1, text: "Raramente", description: "Raramente usa gestos simples" },
-                        { value: 1, text: "Nunca", description: "Nunca usa gestos simples" }
-                    ]
-                },
-                {
-                    id: 20,
-                    text: "¿Su hijo/a mira hacia donde usted está mirando?",
-                    category: "social",
-                    options: [
-                        { value: 0, text: "Siempre", description: "Siempre sigue mi dirección de mirada" },
-                        { value: 0, text: "Casi siempre", description: "Casi siempre mira hacia donde miro" },
-                        { value: 0, text: "A veces", description: "A veces sigue mi dirección de mirada" },
-                        { value: 1, text: "Raramente", description: "Raramente mira hacia donde miro" },
-                        { value: 1, text: "Nunca", description: "Nunca sigue mi dirección de mirada" }
-                    ]
-                },
-                {
-                    id: 21,
-                    text: "¿Su hijo/a tiene algún movimiento extraño o repetitivo con los dedos cerca de su cara?",
-                    category: "behavioral",
-                    options: [
-                        { value: 1, text: "Siempre", description: "Siempre tiene movimientos repetitivos con los dedos" },
-                        { value: 1, text: "A menudo", description: "Frecuentemente hace movimientos repetitivos" },
-                        { value: 0, text: "A veces", description: "A veces hace movimientos repetitivos" },
-                        { value: 0, text: "Raramente", description: "Raramente hace estos movimientos" },
-                        { value: 0, text: "Nunca", description: "Nunca hace movimientos extraños o repetitivos" }
-                    ]
-                },
-                {
-                    id: 22,
-                    text: "¿Su hijo/a trata de llamar su atención hacia su propia actividad?",
-                    category: "social",
-                    options: [
-                        { value: 0, text: "Siempre", description: "Siempre trata de llamar mi atención" },
-                        { value: 0, text: "Casi siempre", description: "Casi siempre busca mi atención" },
-                        { value: 0, text: "A veces", description: "A veces trata de llamar mi atención" },
-                        { value: 1, text: "Raramente", description: "Raramente busca mi atención" },
-                        { value: 1, text: "Nunca", description: "Nunca trata de llamar mi atención" }
-                    ]
-                },
-                {
-                    id: 23,
-                    text: "¿Alguna vez ha sospechado que su hijo/a tiene problemas de audición?",
-                    category: "sensory",
-                    options: [
-                        { value: 0, text: "No", description: "No he sospechado problemas de audición" },
-                        { value: 1, text: "Sí", description: "He sospechado que puede tener problemas de audición" }
-                    ]
-                },
-                {
-                    id: 24,
-                    text: "¿Su hijo/a entiende lo que la gente dice?",
-                    category: "communication",
-                    options: [
-                        { value: 0, text: "Siempre", description: "Siempre entiende lo que le decimos" },
-                        { value: 0, text: "Casi siempre", description: "Casi siempre entiende lo que decimos" },
-                        { value: 0, text: "A veces", description: "A veces entiende lo que decimos" },
-                        { value: 1, text: "Raramente", description: "Raramente entiende lo que decimos" },
-                        { value: 1, text: "Nunca", description: "No parece entender lo que decimos" }
-                    ]
-                },
-                {
-                    id: 25,
-                    text: "¿Su hijo/a a veces mira fijamente a la nada o camina sin rumbo?",
-                    category: "behavioral",
-                    options: [
-                        { value: 1, text: "Siempre", description: "Siempre parece estar mirando a la nada" },
-                        { value: 1, text: "A menudo", description: "Frecuentemente mira fijamente o camina sin rumbo" },
-                        { value: 0, text: "A veces", description: "A veces mira fijamente o camina sin rumbo" },
-                        { value: 0, text: "Raramente", description: "Raramente hace esto" },
-                        { value: 0, text: "Nunca", description: "Nunca mira fijamente a la nada o camina sin rumbo" }
-                    ]
-                }
-            ]
-        };
-
-        // Función para obtener el nombre de la categoría
-        function getCategoryName(category) {
-            const categories = {
-                social: 'Interacción Social',
-                communication: 'Comunicación',
-                play: 'Juego',
-                behavioral: 'Comportamiento',
-                sensory: 'Procesamiento Sensorial'
-            };
-            return categories[category] || category;
-        }
-
-        // Demo function to show a sample question
-        function startDemo() {
-            currentQuestionIndex = 0;
-            responses = {};
-            startTime = Date.now();
-            showQuestion();
-        }
-
-        // Función para mostrar una pregunta
-        function showQuestion() {
-            if (currentQuestionIndex >= qchatData.questions.length) {
-                showFinalResults();
-                return;
-            }
-
-            const question = qchatData.questions[currentQuestionIndex];
-            const container = document.getElementById('qchat-container');
-            const progress = ((currentQuestionIndex + 1) / qchatData.questions.length) * 100;
-
-            let optionsHtml = '';
-            question.options.forEach(option => {
-                optionsHtml += 
-                    '<label class="option-label">' +
-                        '<input type="radio" name="current-response" value="' + option.value + '" data-text="' + option.text + '">' +
-                        '<div class="option-content">' +
-                            '<div class="option-text">' + option.text + '</div>' +
-                            '<div class="option-description">' + option.description + '</div>' +
-                        '</div>' +
-                    '</label>';
-            });
-
-            container.innerHTML = 
-                '<div class="qchat-question">' +
-                    '<div class="question-header">' +
-                        '<div class="question-number">Pregunta ' + (currentQuestionIndex + 1) + ' de ' + qchatData.questions.length + '</div>' +
-                        '<div class="question-category">' + getCategoryName(question.category) + '</div>' +
-                    '</div>' +
-                    '<div class="progress-container">' +
-                        '<div class="progress-bar">' +
-                            '<div class="progress-fill" style="width: ' + progress + '%"></div>' +
-                        '</div>' +
-                        '<div class="progress-text">' + Math.round(progress) + '% completado</div>' +
-                    '</div>' +
-                    '<div class="question-content">' +
-                        '<h2 class="question-text">' + question.text + '</h2>' +
-                        '<div class="question-options">' + optionsHtml + '</div>' +
-                    '</div>' +
-                    '<div class="question-actions">' +
-                        '<button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" ' + 
-                            (currentQuestionIndex === 0 ? 'disabled' : '') + '>← Anterior</button>' +
-                        '<button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>' +
-                            (currentQuestionIndex === qchatData.questions.length - 1 ? 'Finalizar' : 'Siguiente →') +
-                        '</button>' +
-                    '</div>' +
-                '</div>';
-
-            // Add event listeners for radio buttons
-            const radioButtons = container.querySelectorAll('input[name="current-response"]');
-            const nextBtn = container.querySelector('#nextBtn');
-            
-            radioButtons.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    // Remove selected class from all labels
-                    container.querySelectorAll('.option-label').forEach(label => {
-                        label.classList.remove('selected');
-                    });
-                    
-                    // Add selected class to current label
-                    this.closest('.option-label').classList.add('selected');
-                    
-                    // Save response
-                    responses[question.id] = parseInt(this.value);
-                    
-                    // Enable next button
-                    if (nextBtn) {
-                        nextBtn.disabled = false;
-                    }
-                    
-                    // Get the selected text for feedback
-                    const selectedText = this.getAttribute('data-text');
-                    
-                    // Show notification
-                    showNotification('Respuesta seleccionada: ' + selectedText, 'success');
-                    
-                    console.log('Pregunta ' + question.id + ' respondida:', selectedText, 'Valor:', this.value);
-                });
-            });
-
-            // Restore previous response if exists
-            if (responses[question.id] !== undefined) {
-                const savedValue = responses[question.id];
-                const savedRadio = container.querySelector('input[value="' + savedValue + '"]');
-                if (savedRadio) {
-                    savedRadio.checked = true;
-                    savedRadio.closest('.option-label').classList.add('selected');
-                    nextBtn.disabled = false;
-                }
-            }
-        }
-
-        // Función para ir a la siguiente pregunta
-        function nextQuestion() {
-            const question = qchatData.questions[currentQuestionIndex];
-            
-            if (responses[question.id] === undefined) {
-                showNotification('Por favor, selecciona una respuesta antes de continuar', 'warning');
-                return;
-            }
-
-            currentQuestionIndex++;
-            showQuestion();
-        }
-
-        // Función para ir a la pregunta anterior
-        function previousQuestion() {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                showQuestion();
-            }
-        }
-
-        // Función para calcular el puntaje total
-        function calculateTotalScore() {
-            return Object.values(responses).reduce((sum, value) => sum + value, 0);
-        }
-
-        // Función para calcular puntajes por categoría
-        function calculateCategoryScores() {
-            const categoryScores = {
-                social: 0,
-                communication: 0,
-                play: 0,
-                behavioral: 0,
-                sensory: 0
-            };
-
-            qchatData.questions.forEach(question => {
-                if (responses[question.id] !== undefined) {
-                    categoryScores[question.category] += responses[question.id];
-                }
-            });
-
-            return categoryScores;
-        }
-
-        // Función para obtener la interpretación del resultado
-        function getInterpretation(score) {
-            if (score <= 2) {
-                return {
-                    level: 'Bajo Riesgo',
-                    color: '#48bb78',
-                    description: 'El desarrollo de su hijo/a parece estar dentro del rango típico para su edad.',
-                    recommendation: 'Continue con las visitas regulares al pediatra y fomente el desarrollo a través del juego y la interacción social.'
-                };
-            } else if (score <= 7) {
-                return {
-                    level: 'Riesgo Moderado',
-                    color: '#ed8936',
-                    description: 'Algunas respuestas sugieren la necesidad de evaluación adicional.',
-                    recommendation: 'Se recomienda consultar con un pediatra del desarrollo o especialista en autismo para una evaluación más detallada.'
-                };
-            } else {
-                return {
-                    level: 'Alto Riesgo',
-                    color: '#e53e3e',
-                    description: 'Las respuestas indican una alta probabilidad de características del espectro autista.',
-                    recommendation: 'Se recomienda encarecidamente buscar una evaluación profesional inmediata con un especialista en desarrollo infantil.'
-                };
-            }
-        }
-
-        // Función para mostrar los resultados finales
-        function showFinalResults() {
-            const totalScore = calculateTotalScore();
-            const categoryScores = calculateCategoryScores();
-            const interpretation = getInterpretation(totalScore);
-            const completionTime = Math.round((Date.now() - startTime) / 60000);
-            const container = document.getElementById('qchat-container');
-
-            let categoryHtml = '';
-            Object.entries(categoryScores).forEach(([category, score]) => {
-                categoryHtml += 
-                    '<div class="category-item">' +
-                        '<div class="category-name">' + getCategoryName(category) + '</div>' +
-                        '<div class="category-score">' + score + ' puntos</div>' +
-                    '</div>';
-            });
-
-            container.innerHTML = 
-                '<div class="qchat-results">' +
-                    '<div class="results-header">' +
-                        '<h1>📋 Resultados del Q-CHAT</h1>' +
-                        '<div class="completion-info">' +
-                            '<span>✅ Cuestionario completado en ' + completionTime + ' minutos</span>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="score-summary">' +
-                        '<div class="score-card" style="border-color: ' + interpretation.color + '">' +
-                            '<div class="score-number">' + totalScore + '</div>' +
-                            '<div class="score-label">Puntuación Total</div>' +
-                            '<div class="score-range">(Rango: 0-25)</div>' +
-                        '</div>' +
-                        '<div class="interpretation-card" style="background-color: ' + interpretation.color + '20; border-color: ' + interpretation.color + '">' +
-                            '<h3 style="color: ' + interpretation.color + '">' + interpretation.level + '</h3>' +
-                            '<p>' + interpretation.description + '</p>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="category-breakdown">' +
-                        '<h3>📊 Desglose por Categorías</h3>' +
-                        '<div class="category-scores">' + categoryHtml + '</div>' +
-                    '</div>' +
-                    '<div class="recommendations">' +
-                        '<h3>💡 Recomendaciones</h3>' +
-                        '<div class="recommendation-content">' +
-                            '<p>' + interpretation.recommendation + '</p>' +
-                            (totalScore >= 3 ? 
-                                '<div class="next-steps">' +
-                                    '<h4>Próximos Pasos Sugeridos:</h4>' +
-                                    '<ul>' +
-                                        '<li>Programar cita con pediatra del desarrollo</li>' +
-                                        '<li>Documentar comportamientos específicos observados</li>' +
-                                        '<li>Recopilar videos de interacciones sociales</li>' +
-                                        '<li>Contactar servicios de intervención temprana locales</li>' +
-                                    '</ul>' +
-                                '</div>' :
-                                '<div class="monitoring-tips">' +
-                                    '<h4>Seguimiento Recomendado:</h4>' +
-                                    '<ul>' +
-                                        '<li>Continuar con visitas regulares al pediatra</li>' +
-                                        '<li>Fomentar el desarrollo a través del juego</li>' +
-                                        '<li>Mantener interacciones sociales frecuentes</li>' +
-                                        '<li>Repetir evaluación en 6 meses</li>' +
-                                    '</ul>' +
-                                '</div>'
-                            ) +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="results-actions">' +
-                        '<button class="btn btn-primary" onclick="generateReport()">' +
-                            '📄 Generar Reporte' +
-                        '</button>' +
-                        '<button class="btn btn-secondary" onclick="restartQuestionnaire()">' +
-                            '🔄 Realizar Nuevamente' +
-                        '</button>' +
-                        '<button class="btn btn-accent" onclick="shareResults()">' +
-                            '📤 Compartir Resultados' +
-                        '</button>' +
-                    '</div>' +
-                    '<div class="disclaimer-box">' +
-                        '<span class="disclaimer-icon">⚠️</span>' +
-                        '<div>' +
-                            '<strong>Recordatorio:</strong> ' +
-                            'Estos resultados son solo orientativos. Para un diagnóstico ' +
-                            'preciso, consulte con un profesional especializado en desarrollo infantil.' +
-                        '</div>' +
-                    '</div>' +
-                '</div>';
-
-            // Guardar resultados
-            saveResults(totalScore, categoryScores, interpretation, completionTime);
-        }
-
-        // Función para guardar resultados
-        function saveResults(totalScore, categoryScores, interpretation, completionTime) {
-            try {
-                const results = {
-                    timestamp: new Date().toISOString(),
-                    totalScore: totalScore,
-                    categoryScores: categoryScores,
-                    interpretation: interpretation,
-                    completionTime: completionTime,
-                    responses: responses,
-                    questionsAnswered: Object.keys(responses).length
-                };
-                
-                localStorage.setItem('qchat_results', JSON.stringify(results));
-                console.log('💾 Resultados guardados:', results);
-            } catch (error) {
-                console.warn('⚠️ No se pudieron guardar los resultados:', error);
-            }
-        }
-
-        // Función para reiniciar el cuestionario
-        function restartQuestionnaire() {
-            if (confirm('¿Está seguro de que desea reiniciar el cuestionario? Se perderán todas las respuestas actuales.')) {
-                currentQuestionIndex = 0;
-                responses = {};
-                startTime = Date.now();
-                
-                // Mostrar la introducción nuevamente
-                const container = document.getElementById('qchat-container');
-                container.innerHTML = 
-                    '<div class="qchat-introduction">' +
-                        '<div class="intro-header">' +
-                            '<h1>Q-CHAT (Quantitative Checklist for Autism in Toddlers)</h1>' +
-                            '<p class="intro-subtitle">Cuestionario de detección temprana para autismo en niños de 18-24 meses</p>' +
-                        '</div>' +
-                        '<div class="intro-content">' +
-                            '<div class="intro-info">' +
-                                '<div class="info-item">' +
-                                    '<span class="info-icon">⏱️</span>' +
-                                    '<div><strong>Tiempo estimado:</strong><br><span>5-7 minutos</span></div>' +
-                                '</div>' +
-                                '<div class="info-item">' +
-                                    '<span class="info-icon">❓</span>' +
-                                    '<div><strong>Preguntas:</strong><br><span>25 preguntas</span></div>' +
-                                '</div>' +
-                                '<div class="info-item">' +
-                                    '<span class="info-icon">👶</span>' +
-                                    '<div><strong>Edad recomendada:</strong><br><span>18-24 meses</span></div>' +
-                                '</div>' +
-                                '<div class="info-item">' +
-                                    '<span class="info-icon">🔒</span>' +
-                                    '<div><strong>Privacidad:</strong><br><span>Respuestas anónimas</span></div>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="disclaimer-box">' +
-                                '<span class="disclaimer-icon">⚠️</span>' +
-                                '<div>' +
-                                    '<strong>Importante:</strong> ' +
-                                    'Este cuestionario es solo una herramienta de detección. ' +
-                                    'Los resultados no constituyen un diagnóstico médico. ' +
-                                    'Consulte con un profesional de la salud si tiene preocupaciones.' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="intro-actions">' +
-                            '<button class="btn btn-primary btn-large" onclick="startDemo()">' +
-                                '🚀 Comenzar Cuestionario' +
-                            '</button>' +
-                        '</div>' +
-                    '</div>';
-            }
-        }
-
-        // Función para generar reporte
-        function generateReport() {
-            showNotification('Generando reporte en formato texto...', 'info');
-            
-            try {
-                const results = JSON.parse(localStorage.getItem('qchat_results'));
-                if (!results) {
-                    showNotification('No se encontraron resultados para generar reporte', 'error');
-                    return;
-                }
-
-                const reportText = 
-                    '=== REPORTE Q-CHAT ===' + '\n' +
-                    'Fecha: ' + new Date(results.timestamp).toLocaleString('es-ES') + '\n' +
-                    'Tiempo de completion: ' + results.completionTime + ' minutos' + '\n' +
-                    'Preguntas respondidas: ' + results.questionsAnswered + '/25' + '\n\n' +
-                    '=== RESULTADOS ===' + '\n' +
-                    'Puntuación Total: ' + results.totalScore + '/25' + '\n' +
-                    'Nivel de Riesgo: ' + results.interpretation.level + '\n' +
-                    'Descripción: ' + results.interpretation.description + '\n\n' +
-                    '=== RECOMENDACIONES ===' + '\n' +
-                    results.interpretation.recommendation + '\n\n' +
-                    '=== PUNTUACIONES POR CATEGORÍA ===' + '\n' +
-                    'Interacción Social: ' + results.categoryScores.social + '\n' +
-                    'Comunicación: ' + results.categoryScores.communication + '\n' +
-                    'Juego: ' + results.categoryScores.play + '\n' +
-                    'Comportamiento: ' + results.categoryScores.behavioral + '\n' +
-                    'Procesamiento Sensorial: ' + results.categoryScores.sensory + '\n\n' +
-                    '=== DISCLAIMER ===' + '\n' +
-                    'Este cuestionario es solo una herramienta de detección. ' +
-                    'Los resultados no constituyen un diagnóstico médico. ' +
-                    'Consulte con un profesional especializado en desarrollo infantil.';
-
-                // Crear y descargar archivo
-                const blob = new Blob([reportText], { type: 'text/plain;charset=utf-8' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'Q-CHAT_Reporte_' + new Date().toISOString().split('T')[0] + '.txt';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-
-                showNotification('Reporte descargado exitosamente', 'success');
-            } catch (error) {
-                console.error('Error generando reporte:', error);
-                showNotification('Error al generar el reporte', 'error');
-            }
-        }
-
-        // Función para compartir resultados
-        function shareResults() {
-            try {
-                const results = JSON.parse(localStorage.getItem('qchat_results'));
-                if (!results) {
-                    showNotification('No se encontraron resultados para compartir', 'error');
-                    return;
-                }
-
-                const shareText = 'Resultados Q-CHAT: Puntuación ' + results.totalScore + '/25 - ' + results.interpretation.level;
-                
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'Resultados Q-CHAT',
-                        text: shareText,
-                        url: window.location.href
-                    }).then(() => {
-                        showNotification('Resultados compartidos', 'success');
-                    }).catch(() => {
-                        copyToClipboard(shareText);
-                    });
-                } else {
-                    copyToClipboard(shareText);
-                }
-            } catch (error) {
-                console.error('Error compartiendo resultados:', error);
-                showNotification('Error al compartir resultados', 'error');
-            }
-        }
-
-        // Función para copiar al portapapeles
-        function copyToClipboard(text) {
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showNotification('Resultados copiados al portapapeles', 'success');
-                }).catch(() => {
-                    showNotification('No se pudo copiar al portapapeles', 'error');
-                });
-            } else {
-                // Fallback para navegadores más antiguos
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    showNotification('Resultados copiados al portapapeles', 'success');
-                } catch (err) {
-                    showNotification('No se pudo copiar al portapapeles', 'error');
-                }
-                document.body.removeChild(textArea);
-            }
-        }
-
-        // Show notification function
-        function showNotification(message, type) {
-            // Remove any existing notification
-            const existingNotification = document.querySelector('.notification');
-            if (existingNotification) {
-                existingNotification.remove();
-            }
-
-            const notification = document.createElement('div');
-            notification.className = 'notification notification-' + type;
-            notification.innerHTML = 
-                '<span class="notification-icon">' +
-                    (type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'error' ? '❌' : 'ℹ️') +
-                '</span>' +
-                '<span class="notification-message">' + message + '</span>';
-            
-            document.body.appendChild(notification);
-            
-            // Show notification
-            setTimeout(function() {
-                notification.classList.add('show');
-            }, 100);
-            
-            // Hide notification after 3 seconds
-            setTimeout(function() {
-                notification.classList.remove('show');
-                setTimeout(function() {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q-CHAT - Detección Temprana del Autismo</title>
+    <title>Q-CHAT - Cuestionario de Detección del Autismo | JuegoTEA</title>
     
-    <style>
-        /* Reset y Variables */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-color: #4299e1;
-            --secondary-color: #63b3ed;
-            --success-color: #48bb78;
-            --warning-color: #ed8936;
-            --danger-color: #e53e3e;
-            --text-primary: #2d3748;
-            --text-secondary: #4a5568;
-            --background: #f7fafc;
-            --white: #ffffff;
-            --border: #e2e8f0;
-            --shadow: 0 4px 15px rgba(0,0,0,0.1);
-            --radius: 12px;
-            --transition: all 0.3s ease;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            min-height: 100vh;
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 1rem 0;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 2rem;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .back-btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .back-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-
-        /* Main Container */
-        .main-container {
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        #qchat-container {
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-
-        /* Introduction Styles */
-        .qchat-introduction {
-            padding: 3rem;
-            text-align: center;
-        }
-
-        .intro-header h1 {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-
-        .intro-subtitle {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-        }
-
-        .intro-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: var(--background);
-            border-radius: var(--radius);
-            text-align: left;
-        }
-
-        .info-icon {
-            font-size: 2rem;
-            flex-shrink: 0;
-        }
-
-        .intro-instructions {
-            background: var(--background);
-            padding: 2rem;
-            border-radius: var(--radius);
-            margin: 2rem 0;
-            text-align: left;
-        }
-
-        .intro-instructions h3 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-
-        .intro-instructions ul {
-            list-style-position: inside;
-        }
-
-        .intro-instructions li {
-            margin: 0.5rem 0;
-        }
-
-        .disclaimer-box {
-            background: #fff3cd;
-            border: 2px solid var(--warning-color);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            margin: 2rem 0;
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-        }
-
-        .disclaimer-icon {
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        /* Question Styles */
-        .qchat-question {
-            padding: 2rem;
-        }
-
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .question-number {
-            font-weight: bold;
-            color: var(--primary-color);
-            font-size: 1.1rem;
-        }
-
-        .question-category {
-            background: var(--primary-color);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-
-        .progress-container {
-            margin-bottom: 2rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 12px;
-            background: var(--border);
-            border-radius: 6px;
-            overflow: hidden;
-            margin-bottom: 0.5rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            border-radius: 6px;
-            transition: width 0.5s ease;
-            width: 0%;
-        }
-
-        .progress-text {
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .question-content {
-            margin-bottom: 2rem;
-        }
-
-        .question-text {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 2rem;
-            line-height: 1.4;
-        }
-
-        .question-options {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .option-label {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1.5rem;
-            border: 2px solid var(--border);
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: var(--transition);
-            background: var(--white);
-        }
-
-        .option-label:hover {
-            border-color: var(--primary-color);
-            background: #f0f9ff;
-            transform: translateY(-2px);
-        }
-
-        .option-label.selected {
-            border-color: var(--primary-color);
-            background: #e6f7ff;
-        }
-
-        .option-label input[type="radio"] {
-            margin: 0;
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-            accent-color: var(--primary-color);
-        }
-
-        .option-content {
-            flex: 1;
-        }
-
-        .option-text {
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .option-description {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
-        .question-actions {
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        /* Results Styles */
-        .qchat-results {
-            padding: 2rem;
-        }
-
-        .results-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .results-header h1 {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-
-        .completion-info {
-            color: var(--text-secondary);
-        }
-
-        .score-summary {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 2rem;
-            margin-bottom: 3rem;
-            align-items: center;
-        }
-
-        .score-card {
-            text-align: center;
-            padding: 2rem;
-            border: 3px solid;
-            border-radius: var(--radius);
-            background: var(--white);
-        }
-
-        .score-number {
-            font-size: 4rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .score-label {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .score-range {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .interpretation-card {
-            padding: 2rem;
-            border-radius: var(--radius);
-            border: 2px solid;
-        }
-
-        .interpretation-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .category-breakdown {
-            margin-bottom: 3rem;
-        }
-
-        .category-breakdown h3 {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-        }
-
-        .category-scores {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-
-        .category-item {
-            padding: 1.5rem;
-            background: var(--background);
-            border-radius: var(--radius);
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .category-name {
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .category-score {
-            color: var(--primary-color);
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
-        .category-description {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .recommendations {
-            background: var(--background);
-            padding: 2rem;
-            border-radius: var(--radius);
-            margin-bottom: 2rem;
-        }
-
-        .recommendations h3 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-
-        .next-steps, .monitoring-tips {
-            margin-top: 1.5rem;
-        }
-
-        .next-steps h4, .monitoring-tips h4 {
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-        }
-
-        .next-steps ul, .monitoring-tips ul {
-            list-style-position: inside;
-        }
-
-        .results-actions {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 25px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            min-height: 44px;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            color: white;
-        }
-
-        .btn-secondary {
-            background: linear-gradient(45deg, #718096, #a0aec0);
-            color: white;
-        }
-
-        .btn-accent {
-            background: linear-gradient(45deg, var(--success-color), #68d391);
-            color: white;
-        }
-
-        .btn-large {
-            padding: 16px 32px;
-            font-size: 1.2rem;
-        }
-
-        .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        /* Error Styles */
-        .error-container {
-            text-align: center;
-            padding: 3rem;
-        }
-
-        .error-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
-        .error-container h2 {
-            color: var(--danger-color);
-            margin-bottom: 1rem;
-        }
-
-        /* Notifications */
-        .notification {
-            position: fixed;
-            top: 100px;
-            right: -400px;
-            background: var(--white);
-            padding: 1rem 1.5rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            z-index: 1000;
-            transition: right 0.3s ease;
-            max-width: 350px;
-            border-left: 4px solid;
-        }
-
-        .notification.show {
-            right: 20px;
-        }
-
-        .notification-info {
-            border-left-color: var(--primary-color);
-        }
-
-        .notification-success {
-            border-left-color: var(--success-color);
-        }
-
-        .notification-warning {
-            border-left-color: var(--warning-color);
-        }
-
-        .notification-error {
-            border-left-color: var(--danger-color);
-        }
-
-        .notification-icon {
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        .notification-message {
-            font-weight: 600;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .nav-container {
-                padding: 0 1rem;
-            }
-
-            .main-container {
-                padding: 0 1rem;
-                margin: 1rem auto;
-            }
-
-            .qchat-introduction,
-            .qchat-question,
-            .qchat-results {
-                padding: 1.5rem;
-            }
-
-            .intro-header h1 {
-                font-size: 2rem;
-            }
-
-            .question-text {
-                font-size: 1.3rem;
-            }
-
-            .score-summary {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .score-number {
-                font-size: 3rem;
-            }
-
-            .question-actions {
-                flex-direction: column;
-            }
-
-            .results-actions {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .category-scores {
-                grid-template-columns: 1fr;
-            }
-
-            .notification {
-                right: -350px;
-                max-width: 300px;
-            }
-
-            .notification.show {
-                right: 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .intro-info {
-                grid-template-columns: 1fr;
-            }
-
-            .question-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .option-label {
-                padding: 1rem;
-            }
-
-            .score-number {
-                font-size: 2.5rem;
-            }
-        }
-
-        /* Loading Animation */
-        .loading {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .loading.show {
-            display: flex;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Accessibility Improvements */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-
-        .skip-link {
-            position: absolute;
-            top: -40px;
-            left: 6px;
-            background: var(--primary-color);
-            color: white;
-            padding: 8px;
-            text-decoration: none;
-            border-radius: 4px;
-            z-index: 9999;
-            transition: top 0.3s;
-        }
-
-        .skip-link:focus {
-            top: 6px;
-        }
-
-        /* Focus States */
-        .btn:focus,
-        .option-label:focus,
-        input:focus {
-            outline: 3px solid var(--success-color);
-            outline-offset: 2px;
-        }
-
-        /* Print Styles */
-        @media print {
-            body {
-                background: white;
-            }
-
-            .header,
-            .question-actions,
-            .results-actions,
-            .notification {
-                display: none;
-            }
-
-            .qchat-results {
-                page-break-inside: avoid;
-            }
-        }
-    </style>
+    <!-- Meta tags para SEO y accesibilidad -->
+    <meta name="description" content="Cuestionario Q-CHAT para la detección temprana del Trastorno del Espectro Autista (TEA) en niños de 2-17 años">
+    <meta name="keywords" content="autismo, TEA, detección temprana, Q-CHAT, cuestionario, desarrollo infantil">
+    <meta name="author" content="JuegoTEA">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Q-CHAT - Cuestionario de Detección del Autismo">
+    <meta property="og:description" content="Herramienta de detección temprana para el Trastorno del Espectro Autista">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_ES">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="../manifest.json">
+    <meta name="theme-color" content="#4299e1">
+    
+    <!-- Preload crítico -->
+    <link rel="preload" href="./data/qchat-data.json" as="fetch" crossorigin="anonymous">
+    
+    <!-- Estilos CSS -->
+    <link rel="stylesheet" href="./css/qchat-quiz.css">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "MedicalWebPage",
+        "name": "Q-CHAT - Cuestionario de Detección del Autismo",
+        "description": "Cuestionario de detección temprana para el Trastorno del Espectro Autista",
+        "medicalAudience": "Patient",
+        "about": {
+            "@type": "MedicalCondition",
+            "name": "Trastorno del Espectro Autista",
+            "alternateName": "TEA"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "JuegoTEA"
+        }
+    }
+    </script>
 </head>
+
 <body>
+    <!-- Skip link para accesibilidad -->
     <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
 
     <!-- Header -->
-    <header class="header">
-        <nav class="nav-container">
+    <header class="header" role="banner">
+        <nav class="nav-container" role="navigation" aria-label="Navegación principal">
             <div class="logo">
                 📋 Q-CHAT
             </div>
-            <a href="../index.html" class="back-btn">
+            <a href="../index.html" class="back-btn" aria-label="Volver a la página principal">
                 ← Volver al Inicio
             </a>
         </nav>
     </header>
 
     <!-- Loading Overlay -->
-    <div class="loading" id="loadingOverlay">
-        <div class="spinner"></div>
+    <div class="loading" id="loadingOverlay" role="status" aria-label="Cargando cuestionario">
+        <div class="spinner" aria-hidden="true"></div>
+        <span class="sr-only">Cargando...</span>
     </div>
 
     <!-- Main Content -->
-    <main class="main-container" id="main-content">
-        <div id="qchat-container">
-            <!-- Content will be dynamically generated here -->
-            <div style="text-align: center; padding: 3rem;">
+    <main class="main-container" id="main-content" role="main">
+        <div id="qchat-container" aria-live="polite" aria-atomic="true">
+            <!-- Contenido inicial mientras carga -->
+            <div class="loading-placeholder" style="text-align: center; padding: 3rem;">
                 <div class="spinner"></div>
                 <p style="margin-top: 1rem; color: var(--text-secondary);">
                     Cargando cuestionario...
@@ -1538,30 +86,297 @@
             </div>
         </div>
     </main>
-    
+
     <!-- Scripts -->
     <script>
-        // Include the optimized JavaScript here or load from external file
-        // For production, you would load: <script src="js/qchat-optimized.js">
-        
-        // Fallback error handling
+        // Configuración global y datos del cuestionario
+        window.QChatConfig = {
+            dataUrl: './data/qchat-data.json',
+            debug: false,
+            enableAnalytics: false,
+            version: '2.0'
+        };
+
+        // Datos completos del cuestionario (normalmente vendría del JSON)
+        window.QChatData = {
+            "metadata": {
+                "version": "2.0",
+                "title": "Q-CHAT - Cuestionario de Detección del Autismo",
+                "description": "Cuestionario de detección temprana para el Trastorno del Espectro Autista (TEA) adaptado para diferentes rangos de edad",
+                "authors": "JuegoTEA - Adaptado de Allison et al.",
+                "language": "es",
+                "lastUpdated": "2025-01-25"
+            },
+            "ageGroups": {
+                "toddlers": {
+                    "id": "toddlers",
+                    "name": "Niños Pequeños",
+                    "ageRange": "2-6 años",
+                    "minAge": 24,
+                    "maxAge": 72,
+                    "description": "Cuestionario adaptado para la primera infancia",
+                    "totalQuestions": 25,
+                    "completionTime": "5-7 minutos",
+                    "scoringThreshold": {
+                        "lowRisk": { "min": 0, "max": 3 },
+                        "moderateRisk": { "min": 4, "max": 7 },
+                        "highRisk": { "min": 8, "max": 25 }
+                    }
+                },
+                "children": {
+                    "id": "children",
+                    "name": "Niños Escolares",
+                    "ageRange": "7-11 años",
+                    "minAge": 84,
+                    "maxAge": 132,
+                    "description": "Cuestionario adaptado para edad escolar temprana",
+                    "totalQuestions": 30,
+                    "completionTime": "8-10 minutos",
+                    "scoringThreshold": {
+                        "lowRisk": { "min": 0, "max": 4 },
+                        "moderateRisk": { "min": 5, "max": 9 },
+                        "highRisk": { "min": 10, "max": 30 }
+                    }
+                },
+                "adolescents": {
+                    "id": "adolescents",
+                    "name": "Adolescentes",
+                    "ageRange": "12-17 años",
+                    "minAge": 144,
+                    "maxAge": 204,
+                    "description": "Cuestionario adaptado para adolescentes",
+                    "totalQuestions": 35,
+                    "completionTime": "10-12 minutos",
+                    "scoringThreshold": {
+                        "lowRisk": { "min": 0, "max": 5 },
+                        "moderateRisk": { "min": 6, "max": 12 },
+                        "highRisk": { "min": 13, "max": 35 }
+                    }
+                }
+            },
+            "questions": {
+                "toddlers": [
+                    {
+                        "id": 1,
+                        "text": "¿Su hijo/a le mira cuando le habla?",
+                        "category": "social",
+                        "subcategory": "eye_contact",
+                        "options": [
+                            { "value": 0, "text": "Siempre", "description": "Mi hijo/a siempre me mira cuando le hablo" },
+                            { "value": 0, "text": "Casi siempre", "description": "Mi hijo/a me mira la mayoría de las veces" },
+                            { "value": 0, "text": "A veces", "description": "Mi hijo/a me mira algunas veces" },
+                            { "value": 1, "text": "Raramente", "description": "Mi hijo/a raramente me mira cuando le hablo" },
+                            { "value": 1, "text": "Nunca", "description": "Mi hijo/a nunca me mira cuando le hablo" }
+                        ]
+                    },
+                    {
+                        "id": 2,
+                        "text": "¿Qué tan fácil es para usted hacer contacto visual con su hijo/a?",
+                        "category": "social",
+                        "subcategory": "eye_contact",
+                        "options": [
+                            { "value": 0, "text": "Muy fácil", "description": "Es muy fácil establecer contacto visual" },
+                            { "value": 0, "text": "Bastante fácil", "description": "Generalmente es fácil hacer contacto visual" },
+                            { "value": 0, "text": "Bastante difícil", "description": "A veces es difícil hacer contacto visual" },
+                            { "value": 1, "text": "Muy difícil", "description": "Es muy difícil establecer contacto visual" },
+                            { "value": 1, "text": "Imposible", "description": "No logro hacer contacto visual con mi hijo/a" }
+                        ]
+                    },
+                    {
+                        "id": 3,
+                        "text": "¿Su hijo/a señala para pedir algo (por ejemplo, un juguete que está fuera de su alcance)?",
+                        "category": "communication",
+                        "subcategory": "pointing",
+                        "options": [
+                            { "value": 0, "text": "Muchas veces al día", "description": "Señala frecuentemente para pedir cosas" },
+                            { "value": 0, "text": "Algunas veces al día", "description": "Señala ocasionalmente durante el día" },
+                            { "value": 0, "text": "Algunas veces por semana", "description": "Señala unas pocas veces por semana" },
+                            { "value": 1, "text": "Menos de una vez por semana", "description": "Raramente señala para pedir" },
+                            { "value": 1, "text": "Nunca", "description": "Nunca señala para pedir algo" }
+                        ]
+                    },
+                    {
+                        "id": 4,
+                        "text": "¿Su hijo/a señala para mostrarle algo interessante?",
+                        "category": "communication",
+                        "subcategory": "joint_attention",
+                        "options": [
+                            { "value": 0, "text": "Muchas veces al día", "description": "Señala frecuentemente para mostrar cosas" },
+                            { "value": 0, "text": "Algunas veces al día", "description": "Ocasionalmente señala para mostrar" },
+                            { "value": 0, "text": "Algunas veces por semana", "description": "Señala para mostrar pocas veces por semana" },
+                            { "value": 1, "text": "Menos de una vez por semana", "description": "Raramente señala para mostrar" },
+                            { "value": 1, "text": "Nunca", "description": "Nunca señala para mostrar algo" }
+                        ]
+                    },
+                    {
+                        "id": 5,
+                        "text": "¿Su hijo/a pretende (por ejemplo, hacer té, hablar por teléfono)?",
+                        "category": "play",
+                        "subcategory": "pretend_play",
+                        "options": [
+                            { "value": 0, "text": "Muchas veces al día", "description": "Juega imaginativamente con frecuencia" },
+                            { "value": 0, "text": "Algunas veces al día", "description": "Ocasionalmente hace juego de pretensión" },
+                            { "value": 0, "text": "Algunas veces por semana", "description": "Juego imaginativo pocas veces por semana" },
+                            { "value": 1, "text": "Menos de una vez por semana", "description": "Raramente hace juego de pretensión" },
+                            { "value": 1, "text": "Nunca", "description": "Nunca juega imaginativamente" }
+                        ]
+                    }
+                ],
+                "children": [
+                    {
+                        "id": 1,
+                        "text": "¿Su hijo/a mantiene conversaciones apropiadas para su edad?",
+                        "category": "communication",
+                        "subcategory": "conversation",
+                        "options": [
+                            { "value": 0, "text": "Siempre", "description": "Mantiene conversaciones fluidas y apropiadas" },
+                            { "value": 0, "text": "Casi siempre", "description": "Generalmente conversa apropiadamente" },
+                            { "value": 1, "text": "A veces", "description": "A veces tiene dificultades conversacionales" },
+                            { "value": 1, "text": "Raramente", "description": "Raramente mantiene conversaciones apropiadas" },
+                            { "value": 1, "text": "Nunca", "description": "No mantiene conversaciones apropiadas" }
+                        ]
+                    },
+                    {
+                        "id": 2,
+                        "text": "¿Su hijo/a entiende las expresiones faciales y el lenguaje corporal de otros?",
+                        "category": "social",
+                        "subcategory": "nonverbal_communication",
+                        "options": [
+                            { "value": 0, "text": "Muy bien", "description": "Comprende claramente las expresiones y gestos" },
+                            { "value": 0, "text": "Bastante bien", "description": "Generalmente entiende las señales no verbales" },
+                            { "value": 1, "text": "Con dificultad", "description": "Tiene dificultades para interpretar expresiones" },
+                            { "value": 1, "text": "Muy poco", "description": "Apenas comprende las señales no verbales" },
+                            { "value": 1, "text": "No entiende", "description": "No comprende expresiones ni gestos" }
+                        ]
+                    }
+                ],
+                "adolescents": [
+                    {
+                        "id": 1,
+                        "text": "¿Su hijo/a comprende las normas sociales no escritas en diferentes situaciones?",
+                        "category": "social",
+                        "subcategory": "social_norms",
+                        "options": [
+                            { "value": 0, "text": "Completamente", "description": "Comprende y aplica las normas sociales apropiadamente" },
+                            { "value": 0, "text": "Bastante bien", "description": "Generalmente comprende las expectativas sociales" },
+                            { "value": 1, "text": "Con ayuda", "description": "Necesita orientación para entender normas sociales" },
+                            { "value": 1, "text": "Con mucha dificultad", "description": "Tiene grandes dificultades con las normas sociales" },
+                            { "value": 1, "text": "No las comprende", "description": "No comprende las expectativas sociales implícitas" }
+                        ]
+                    },
+                    {
+                        "id": 2,
+                        "text": "¿Su hijo/a maneja bien los cambios en rutinas o planes?",
+                        "category": "behavioral",
+                        "subcategory": "flexibility",
+                        "options": [
+                            { "value": 0, "text": "Muy bien", "description": "Se adapta fácilmente a los cambios" },
+                            { "value": 0, "text": "Bastante bien", "description": "Generalmente acepta los cambios sin problema" },
+                            { "value": 1, "text": "Con dificultad", "description": "Le cuesta adaptarse a los cambios" },
+                            { "value": 1, "text": "Muy mal", "description": "Los cambios le causan mucho estrés" },
+                            { "value": 1, "text": "Extremadamente mal", "description": "No puede tolerar cambios en rutinas" }
+                        ]
+                    }
+                ]
+            },
+            "categories": {
+                "social": {
+                    "name": "Interacción Social",
+                    "description": "Habilidades de comunicación social, contacto visual y relaciones interpersonales",
+                    "icon": "👥",
+                    "color": "#4299e1"
+                },
+                "communication": {
+                    "name": "Comunicación",
+                    "description": "Lenguaje verbal y no verbal, comprensión y expresión",
+                    "icon": "💬",
+                    "color": "#48bb78"
+                },
+                "play": {
+                    "name": "Juego",
+                    "description": "Juego imaginativo, creativo y uso apropiado de juguetes",
+                    "icon": "🎭",
+                    "color": "#ed8936"
+                },
+                "behavioral": {
+                    "name": "Comportamiento",
+                    "description": "Rutinas, flexibilidad, movimientos repetitivos y adaptabilidad",
+                    "icon": "🔄",
+                    "color": "#9f7aea"
+                },
+                "sensory": {
+                    "name": "Procesamiento Sensorial",
+                    "description": "Sensibilidades auditivas, visuales, táctiles y procesamiento sensorial",
+                    "icon": "👂",
+                    "color": "#38b2ac"
+                },
+                "cognitive": {
+                    "name": "Habilidades Cognitivas",
+                    "description": "Atención, memoria, resolución de problemas y funciones ejecutivas",
+                    "icon": "🧠",
+                    "color": "#e53e3e"
+                }
+            },
+            "scoring": {
+                "interpretation": {
+                    "lowRisk": {
+                        "title": "Desarrollo Típico",
+                        "description": "Las respuestas sugieren un desarrollo dentro del rango esperado para la edad.",
+                        "color": "#48bb78",
+                        "icon": "✅",
+                        "recommendations": [
+                            "Continue fomentando el desarrollo a través del juego y la interacción",
+                            "Mantenga las visitas regulares al pediatra",
+                            "Continúe observando el desarrollo de su hijo/a"
+                        ]
+                    },
+                    "moderateRisk": {
+                        "title": "Requiere Atención",
+                        "description": "Algunas respuestas sugieren la necesidad de evaluación adicional.",
+                        "color": "#ed8936",
+                        "icon": "⚠️",
+                        "recommendations": [
+                            "Consulte con el pediatra de su hijo/a",
+                            "Considere una evaluación del desarrollo",
+                            "Documente comportamientos específicos",
+                            "Busque recursos de apoyo temprano"
+                        ]
+                    },
+                    "highRisk": {
+                        "title": "Evaluación Recomendada",
+                        "description": "Las respuestas indican la necesidad de evaluación profesional especializada.",
+                        "color": "#e53e3e",
+                        "icon": "🚨",
+                        "recommendations": [
+                            "Busque evaluación profesional inmediata",
+                            "Contacte servicios de intervención temprana",
+                            "Documente comportamientos y situaciones específicas",
+                            "Considere servicios de apoyo para la familia"
+                        ]
+                    }
+                }
+            }
+        };
+
+        // Gestión de errores global
         window.addEventListener('error', function(e) {
             console.error('Error en Q-CHAT:', e.error);
             const container = document.getElementById('qchat-container');
             if (container) {
-                container.innerHTML = 
-                    '<div class="error-container">' +
-                        '<div class="error-icon">❌</div>' +
-                        '<h2>Error de Carga</h2>' +
-                        '<p>No se pudo cargar el cuestionario. Por favor, recarga la página.</p>' +
-                        '<button class="btn btn-primary" onclick="location.reload()">' +
-                            '🔄 Recargar Página' +
-                        '</button>' +
-                    '</div>';
+                container.innerHTML = `
+                    <div class="error-container">
+                        <div class="error-icon">❌</div>
+                        <h2>Error de Carga</h2>
+                        <p>No se pudo cargar el cuestionario. Por favor, recarga la página.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">
+                            🔄 Recargar Página
+                        </button>
+                    </div>
+                `;
             }
         });
 
-        // Basic loading state management
+        // Gestión del estado de carga
         function showLoading() {
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) {
@@ -1576,265 +391,69 @@
             }
         }
 
-        // Initialize loading state
+        // Inicialización cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
-            // The QChatAssessment class will handle initialization
             console.log('📋 Q-CHAT DOM loaded');
             
-            // Simulate loading for demo
+            // Simular carga inicial
             showLoading();
+            
             setTimeout(() => {
                 hideLoading();
-                const container = document.getElementById('qchat-container');
-                if (container) {
-                    container.innerHTML = 
-                        '<div class="qchat-introduction">' +
-                            '<div class="intro-header">' +
-                                '<h1>Q-CHAT (Quantitative Checklist for Autism in Toddlers)</h1>' +
-                                '<p class="intro-subtitle">Cuestionario de detección temprana para autismo en niños de 18-24 meses</p>' +
-                            '</div>' +
-                            '<div class="intro-content">' +
-                                '<div class="intro-info">' +
-                                    '<div class="info-item">' +
-                                        '<span class="info-icon">⏱️</span>' +
-                                        '<div><strong>Tiempo estimado:</strong><br><span>5-7 minutos</span></div>' +
-                                    '</div>' +
-                                    '<div class="info-item">' +
-                                        '<span class="info-icon">❓</span>' +
-                                        '<div><strong>Preguntas:</strong><br><span>25 preguntas</span></div>' +
-                                    '</div>' +
-                                    '<div class="info-item">' +
-                                        '<span class="info-icon">👶</span>' +
-                                        '<div><strong>Edad recomendada:</strong><br><span>18-24 meses</span></div>' +
-                                    '</div>' +
-                                    '<div class="info-item">' +
-                                        '<span class="info-icon">🔒</span>' +
-                                        '<div><strong>Privacidad:</strong><br><span>Respuestas anónimas</span></div>' +
-                                    '</div>' +
-                                '</div>' +
-                                '<div class="intro-instructions">' +
-                                    '<h3>📋 Instrucciones:</h3>' +
-                                    '<ul>' +
-                                        '<li>Responda basándose en el comportamiento típico de su hijo/a</li>' +
-                                        '<li>Si no está seguro/a, seleccione la opción más cercana</li>' +
-                                        '<li>No hay respuestas correctas o incorrectas</li>' +
-                                        '<li>Puede pausar y continuar en cualquier momento</li>' +
-                                    '</ul>' +
-                                '</div>' +
-                                '<div class="disclaimer-box">' +
-                                    '<span class="disclaimer-icon">⚠️</span>' +
-                                    '<div>' +
-                                        '<strong>Importante:</strong> ' +
-                                        'Este cuestionario es solo una herramienta de detección. ' +
-                                        'Los resultados no constituyen un diagnóstico médico. ' +
-                                        'Consulte con un profesional de la salud si tiene preocupaciones.' +
-                                    '</div>' +
-                                '</div>' +
-                            '</div>' +
-                            '<div class="intro-actions">' +
-                                '<button class="btn btn-primary btn-large" onclick="startDemo()">' +
-                                    '🚀 Comenzar Cuestionario (Demo)' +
-                                '</button>' +
-                            '</div>' +
-                        '</div>';
-                }
-            }, 1500);
+                // El QChatAssessment se inicializará automáticamente
+            }, 1000);
         });
 
-        // Demo function to show a sample question
-        function startDemo() {
-            const container = document.getElementById('qchat-container');
-            if (container) {
-                container.innerHTML = 
-                    '<div class="qchat-question">' +
-                        '<div class="question-header">' +
-                            '<div class="question-number">Pregunta 1 de 25</div>' +
-                            '<div class="question-category">Interacción Social</div>' +
-                        '</div>' +
-                        '<div class="progress-container">' +
-                            '<div class="progress-bar">' +
-                                '<div class="progress-fill" style="width: 4%"></div>' +
-                            '</div>' +
-                            '<div class="progress-text">4% completado</div>' +
-                        '</div>' +
-                        '<div class="question-content">' +
-                            '<h2 class="question-text">¿Su hijo/a le mira cuando le habla?</h2>' +
-                            '<div class="question-options">' +
-                                '<label class="option-label">' +
-                                    '<input type="radio" name="demo-response" value="0" data-text="Siempre">' +
-                                    '<div class="option-content">' +
-                                        '<div class="option-text">Siempre</div>' +
-                                        '<div class="option-description">Mi hijo/a siempre me mira cuando le hablo</div>' +
-                                    '</div>' +
-                                '</label>' +
-                                '<label class="option-label">' +
-                                    '<input type="radio" name="demo-response" value="0" data-text="Casi siempre">' +
-                                    '<div class="option-content">' +
-                                        '<div class="option-text">Casi siempre</div>' +
-                                        '<div class="option-description">Mi hijo/a me mira la mayoría de las veces</div>' +
-                                    '</div>' +
-                                '</label>' +
-                                '<label class="option-label">' +
-                                    '<input type="radio" name="demo-response" value="0" data-text="A veces">' +
-                                    '<div class="option-content">' +
-                                        '<div class="option-text">A veces</div>' +
-                                        '<div class="option-description">Mi hijo/a me mira algunas veces</div>' +
-                                    '</div>' +
-                                '</label>' +
-                                '<label class="option-label">' +
-                                    '<input type="radio" name="demo-response" value="1" data-text="Raramente">' +
-                                    '<div class="option-content">' +
-                                        '<div class="option-text">Raramente</div>' +
-                                        '<div class="option-description">Mi hijo/a raramente me mira cuando le hablo</div>' +
-                                    '</div>' +
-                                '</label>' +
-                                '<label class="option-label">' +
-                                    '<input type="radio" name="demo-response" value="1" data-text="Nunca">' +
-                                    '<div class="option-content">' +
-                                        '<div class="option-text">Nunca</div>' +
-                                        '<div class="option-description">Mi hijo/a nunca me mira cuando le hablo</div>' +
-                                    '</div>' +
-                                '</label>' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="question-actions">' +
-                            '<button class="btn btn-secondary" disabled>← Anterior</button>' +
-                            '<button class="btn btn-primary" id="nextBtn" onclick="showDemoResults()" disabled>Siguiente →</button>' +
-                        '</div>' +
-                    '</div>';
-
-                // Add event listeners for radio buttons
-                const radioButtons = container.querySelectorAll('input[name="demo-response"]');
-                const nextBtn = container.querySelector('#nextBtn');
-                
-                radioButtons.forEach(radio => {
-                    radio.addEventListener('change', function() {
-                        // Remove selected class from all labels
-                        container.querySelectorAll('.option-label').forEach(label => {
-                            label.classList.remove('selected');
-                        });
-                        
-                        // Add selected class to current label
-                        this.closest('.option-label').classList.add('selected');
-                        
-                        // Enable next button
-                        if (nextBtn) {
-                            nextBtn.disabled = false;
-                        }
-                        
-                        // Get the selected text for feedback
-                        const selectedText = this.getAttribute('data-text');
-                        
-                        // Show notification
-                        showNotification('Respuesta seleccionada: ' + selectedText, 'success');
-                        
-                        // Optional: speak the selection (if speech synthesis is available)
-                        if ('speechSynthesis' in window) {
-                            const utterance = new SpeechSynthesisUtterance('Seleccionado: ' + selectedText);
-                            utterance.lang = 'es-ES';
-                            utterance.rate = 0.8;
-                            utterance.volume = 0.7;
-                            speechSynthesis.speak(utterance);
-                        }
-                        
-                        console.log('Demo - Respuesta seleccionada:', selectedText, 'Valor:', this.value);
+        // Service Worker para PWA (opcional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('../sw.js')
+                    .then(function(registration) {
+                        console.log('SW registrado con éxito:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('SW falló al registrarse:', error);
                     });
-                });
+            });
+        }
+    </script>
+
+    <!-- Cargar el JavaScript principal -->
+    <script src="./js/qchat-optimized.js"></script>
+
+    <!-- Analytics (opcional) -->
+    <script>
+        // Analytics anónimo para mejorar el cuestionario
+        function trackEvent(category, action, label) {
+            if (window.QChatConfig && window.QChatConfig.enableAnalytics) {
+                // Implementar tracking anónimo aquí
+                console.log('Analytics:', { category, action, label });
             }
         }
 
-        // Show notification function
-        function showNotification(message, type) {
-            // Remove any existing notification
-            const existingNotification = document.querySelector('.notification');
-            if (existingNotification) {
-                existingNotification.remove();
-            }
+        // Trackear inicio del cuestionario
+        document.addEventListener('DOMContentLoaded', function() {
+            trackEvent('Q-CHAT', 'page_load', 'cuestionario_iniciado');
+        });
+    </script>
 
-            const notification = document.createElement('div');
-            notification.className = 'notification notification-' + type;
-            notification.innerHTML = 
-                '<span class="notification-icon">' +
-                    (type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'error' ? '❌' : 'ℹ️') +
-                '</span>' +
-                '<span class="notification-message">' + message + '</span>';
-            
-            document.body.appendChild(notification);
-            
-            // Show notification
-            setTimeout(function() {
-                notification.classList.add('show');
-            }, 100);
-            
-            // Hide notification after 3 seconds
-            setTimeout(function() {
-                notification.classList.remove('show');
-                setTimeout(function() {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
+    <!-- Síntesis de voz (opcional para accesibilidad) -->
+    <script>
+        // Funcionalidad de texto a voz para mejorar accesibilidad
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.8;
+                utterance.volume = 0.7;
+                speechSynthesis.speak(utterance);
+            }
         }
 
-        // Demo results function
-        function showDemoResults() {
-            const container = document.getElementById('qchat-container');
-            if (container) {
-                container.innerHTML = 
-                    '<div class="qchat-results">' +
-                        '<div class="results-header">' +
-                            '<h1>📋 Demo - Resultados del Q-CHAT</h1>' +
-                            '<div class="completion-info">' +
-                                '<span>✅ Esta es una demostración del cuestionario</span>' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="score-summary">' +
-                            '<div class="score-card" style="border-color: #48bb78">' +
-                                '<div class="score-number">2</div>' +
-                                '<div class="score-label">Puntuación Demo</div>' +
-                                '<div class="score-range">(Rango: 0-2)</div>' +
-                            '</div>' +
-                            '<div class="interpretation-card" style="background-color: #48bb7820; border-color: #48bb78">' +
-                                '<h3 style="color: #48bb78">Bajo Riesgo (Demo)</h3>' +
-                                '<p>Este es un ejemplo de cómo se mostrarían los resultados después de completar las 25 preguntas del cuestionario.</p>' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="recommendations">' +
-                            '<h3>💡 Sobre el Q-CHAT Real</h3>' +
-                            '<div class="recommendation-content">' +
-                                '<p>El cuestionario completo incluye 25 preguntas validadas científicamente para la detección temprana del autismo en niños de 18-24 meses.</p>' +
-                                '<div class="next-steps">' +
-                                    '<h4>Características del Cuestionario Completo:</h4>' +
-                                    '<ul>' +
-                                        '<li>25 preguntas organizadas en 5 categorías</li>' +
-                                        '<li>Sistema de puntuación validado clínicamente</li>' +
-                                        '<li>Interpretación automática de resultados</li>' +
-                                        '<li>Recomendaciones específicas según la puntuación</li>' +
-                                        '<li>Guardado automático del progreso</li>' +
-                                        '<li>Generación de reportes para profesionales</li>' +
-                                    '</ul>' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                        '<div class="results-actions">' +
-                            '<button class="btn btn-primary" onclick="location.reload()">' +
-                                '🔄 Reiniciar Demo' +
-                            '</button>' +
-                            '<button class="btn btn-secondary" onclick="window.history.back()">' +
-                                '🏠 Volver al Menú' +
-                            '</button>' +
-                        '</div>' +
-                        '<div class="disclaimer-box">' +
-                            '<span class="disclaimer-icon">⚠️</span>' +
-                            '<div>' +
-                                '<strong>Recordatorio:</strong> ' +
-                                'Esta es solo una demostración. Para el cuestionario real, ' +
-                                'consulte con un profesional especializado en desarrollo infantil.' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>';
-            }
+        // Agregar botones de audio a las preguntas (se puede implementar más tarde)
+        function addAudioSupport() {
+            // Esta función se puede expandir para agregar botones de audio
+            // a cada pregunta para mayor accesibilidad
         }
     </script>
 </body>

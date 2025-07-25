@@ -1,14 +1,18 @@
-// 📋 Q-CHAT - JavaScript Optimizado
-console.log('📋 Iniciando Q-CHAT...');
+// 📋 Q-CHAT - JavaScript Optimizado v2.0
+// Sistema de evaluación para múltiples rangos de edad
+console.log('📋 Iniciando Q-CHAT v2.0...');
 
 class QChatAssessment {
     constructor() {
         this.data = null;
         this.responses = {};
         this.currentQuestion = 0;
+        this.selectedAgeGroup = null;
+        this.currentQuestions = [];
         this.score = 0;
         this.categoryScores = {};
-        this.startTime = Date.now();
+        this.startTime = null;
+        this.demographicData = {};
         
         this.init();
     }
@@ -17,8 +21,8 @@ class QChatAssessment {
         try {
             await this.loadData();
             this.setupEventListeners();
-            this.initializeAssessment();
-            console.log('✅ Q-CHAT inicializado correctamente');
+            this.showAgeSelection();
+            console.log('✅ Q-CHAT v2.0 inicializado correctamente');
         } catch (error) {
             console.error('❌ Error inicializando Q-CHAT:', error);
             this.showError('Error cargando el cuestionario. Por favor, recarga la página.');
@@ -27,11 +31,11 @@ class QChatAssessment {
 
     async loadData() {
         try {
-            // En un entorno real, cargarías desde un archivo JSON
+            // En producción, esto cargaría desde el archivo JSON
             // const response = await fetch('./data/qchat-data.json');
             // this.data = await response.json();
             
-            // Para este ejemplo, simularemos la carga de datos
+            // Para desarrollo, simulamos la carga de datos
             this.data = await this.getQChatData();
             console.log('📊 Datos del Q-CHAT cargados:', this.data.metadata);
         } catch (error) {
@@ -39,289 +43,439 @@ class QChatAssessment {
         }
     }
 
-    // Método que simula la carga de datos (en producción vendría del JSON)
+    // Simulación de carga de datos (en producción vendría del JSON)
     async getQChatData() {
-        // Aquí irían los datos del JSON que creamos anteriormente
-        // Por simplicidad, devolvemos una versión reducida para demostrar la funcionalidad
         return new Promise(resolve => {
             setTimeout(() => {
+                // Aquí iría la estructura completa del JSON
                 resolve({
                     metadata: {
-                        title: "Q-CHAT (Quantitative Checklist for Autism in Toddlers)",
-                        totalQuestions: 25,
-                        scoringThreshold: 3
+                        version: "2.0",
+                        title: "Q-CHAT - Cuestionario de Detección del Autismo"
                     },
-                    questions: [], // Se cargarían del JSON completo
-                    scoring: {
-                        interpretation: {
-                            lowRisk: { range: "0-2", title: "Bajo Riesgo", color: "#48bb78" },
-                            moderateRisk: { range: "3-7", title: "Riesgo Moderado", color: "#ed8936" },
-                            highRisk: { range: "8+", title: "Alto Riesgo", color: "#e53e3e" }
+                    ageGroups: {
+                        toddlers: {
+                            name: "Niños Pequeños",
+                            ageRange: "2-6 años",
+                            totalQuestions: 25
+                        },
+                        children: {
+                            name: "Niños Escolares", 
+                            ageRange: "7-11 años",
+                            totalQuestions: 30
+                        },
+                        adolescents: {
+                            name: "Adolescentes",
+                            ageRange: "12-17 años", 
+                            totalQuestions: 35
                         }
+                    },
+                    questions: {
+                        toddlers: [],
+                        children: [],
+                        adolescents: []
                     }
                 });
-            }, 500);
+            }, 1000);
         });
     }
 
     setupEventListeners() {
-        // Navegación
-        document.addEventListener('click', (e) => {
-            if (e.target.matches('[data-action="next"]')) {
-                this.nextQuestion();
-            }
-            if (e.target.matches('[data-action="previous"]')) {
-                this.previousQuestion();
-            }
-            if (e.target.matches('[data-action="restart"]')) {
-                this.restartAssessment();
-            }
-            if (e.target.matches('[data-action="complete"]')) {
-                this.completeAssessment();
-            }
-        });
-
-        // Selección de respuestas
-        document.addEventListener('change', (e) => {
-            if (e.target.matches('input[name="response"]')) {
-                this.handleResponse(e.target);
-            }
-        });
-
-        // Navegación por teclado
+        // Gestión de eventos globales
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && e.target.matches('input[name="response"]')) {
-                this.nextQuestion();
+            if (e.key === 'Escape') {
+                this.handleEscape();
             }
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        });
+
+        // Navegación con teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' && this.currentQuestion > 0) {
                 this.previousQuestion();
-            }
-            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            } else if (e.key === 'ArrowRight' && this.canProceed()) {
                 this.nextQuestion();
             }
         });
     }
 
-    initializeAssessment() {
-        this.showIntroduction();
-        this.updateProgressBar();
-        this.initializeCategoryScores();
+    showAgeSelection() {
+        const container = document.getElementById('qchat-container');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="age-selection">
+                <div class="age-header">
+                    <h1>📋 Q-CHAT - Selección de Edad</h1>
+                    <p class="age-subtitle">Seleccione el rango de edad de su hijo/a para acceder al cuestionario apropiado</p>
+                </div>
+                
+                <div class="age-options">
+                    <div class="age-card" data-age-group="toddlers">
+                        <div class="age-icon">👶</div>
+                        <h3>Niños Pequeños</h3>
+                        <p class="age-range">2 - 6 años</p>
+                        <p class="age-description">Cuestionario adaptado para la primera infancia</p>
+                        <div class="age-details">
+                            <span class="detail-item">⏱️ 5-7 minutos</span>
+                            <span class="detail-item">❓ 25 preguntas</span>
+                        </div>
+                    </div>
+                    
+                    <div class="age-card" data-age-group="children">
+                        <div class="age-icon">🧒</div>
+                        <h3>Niños Escolares</h3>
+                        <p class="age-range">7 - 11 años</p>
+                        <p class="age-description">Cuestionario para edad escolar temprana</p>
+                        <div class="age-details">
+                            <span class="detail-item">⏱️ 8-10 minutos</span>
+                            <span class="detail-item">❓ 30 preguntas</span>
+                        </div>
+                    </div>
+                    
+                    <div class="age-card" data-age-group="adolescents">
+                        <div class="age-icon">👦</div>
+                        <h3>Adolescentes</h3>
+                        <p class="age-range">12 - 17 años</p>
+                        <p class="age-description">Cuestionario adaptado para adolescentes</p>
+                        <div class="age-details">
+                            <span class="detail-item">⏱️ 10-12 minutos</span>
+                            <span class="detail-item">❓ 35 preguntas</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="important-notice">
+                    <div class="notice-icon">⚠️</div>
+                    <div class="notice-content">
+                        <h4>Importante</h4>
+                        <p>Este cuestionario es una herramienta de detección, no un diagnóstico. 
+                        Los resultados deben ser interpretados por un profesional de la salud.</p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Agregar event listeners para la selección de edad
+        const ageCards = container.querySelectorAll('.age-card');
+        ageCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const ageGroup = card.dataset.ageGroup;
+                this.selectAgeGroup(ageGroup);
+            });
+
+            // Accesibilidad con teclado
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const ageGroup = card.dataset.ageGroup;
+                    this.selectAgeGroup(ageGroup);
+                }
+            });
+        });
     }
 
-    initializeCategoryScores() {
-        const categories = this.data.scoring?.categories || {};
-        Object.keys(categories).forEach(category => {
-            this.categoryScores[category] = 0;
+    selectAgeGroup(ageGroupId) {
+        this.selectedAgeGroup = ageGroupId;
+        this.currentQuestions = this.data.questions[ageGroupId] || [];
+        this.showDemographicForm();
+    }
+
+    showDemographicForm() {
+        const container = document.getElementById('qchat-container');
+        const ageGroupData = this.data.ageGroups[this.selectedAgeGroup];
+
+        container.innerHTML = `
+            <div class="demographic-form">
+                <div class="demo-header">
+                    <h1>📋 Q-CHAT - ${ageGroupData.name}</h1>
+                    <p class="demo-subtitle">Información básica antes de comenzar</p>
+                    <div class="selected-age">
+                        <span class="age-badge">${ageGroupData.ageRange}</span>
+                    </div>
+                </div>
+                
+                <form class="demo-form" id="demographicForm">
+                    <div class="form-group">
+                        <label for="childAge">Edad específica de su hijo/a (en meses)</label>
+                        <input type="number" id="childAge" min="${ageGroupData.minAge || 24}" 
+                               max="${ageGroupData.maxAge || 204}" required>
+                        <span class="form-help">Ejemplo: 36 meses para 3 años</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="parentRelation">Su relación con el niño/a</label>
+                        <select id="parentRelation" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="mother">Madre</option>
+                            <option value="father">Padre</option>
+                            <option value="guardian">Tutor/a legal</option>
+                            <option value="relative">Familiar cercano</option>
+                            <option value="caregiver">Cuidador/a</option>
+                            <option value="professional">Profesional (educador, terapeuta, etc.)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="previousConcerns">¿Ha tenido preocupaciones previas sobre el desarrollo?</label>
+                        <select id="previousConcerns">
+                            <option value="">Seleccione una opción</option>
+                            <option value="none">Ninguna preocupación</option>
+                            <option value="mild">Algunas preocupaciones menores</option>
+                            <option value="moderate">Preocupaciones moderadas</option>
+                            <option value="high">Preocupaciones significativas</option>
+                        </select>
+                    </div>
+                    
+                    <div class="privacy-notice">
+                        <div class="privacy-icon">🔒</div>
+                        <p>Sus respuestas son completamente anónimas y no se almacenan datos personales.</p>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        Comenzar Cuestionario →
+                    </button>
+                </form>
+            </div>
+        `;
+
+        // Manejar envío del formulario
+        const form = document.getElementById('demographicForm');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.processDemographicData(new FormData(form));
         });
+    }
+
+    processDemographicData(formData) {
+        this.demographicData = {
+            childAge: parseInt(formData.get('childAge')),
+            parentRelation: formData.get('parentRelation'),
+            previousConcerns: formData.get('previousConcerns'),
+            startTime: new Date().toISOString()
+        };
+
+        // Validar edad según el grupo seleccionado
+        const ageGroupData = this.data.ageGroups[this.selectedAgeGroup];
+        const childAgeMonths = this.demographicData.childAge;
+        
+        if (childAgeMonths < (ageGroupData.minAge || 0) || 
+            childAgeMonths > (ageGroupData.maxAge || 240)) {
+            this.showNotification(
+                `La edad ingresada (${childAgeMonths} meses) no corresponde al rango seleccionado (${ageGroupData.ageRange}). ¿Desea continuar de todos modos?`,
+                'warning'
+            );
+        }
+
+        this.startTime = Date.now();
+        this.currentQuestion = 0;
+        this.responses = {};
+        this.showIntroduction();
     }
 
     showIntroduction() {
         const container = document.getElementById('qchat-container');
+        const ageGroupData = this.data.ageGroups[this.selectedAgeGroup];
+
         container.innerHTML = `
             <div class="qchat-introduction">
                 <div class="intro-header">
-                    <h1>${this.data.metadata.title}</h1>
-                    <p class="intro-subtitle">${this.data.metadata.description || 'Cuestionario de detección temprana'}</p>
+                    <h1>📋 Q-CHAT - ${ageGroupData.name}</h1>
+                    <p class="intro-subtitle">Cuestionario para ${ageGroupData.ageRange}</p>
                 </div>
                 
                 <div class="intro-content">
-                    <div class="intro-info">
+                                            <div class="intro-info">
                         <div class="info-item">
                             <span class="info-icon">⏱️</span>
                             <div>
-                                <strong>Tiempo estimado:</strong>
-                                <span>5-7 minutos</span>
+                                <strong>Tiempo estimado:</strong><br>
+                                <span>${ageGroupData.completionTime || '5-10 minutos'}</span>
                             </div>
                         </div>
                         <div class="info-item">
                             <span class="info-icon">❓</span>
                             <div>
-                                <strong>Preguntas:</strong>
-                                <span>${this.data.metadata.totalQuestions} preguntas</span>
+                                <strong>Preguntas:</strong><br>
+                                <span>${ageGroupData.totalQuestions} preguntas</span>
                             </div>
                         </div>
                         <div class="info-item">
                             <span class="info-icon">👶</span>
                             <div>
-                                <strong>Edad recomendada:</strong>
-                                <span>18-24 meses</span>
+                                <strong>Edad del niño/a:</strong><br>
+                                <span>${this.demographicData.childAge} meses</span>
                             </div>
                         </div>
                         <div class="info-item">
                             <span class="info-icon">🔒</span>
                             <div>
-                                <strong>Privacidad:</strong>
+                                <strong>Privacidad:</strong><br>
                                 <span>Respuestas anónimas</span>
                             </div>
                         </div>
                     </div>
-
-                    <div class="intro-instructions">
-                        <h3>📋 Instrucciones:</h3>
-                        <ul>
+                    
+                    <div class="guidelines-box">
+                        <h3>📋 Instrucciones</h3>
+                        <ul class="guidelines-list">
                             <li>Responda basándose en el comportamiento típico de su hijo/a</li>
                             <li>Si no está seguro/a, seleccione la opción más cercana</li>
                             <li>No hay respuestas correctas o incorrectas</li>
-                            <li>Puede pausar y continuar en cualquier momento</li>
+                            <li>Puede navegar entre preguntas usando los botones</li>
+                            <li>Sus respuestas se guardan automáticamente</li>
                         </ul>
                     </div>
-
-                    <div class="intro-disclaimer">
-                        <div class="disclaimer-box">
-                            <span class="disclaimer-icon">⚠️</span>
-                            <div>
-                                <strong>Importante:</strong>
-                                Este cuestionario es solo una herramienta de detección. 
-                                Los resultados no constituyen un diagnóstico médico. 
-                                Consulte con un profesional de la salud si tiene preocupaciones.
-                            </div>
+                    
+                    <div class="disclaimer-box">
+                        <span class="disclaimer-icon">⚠️</span>
+                        <div>
+                            <strong>Importante:</strong> 
+                            Este cuestionario es una herramienta de detección, no un diagnóstico médico. 
+                            Los resultados deben ser interpretados por un profesional de la salud.
                         </div>
                     </div>
-                </div>
-
-                <div class="intro-actions">
-                    <button class="btn btn-primary btn-large" onclick="qchatApp.startAssessment()">
-                        🚀 Comenzar Cuestionario
-                    </button>
+                    
+                    <div class="intro-actions">
+                        <button class="btn btn-secondary" onclick="qchat.showAgeSelection()">
+                            ← Cambiar Edad
+                        </button>
+                        <button class="btn btn-primary" onclick="qchat.startAssessment()">
+                            Comenzar Cuestionario →
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
     }
 
     startAssessment() {
+        if (this.currentQuestions.length === 0) {
+            this.showError('No hay preguntas disponibles para este grupo de edad');
+            return;
+        }
+        
         this.currentQuestion = 0;
+        this.responses = {};
+        this.score = 0;
+        this.categoryScores = {};
         this.showQuestion();
     }
 
     showQuestion() {
-        if (this.currentQuestion >= this.data.questions.length) {
+        if (this.currentQuestion >= this.currentQuestions.length) {
             this.showResults();
             return;
         }
 
-        const question = this.data.questions[this.currentQuestion];
+        const question = this.currentQuestions[this.currentQuestion];
         const container = document.getElementById('qchat-container');
-        
+        const progress = ((this.currentQuestion + 1) / this.currentQuestions.length) * 100;
+
         container.innerHTML = `
             <div class="qchat-question">
                 <div class="question-header">
-                    <div class="question-number">
-                        Pregunta ${this.currentQuestion + 1} de ${this.data.questions.length}
+                    <div class="progress-section">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        <span class="progress-text">
+                            Pregunta ${this.currentQuestion + 1} de ${this.currentQuestions.length}
+                        </span>
                     </div>
+                    
                     <div class="question-category">
-                        ${this.getCategoryName(question.category)}
+                        <span class="category-badge category-${question.category}">
+                            ${this.getCategoryName(question.category)}
+                        </span>
                     </div>
                 </div>
-
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${(this.currentQuestion / this.data.questions.length) * 100}%"></div>
-                    </div>
-                    <div class="progress-text">
-                        ${Math.round((this.currentQuestion / this.data.questions.length) * 100)}% completado
-                    </div>
-                </div>
-
+                
                 <div class="question-content">
                     <h2 class="question-text">${question.text}</h2>
                     
-                    <div class="question-options">
+                    <div class="options-container" role="radiogroup" 
+                         aria-labelledby="question-text" aria-required="true">
                         ${question.options.map((option, index) => `
-                            <label class="option-label">
-                                <input 
-                                    type="radio" 
-                                    name="response" 
-                                    value="${option.value}"
-                                    data-text="${option.text}"
-                                    ${this.responses[question.id] === option.value ? 'checked' : ''}
-                                >
-                                <div class="option-content">
-                                    <div class="option-text">${option.text}</div>
-                                    ${option.description ? `<div class="option-description">${option.description}</div>` : ''}
-                                </div>
+                            <label class="option-label" for="option-${index}">
+                                <input type="radio" 
+                                       id="option-${index}" 
+                                       name="question-${question.id}" 
+                                       value="${option.value}"
+                                       data-text="${option.text}"
+                                       ${this.responses[question.id] === option.value ? 'checked' : ''}>
+                                <span class="option-content">
+                                    <span class="option-text">${option.text}</span>
+                                    ${option.description ? `<span class="option-description">${option.description}</span>` : ''}
+                                </span>
                             </label>
                         `).join('')}
                     </div>
                 </div>
-
+                
                 <div class="question-actions">
-                    <button 
-                        class="btn btn-secondary" 
-                        data-action="previous"
-                        ${this.currentQuestion === 0 ? 'disabled' : ''}
-                    >
+                    <button class="btn btn-secondary" 
+                            onclick="qchat.previousQuestion()" 
+                            ${this.currentQuestion === 0 ? 'disabled' : ''}>
                         ← Anterior
                     </button>
                     
-                    <button 
-                        class="btn btn-primary" 
-                        data-action="next"
-                        ${!this.responses[question.id] ? 'disabled' : ''}
-                    >
-                        ${this.currentQuestion === this.data.questions.length - 1 ? 'Finalizar' : 'Siguiente →'}
+                    <div class="action-info">
+                        <span class="keyboard-hint">Use ← → para navegar</span>
+                    </div>
+                    
+                    <button class="btn btn-primary" 
+                            onclick="qchat.nextQuestion()" 
+                            id="nextButton"
+                            ${!this.responses.hasOwnProperty(question.id) ? 'disabled' : ''}>
+                        ${this.currentQuestion === this.currentQuestions.length - 1 ? 'Finalizar' : 'Siguiente →'}
                     </button>
                 </div>
             </div>
         `;
 
-        // Scroll to top
-        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Agregar event listeners para las opciones
+        const radioButtons = container.querySelectorAll('input[type="radio"]');
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', () => {
+                this.selectOption(question.id, parseInt(radio.value), radio.dataset.text);
+            });
+        });
+
+        // Focus en la primera opción no seleccionada
+        const firstRadio = container.querySelector('input[type="radio"]');
+        if (firstRadio) {
+            firstRadio.focus();
+        }
+    }
+
+    selectOption(questionId, value, text) {
+        this.responses[questionId] = value;
         
-        // Focus on first option for accessibility
+        // Actualizar botón siguiente
+        const nextButton = document.getElementById('nextButton');
+        if (nextButton) {
+            nextButton.disabled = false;
+        }
+        
+        // Auto-avanzar después de selección (opcional)
         setTimeout(() => {
-            const firstOption = container.querySelector('input[name="response"]');
-            if (firstOption && !this.responses[question.id]) {
-                firstOption.focus();
+            if (this.currentQuestion < this.currentQuestions.length - 1) {
+                // this.nextQuestion(); // Descomenta para auto-avanzar
             }
-        }, 100);
-    }
-
-    handleResponse(input) {
-        const question = this.data.questions[this.currentQuestion];
-        const value = parseInt(input.value);
-        const text = input.getAttribute('data-text');
+        }, 500);
         
-        // Guardar respuesta
-        this.responses[question.id] = value;
-        
-        // Actualizar puntuación de categoría
-        this.updateCategoryScore(question.category, value);
-        
-        // Habilitar botón siguiente
-        const nextBtn = document.querySelector('[data-action="next"]');
-        if (nextBtn) {
-            nextBtn.disabled = false;
-        }
-        
-        // Feedback visual
-        input.closest('label').classList.add('selected');
-        
-        // Feedback de voz (opcional)
-        this.speakText(`Seleccionado: ${text}`);
-        
-        console.log(`Respuesta registrada - Pregunta ${question.id}: ${value} (${text})`);
-    }
-
-    updateCategoryScore(category, points) {
-        if (this.categoryScores[category] !== undefined) {
-            this.categoryScores[category] += points;
-        }
+        this.showNotification(`Respuesta guardada: ${text}`, 'success');
     }
 
     nextQuestion() {
-        const question = this.data.questions[this.currentQuestion];
-        
-        if (!this.responses[question.id] && this.responses[question.id] !== 0) {
-            this.showNotification('Por favor, selecciona una respuesta antes de continuar', 'warning');
+        const currentQ = this.currentQuestions[this.currentQuestion];
+        if (!this.responses.hasOwnProperty(currentQ.id)) {
+            this.showNotification('Por favor, seleccione una respuesta antes de continuar', 'warning');
             return;
         }
-
-        if (this.currentQuestion < this.data.questions.length - 1) {
-            this.currentQuestion++;
-            this.showQuestion();
-        } else {
-            this.completeAssessment();
-        }
+        
+        this.currentQuestion++;
+        this.showQuestion();
     }
 
     previousQuestion() {
@@ -331,240 +485,175 @@ class QChatAssessment {
         }
     }
 
-    completeAssessment() {
-        this.calculateFinalScore();
-        this.showResults();
+    calculateScore() {
+        this.score = 0;
+        this.categoryScores = {};
+        
+        // Inicializar categorías
+        const categories = ['social', 'communication', 'play', 'behavioral', 'sensory', 'cognitive'];
+        categories.forEach(cat => {
+            this.categoryScores[cat] = { score: 0, total: 0 };
+        });
+        
+        // Calcular puntuaciones
+        this.currentQuestions.forEach(question => {
+            const response = this.responses[question.id];
+            if (response !== undefined) {
+                this.score += response;
+                
+                if (this.categoryScores[question.category]) {
+                    this.categoryScores[question.category].score += response;
+                    this.categoryScores[question.category].total += 1;
+                }
+            }
+        });
     }
 
-    calculateFinalScore() {
-        this.score = Object.values(this.responses).reduce((sum, value) => sum + value, 0);
-        console.log('📊 Puntuación final:', this.score);
-        console.log('📈 Puntuaciones por categoría:', this.categoryScores);
+    getInterpretation() {
+        const ageGroupData = this.data.ageGroups[this.selectedAgeGroup];
+        const thresholds = ageGroupData.scoringThreshold;
+        
+        if (this.score <= thresholds.lowRisk.max) {
+            return 'lowRisk';
+        } else if (this.score <= thresholds.moderateRisk.max) {
+            return 'moderateRisk';
+        } else {
+            return 'highRisk';
+        }
     }
 
     showResults() {
+        this.calculateScore();
         const interpretation = this.getInterpretation();
-        const completionTime = Math.round((Date.now() - this.startTime) / 60000);
+        const interpretationData = this.data.scoring?.interpretation?.[interpretation] || {
+            title: 'Resultado',
+            description: 'Resultado calculado',
+            color: '#718096'
+        };
         
+        const completionTime = Math.round((Date.now() - this.startTime) / 1000);
+        const ageGroupData = this.data.ageGroups[this.selectedAgeGroup];
+
         const container = document.getElementById('qchat-container');
         container.innerHTML = `
             <div class="qchat-results">
                 <div class="results-header">
                     <h1>📋 Resultados del Q-CHAT</h1>
                     <div class="completion-info">
-                        <span>✅ Cuestionario completado en ${completionTime} minutos</span>
+                        <span>✅ Cuestionario completado</span>
+                        <span>⏱️ Tiempo: ${Math.floor(completionTime/60)}:${(completionTime%60).toString().padStart(2,'0')}</span>
+                        <span>👶 Edad: ${this.demographicData.childAge} meses</span>
                     </div>
                 </div>
-
+                
                 <div class="score-summary">
-                    <div class="score-card" style="border-color: ${interpretation.color}">
+                    <div class="score-card" style="border-color: ${interpretationData.color}">
                         <div class="score-number">${this.score}</div>
                         <div class="score-label">Puntuación Total</div>
-                        <div class="score-range">(Rango: ${interpretation.range})</div>
+                        <div class="score-range">(Rango: 0-${ageGroupData.totalQuestions})</div>
                     </div>
                     
-                    <div class="interpretation-card" style="background-color: ${interpretation.color}20; border-color: ${interpretation.color}">
-                        <h3 style="color: ${interpretation.color}">${interpretation.title}</h3>
-                        <p>${interpretation.description}</p>
+                    <div class="interpretation-card" 
+                         style="background-color: ${interpretationData.color}20; border-color: ${interpretationData.color}">
+                        <h3 style="color: ${interpretationData.color}">
+                            ${interpretationData.icon || '📊'} ${interpretationData.title}
+                        </h3>
+                        <p>${interpretationData.description}</p>
                     </div>
                 </div>
-
+                
                 <div class="category-breakdown">
-                    <h3>📊 Desglose por Categorías</h3>
-                    <div class="category-scores">
-                        ${Object.entries(this.categoryScores).map(([category, score]) => {
-                            const categoryInfo = this.data.scoring.categories[category];
+                    <h3>📊 Análisis por Categorías</h3>
+                    <div class="categories-grid">
+                        ${Object.entries(this.categoryScores).map(([category, data]) => {
+                            const percentage = data.total > 0 ? (data.score / data.total * 100) : 0;
                             return `
-                                <div class="category-item">
-                                    <div class="category-name">${categoryInfo?.name || category}</div>
-                                    <div class="category-score">${score} puntos</div>
-                                    <div class="category-description">${categoryInfo?.description || ''}</div>
+                                <div class="category-card">
+                                    <div class="category-header">
+                                        <span class="category-name">${this.getCategoryName(category)}</span>
+                                        <span class="category-score">${data.score}/${data.total}</span>
+                                    </div>
+                                    <div class="category-bar">
+                                        <div class="category-fill" style="width: ${percentage}%"></div>
+                                    </div>
                                 </div>
                             `;
                         }).join('')}
                     </div>
                 </div>
-
+                
                 <div class="recommendations">
                     <h3>💡 Recomendaciones</h3>
                     <div class="recommendation-content">
-                        <p>${interpretation.recommendation}</p>
-                        
-                        ${this.score >= 3 ? `
-                            <div class="next-steps">
-                                <h4>Próximos Pasos Sugeridos:</h4>
-                                <ul>
-                                    <li>Programar cita con pediatra del desarrollo</li>
-                                    <li>Documentar comportamientos específicos observados</li>
-                                    <li>Recopilar videos de interacciones sociales</li>
-                                    <li>Contactar servicios de intervención temprana locales</li>
-                                </ul>
-                            </div>
-                        ` : `
-                            <div class="monitoring-tips">
-                                <h4>Seguimiento Recomendado:</h4>
-                                <ul>
-                                    <li>Continuar con visitas regulares al pediatra</li>
-                                    <li>Fomentar el desarrollo a través del juego</li>
-                                    <li>Mantener interacciones sociales frecuentes</li>
-                                    <li>Repetir evaluación en 6 meses</li>
-                                </ul>
-                            </div>
-                        `}
+                        ${interpretationData.recommendations ? `
+                            <ul class="recommendations-list">
+                                ${interpretationData.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                            </ul>
+                        ` : '<p>Consulte con un profesional de la salud para obtener orientación específica.</p>'}
                     </div>
                 </div>
-
+                
+                <div class="important-disclaimer">
+                    <div class="disclaimer-icon">⚠️</div>
+                    <div class="disclaimer-content">
+                        <h4>Descargo de Responsabilidad</h4>
+                        <p>Este cuestionario es únicamente una herramienta de detección. Los resultados no constituyen un diagnóstico médico y deben ser interpretados por un profesional de la salud calificado.</p>
+                    </div>
+                </div>
+                
                 <div class="results-actions">
-                    <button class="btn btn-primary" onclick="qchatApp.generateReport()">
-                        📄 Generar Reporte PDF
+                    <button class="btn btn-secondary" onclick="qchat.restartAssessment()">
+                        🔄 Realizar Otro Cuestionario
                     </button>
-                    <button class="btn btn-secondary" onclick="qchatApp.restartAssessment()">
-                        🔄 Realizar Nuevamente
+                    <button class="btn btn-primary" onclick="qchat.printResults()">
+                        🖨️ Guardar/Imprimir Resultados
                     </button>
-                    <button class="btn btn-accent" onclick="qchatApp.shareResults()">
-                        📤 Compartir Resultados
-                    </button>
-                </div>
-
-                <div class="disclaimer-results">
-                    <div class="disclaimer-box">
-                        <span class="disclaimer-icon">⚠️</span>
-                        <div>
-                            <strong>Recordatorio:</strong>
-                            Estos resultados son solo orientativos. Para un diagnóstico 
-                            preciso, consulte con un profesional especializado en desarrollo infantil.
-                        </div>
-                    </div>
                 </div>
             </div>
         `;
-
-        // Scroll to results
-        container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        
-        // Save results locally
-        this.saveResults();
-    }
-
-    getInterpretation() {
-        const scoring = this.data.scoring.interpretation;
-        
-        if (this.score <= 2) {
-            return scoring.lowRisk;
-        } else if (this.score <= 7) {
-            return scoring.moderateRisk;
-        } else {
-            return scoring.highRisk;
-        }
     }
 
     getCategoryName(category) {
-        const categories = {
+        const categoryNames = {
             social: 'Interacción Social',
             communication: 'Comunicación',
             play: 'Juego',
             behavioral: 'Comportamiento',
-            sensory: 'Procesamiento Sensorial'
+            sensory: 'Procesamiento Sensorial',
+            cognitive: 'Habilidades Cognitivas'
         };
-        return categories[category] || category;
+        return categoryNames[category] || category;
     }
 
     restartAssessment() {
-        if (confirm('¿Está seguro de que desea reiniciar el cuestionario? Se perderán todas las respuestas actuales.')) {
+        if (confirm('¿Está seguro de que desea realizar otro cuestionario? Se perderán los resultados actuales.')) {
             this.responses = {};
             this.currentQuestion = 0;
             this.score = 0;
             this.categoryScores = {};
-            this.startTime = Date.now();
-            this.initializeCategoryScores();
-            this.showIntroduction();
+            this.selectedAgeGroup = null;
+            this.demographicData = {};
+            this.showAgeSelection();
         }
     }
 
-    saveResults() {
-        try {
-            const results = {
-                timestamp: new Date().toISOString(),
-                score: this.score,
-                categoryScores: this.categoryScores,
-                interpretation: this.getInterpretation(),
-                completionTime: Math.round((Date.now() - this.startTime) / 60000),
-                responses: this.responses
-            };
-            
-            localStorage.setItem('qchat_results', JSON.stringify(results));
-            console.log('💾 Resultados guardados localmente');
-        } catch (error) {
-            console.warn('⚠️ No se pudieron guardar los resultados:', error);
+    printResults() {
+        window.print();
+    }
+
+    handleEscape() {
+        // Manejar tecla Escape según el contexto
+        if (this.currentQuestion >= 0 && this.currentQuestion < this.currentQuestions.length) {
+            if (confirm('¿Desea salir del cuestionario? Se perderá el progreso actual.')) {
+                this.showAgeSelection();
+            }
         }
     }
 
-    generateReport() {
-        this.showNotification('Generando reporte PDF...', 'info');
-        
-        // Simular generación de PDF
-        setTimeout(() => {
-            this.showNotification('Reporte generado exitosamente', 'success');
-            console.log('📄 Reporte PDF generado');
-        }, 2000);
-    }
-
-    shareResults() {
-        if (navigator.share) {
-            navigator.share({
-                title: 'Resultados Q-CHAT',
-                text: `Puntuación: ${this.score} - ${this.getInterpretation().title}`,
-                url: window.location.href
-            });
-        } else {
-            // Fallback para navegadores sin soporte
-            const text = `Resultados Q-CHAT: Puntuación ${this.score} - ${this.getInterpretation().title}`;
-            navigator.clipboard.writeText(text).then(() => {
-                this.showNotification('Resultados copiados al portapapeles', 'success');
-            });
-        }
-    }
-
-    updateProgressBar() {
-        const progressBar = document.querySelector('.progress-fill');
-        if (progressBar) {
-            const progress = (this.currentQuestion / this.data.questions.length) * 100;
-            progressBar.style.width = `${progress}%`;
-        }
-    }
-
-    speakText(text) {
-        if ('speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'es-ES';
-            utterance.rate = 0.8;
-            utterance.volume = 0.7;
-            speechSynthesis.speak(utterance);
-        }
-    }
-
-    showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.innerHTML = `
-            <span class="notification-icon">
-                ${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : type === 'error' ? '❌' : 'ℹ️'}
-            </span>
-            <span class="notification-message">${message}</span>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 100);
-        
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
+    canProceed() {
+        if (this.currentQuestion >= this.currentQuestions.length) return false;
+        const currentQ = this.currentQuestions[this.currentQuestion];
+        return this.responses.hasOwnProperty(currentQ.id);
     }
 
     showError(message) {
@@ -580,21 +669,45 @@ class QChatAssessment {
             </div>
         `;
     }
+
+    showNotification(message, type = 'info') {
+        // Remover notificaciones existentes
+        const existing = document.querySelectorAll('.notification');
+        existing.forEach(n => n.remove());
+
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        
+        const icons = {
+            success: '✅',
+            warning: '⚠️',
+            error: '❌',
+            info: 'ℹ️'
+        };
+        
+        notification.innerHTML = `
+            <span class="notification-icon">${icons[type] || icons.info}</span>
+            <span class="notification-message">${message}</span>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Mostrar notificación
+        setTimeout(() => notification.classList.add('show'), 100);
+        
+        // Ocultar después de 3 segundos
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
 }
 
-// Inicializar aplicación
-let qchatApp;
-
-document.addEventListener('DOMContentLoaded', function() {
-    qchatApp = new QChatAssessment();
+// Inicializar cuando el DOM esté listo
+let qchat;
+document.addEventListener('DOMContentLoaded', () => {
+    qchat = new QChatAssessment();
 });
 
-// Funciones globales para compatibilidad
-window.qchatApp = null;
-
-// Event listener para cuando la aplicación esté lista
-document.addEventListener('DOMContentLoaded', function() {
-    window.qchatApp = qchatApp;
-});
-
-console.log('✅ Q-CHAT JavaScript cargado correctamente');
+// Exportar para uso global
+window.qchat = qchat;

@@ -1,0 +1,330 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "title": "Q-CHAT - Cuestionario de Detección del Autismo",
+    "description": "Cuestionario de detección temprana para el Trastorno del Espectro Autista (TEA) adaptado para diferentes rangos de edad",
+    "authors": "JuegoTEA - Adaptado de Allison et al.",
+    "language": "es",
+    "lastUpdated": "2025-01-25"
+  },
+  "ageGroups": {
+    "toddlers": {
+      "id": "toddlers",
+      "name": "Niños Pequeños",
+      "ageRange": "2-6 años",
+      "minAge": 24,
+      "maxAge": 72,
+      "description": "Cuestionario adaptado para la primera infancia",
+      "totalQuestions": 25,
+      "completionTime": "5-7 minutos",
+      "scoringThreshold": {
+        "lowRisk": { "min": 0, "max": 3 },
+        "moderateRisk": { "min": 4, "max": 7 },
+        "highRisk": { "min": 8, "max": 25 }
+      }
+    },
+    "children": {
+      "id": "children",
+      "name": "Niños Escolares",
+      "ageRange": "7-11 años",
+      "minAge": 84,
+      "maxAge": 132,
+      "description": "Cuestionario adaptado para edad escolar temprana",
+      "totalQuestions": 30,
+      "completionTime": "8-10 minutos",
+      "scoringThreshold": {
+        "lowRisk": { "min": 0, "max": 4 },
+        "moderateRisk": { "min": 5, "max": 9 },
+        "highRisk": { "min": 10, "max": 30 }
+      }
+    },
+    "adolescents": {
+      "id": "adolescents",
+      "name": "Adolescentes",
+      "ageRange": "12-17 años",
+      "minAge": 144,
+      "maxAge": 204,
+      "description": "Cuestionario adaptado para adolescentes",
+      "totalQuestions": 35,
+      "completionTime": "10-12 minutos",
+      "scoringThreshold": {
+        "lowRisk": { "min": 0, "max": 5 },
+        "moderateRisk": { "min": 6, "max": 12 },
+        "highRisk": { "min": 13, "max": 35 }
+      }
+    }
+  },
+  "questions": {
+    "toddlers": [
+      {
+        "id": 1,
+        "text": "¿Su hijo/a le mira cuando le habla?",
+        "category": "social",
+        "subcategory": "eye_contact",
+        "options": [
+          { "value": 0, "text": "Siempre", "description": "Mi hijo/a siempre me mira cuando le hablo" },
+          { "value": 0, "text": "Casi siempre", "description": "Mi hijo/a me mira la mayoría de las veces" },
+          { "value": 0, "text": "A veces", "description": "Mi hijo/a me mira algunas veces" },
+          { "value": 1, "text": "Raramente", "description": "Mi hijo/a raramente me mira cuando le hablo" },
+          { "value": 1, "text": "Nunca", "description": "Mi hijo/a nunca me mira cuando le hablo" }
+        ]
+      },
+      {
+        "id": 2,
+        "text": "¿Qué tan fácil es para usted hacer contacto visual con su hijo/a?",
+        "category": "social",
+        "subcategory": "eye_contact",
+        "options": [
+          { "value": 0, "text": "Muy fácil", "description": "Es muy fácil establecer contacto visual" },
+          { "value": 0, "text": "Bastante fácil", "description": "Generalmente es fácil hacer contacto visual" },
+          { "value": 0, "text": "Bastante difícil", "description": "A veces es difícil hacer contacto visual" },
+          { "value": 1, "text": "Muy difícil", "description": "Es muy difícil establecer contacto visual" },
+          { "value": 1, "text": "Imposible", "description": "No logro hacer contacto visual con mi hijo/a" }
+        ]
+      },
+      {
+        "id": 3,
+        "text": "¿Su hijo/a señala para pedir algo (por ejemplo, un juguete que está fuera de su alcance)?",
+        "category": "communication",
+        "subcategory": "pointing",
+        "options": [
+          { "value": 0, "text": "Muchas veces al día", "description": "Señala frecuentemente para pedir cosas" },
+          { "value": 0, "text": "Algunas veces al día", "description": "Señala ocasionalmente durante el día" },
+          { "value": 0, "text": "Algunas veces por semana", "description": "Señala unas pocas veces por semana" },
+          { "value": 1, "text": "Menos de una vez por semana", "description": "Raramente señala para pedir" },
+          { "value": 1, "text": "Nunca", "description": "Nunca señala para pedir algo" }
+        ]
+      },
+      {
+        "id": 4,
+        "text": "¿Su hijo/a señala para mostrarle algo interesante?",
+        "category": "communication",
+        "subcategory": "joint_attention",
+        "options": [
+          { "value": 0, "text": "Muchas veces al día", "description": "Señala frecuentemente para mostrar cosas" },
+          { "value": 0, "text": "Algunas veces al día", "description": "Ocasionalmente señala para mostrar" },
+          { "value": 0, "text": "Algunas veces por semana", "description": "Señala para mostrar pocas veces por semana" },
+          { "value": 1, "text": "Menos de una vez por semana", "description": "Raramente señala para mostrar" },
+          { "value": 1, "text": "Nunca", "description": "Nunca señala para mostrar algo" }
+        ]
+      },
+      {
+        "id": 5,
+        "text": "¿Su hijo/a pretende (por ejemplo, hacer té, hablar por teléfono)?",
+        "category": "play",
+        "subcategory": "pretend_play",
+        "options": [
+          { "value": 0, "text": "Muchas veces al día", "description": "Juega imaginativamente con frecuencia" },
+          { "value": 0, "text": "Algunas veces al día", "description": "Ocasionalmente hace juego de pretensión" },
+          { "value": 0, "text": "Algunas veces por semana", "description": "Juego imaginativo pocas veces por semana" },
+          { "value": 1, "text": "Menos de una vez por semana", "description": "Raramente hace juego de pretensión" },
+          { "value": 1, "text": "Nunca", "description": "Nunca juega imaginativamente" }
+        ]
+      }
+    ],
+    "children": [
+      {
+        "id": 1,
+        "text": "¿Su hijo/a mantiene conversaciones apropiadas para su edad?",
+        "category": "communication",
+        "subcategory": "conversation",
+        "options": [
+          { "value": 0, "text": "Siempre", "description": "Mantiene conversaciones fluidas y apropiadas" },
+          { "value": 0, "text": "Casi siempre", "description": "Generalmente conversa apropiadamente" },
+          { "value": 1, "text": "A veces", "description": "A veces tiene dificultades conversacionales" },
+          { "value": 1, "text": "Raramente", "description": "Raramente mantiene conversaciones apropiadas" },
+          { "value": 1, "text": "Nunca", "description": "No mantiene conversaciones apropiadas" }
+        ]
+      },
+      {
+        "id": 2,
+        "text": "¿Su hijo/a entiende las expresiones faciales y el lenguaje corporal de otros?",
+        "category": "social",
+        "subcategory": "nonverbal_communication",
+        "options": [
+          { "value": 0, "text": "Muy bien", "description": "Comprende claramente las expresiones y gestos" },
+          { "value": 0, "text": "Bastante bien", "description": "Generalmente entiende las señales no verbales" },
+          { "value": 1, "text": "Con dificultad", "description": "Tiene dificultades para interpretar expresiones" },
+          { "value": 1, "text": "Muy poco", "description": "Apenas comprende las señales no verbales" },
+          { "value": 1, "text": "No entiende", "description": "No comprende expresiones ni gestos" }
+        ]
+      }
+    ],
+    "adolescents": [
+      {
+        "id": 1,
+        "text": "¿Su hijo/a comprende las normas sociales no escritas en diferentes situaciones?",
+        "category": "social",
+        "subcategory": "social_norms",
+        "options": [
+          { "value": 0, "text": "Completamente", "description": "Comprende y aplica las normas sociales apropiadamente" },
+          { "value": 0, "text": "Bastante bien", "description": "Generalmente comprende las expectativas sociales" },
+          { "value": 1, "text": "Con ayuda", "description": "Necesita orientación para entender normas sociales" },
+          { "value": 1, "text": "Con mucha dificultad", "description": "Tiene grandes dificultades con las normas sociales" },
+          { "value": 1, "text": "No las comprende", "description": "No comprende las expectativas sociales implícitas" }
+        ]
+      },
+      {
+        "id": 2,
+        "text": "¿Su hijo/a maneja bien los cambios en rutinas o planes?",
+        "category": "behavioral",
+        "subcategory": "flexibility",
+        "options": [
+          { "value": 0, "text": "Muy bien", "description": "Se adapta fácilmente a los cambios" },
+          { "value": 0, "text": "Bastante bien", "description": "Generalmente acepta los cambios sin problema" },
+          { "value": 1, "text": "Con dificultad", "description": "Le cuesta adaptarse a los cambios" },
+          { "value": 1, "text": "Muy mal", "description": "Los cambios le causan mucho estrés" },
+          { "value": 1, "text": "Extremadamente mal", "description": "No puede tolerar cambios en rutinas" }
+        ]
+      }
+    ]
+  },
+  "categories": {
+    "social": {
+      "name": "Interacción Social",
+      "description": "Habilidades de comunicación social, contacto visual y relaciones interpersonales",
+      "icon": "👥",
+      "color": "#4299e1"
+    },
+    "communication": {
+      "name": "Comunicación",
+      "description": "Lenguaje verbal y no verbal, comprensión y expresión",
+      "icon": "💬",
+      "color": "#48bb78"
+    },
+    "play": {
+      "name": "Juego",
+      "description": "Juego imaginativo, creativo y uso apropiado de juguetes",
+      "icon": "🎭",
+      "color": "#ed8936"
+    },
+    "behavioral": {
+      "name": "Comportamiento",
+      "description": "Rutinas, flexibilidad, movimientos repetitivos y adaptabilidad",
+      "icon": "🔄",
+      "color": "#9f7aea"
+    },
+    "sensory": {
+      "name": "Procesamiento Sensorial",
+      "description": "Sensibilidades auditivas, visuales, táctiles y procesamiento sensorial",
+      "icon": "👂",
+      "color": "#38b2ac"
+    },
+    "cognitive": {
+      "name": "Habilidades Cognitivas",
+      "description": "Atención, memoria, resolución de problemas y funciones ejecutivas",
+      "icon": "🧠",
+      "color": "#e53e3e"
+    }
+  },
+  "scoring": {
+    "interpretation": {
+      "lowRisk": {
+        "title": "Desarrollo Típico",
+        "description": "Las respuestas sugieren un desarrollo dentro del rango esperado para la edad.",
+        "color": "#48bb78",
+        "icon": "✅",
+        "recommendations": [
+          "Continue fomentando el desarrollo a través del juego y la interacción",
+          "Mantenga las visitas regulares al pediatra",
+          "Continúe observando el desarrollo de su hijo/a"
+        ]
+      },
+      "moderateRisk": {
+        "title": "Requiere Atención",
+        "description": "Algunas respuestas sugieren la necesidad de evaluación adicional.",
+        "color": "#ed8936",
+        "icon": "⚠️",
+        "recommendations": [
+          "Consulte con el pediatra de su hijo/a",
+          "Considere una evaluación del desarrollo",
+          "Documente comportamientos específicos",
+          "Busque recursos de apoyo temprano"
+        ]
+      },
+      "highRisk": {
+        "title": "Evaluación Recomendada",
+        "description": "Las respuestas indican la necesidad de evaluación profesional especializada.",
+        "color": "#e53e3e",
+        "icon": "🚨",
+        "recommendations": [
+          "Busque evaluación profesional inmediata",
+          "Contacte servicios de intervención temprana",
+          "Documente comportamientos y situaciones específicas",
+          "Consider servicios de apoyo para la familia"
+        ]
+      }
+    }
+  },
+  "resources": {
+    "professional_contacts": [
+      {
+        "type": "Pediatra del Desarrollo",
+        "description": "Especialista en desarrollo infantil y detección temprana"
+      },
+      {
+        "type": "Psicólogo Clínico Infantil",
+        "description": "Especialista en evaluación psicológica y diagnóstico"
+      },
+      {
+        "type": "Neuropediatra",
+        "description": "Especialista en trastornos neurológicos del desarrollo"
+      }
+    ],
+    "organizations": [
+      {
+        "name": "Federación Autismo España",
+        "url": "https://autismo.org.es/",
+        "description": "Recursos y apoyo para familias en España"
+      },
+      {
+        "name": "AETAPI",
+        "url": "https://aetapi.org/",
+        "description": "Asociación Española de Profesionales del Autismo"
+      }
+    ],
+    "next_steps": {
+      "immediate": [
+        "Programar cita con pediatra",
+        "Documentar comportamientos específicos",
+        "Recopilar información sobre el desarrollo",
+        "Preparar preguntas para el profesional"
+      ],
+      "ongoing": [
+        "Seguimiento regular del desarrollo",
+        "Participación en programas de apoyo",
+        "Educación sobre el TEA",
+        "Mantenimiento de rutinas consistentes"
+      ]
+    }
+  },
+  "ui_config": {
+    "theme": {
+      "primary_color": "#4299e1",
+      "secondary_color": "#63b3ed",
+      "success_color": "#48bb78",
+      "warning_color": "#ed8936",
+      "danger_color": "#e53e3e",
+      "neutral_color": "#718096"
+    },
+    "accessibility": {
+      "high_contrast_mode": true,
+      "large_text_support": true,
+      "keyboard_navigation": true,
+      "screen_reader_support": true,
+      "reduced_motion": true
+    },
+    "animations": {
+      "transition_duration": "0.3s",
+      "fade_in_duration": "0.5s",
+      "slide_duration": "0.4s"
+    }
+  },
+  "validation": {
+    "required_demographics": ["child_age", "parent_relationship"],
+    "progress_tracking": true,
+    "auto_save": true,
+    "anonymous_mode": true,
+    "completion_validation": true
+  }
+}
