@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q-CHAT - Cuestionario de Detección TEA | JuegoTEA</title>
+    
+    <!-- Meta tags para SEO y accesibilidad -->
+    <meta name="description" content="Cuestionario Q-CHAT para la detección temprana del Trastorno del Espectro Autista (TEA) en niños">
+    <meta name="keywords" content="autismo, TEA, detección temprana, Q-CHAT, cuestionario, desarrollo infantil">
+    <meta name="author" content="JuegoTEA">
+    <meta name="robots" content="index, follow">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="../manifest.json">
+    <meta name="theme-color" content="#4299e1">
+    
+    <!-- Estilos CSS -->
+    <link rel="stylesheet" href="../css/qchat-quiz.css">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "MedicalWebPage",
+        "name": "Q-CHAT - Cuestionario de Detección del Autismo",
+        "description": "Cuestionario de detección temprana para el Trastorno del Espectro Autista",
+        "medicalAudience": "Patient",
+        "about": {
+            "@type": "MedicalCondition",
+            "name": "Trastorno del Espectro Autista",
+            "alternateName": "TEA"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "JuegoTEA"
+        }
+    }
+    </script>
+</head>
+
+<body>
+    <!-- Skip link para accesibilidad -->
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+    <!-- Header -->
+    <header class="header" role="banner">
+        <nav class="nav-container" role="navigation" aria-label="Navegación principal">
+            <div class="logo">
+                🧩 Q-CHAT
+            </div>
+            <div class="nav-buttons">
+                <button id="helpBtn" class="nav-btn" title="Ayuda" aria-label="Mostrar ayuda">
+                    ❓
+                </button>
+                <a href="../index.html" class="back-btn" aria-label="Volver a la página principal">
+                    ← Inicio
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" role="status" aria-label="Cargando cuestionario">
+        <div class="spinner" aria-hidden="true"></div>
+        <span class="loading-text">Cargando cuestionario...</span>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-container" id="main-content" role="main">
+        <!-- Pantalla de Bienvenida -->
+        <section id="welcomeScreen" class="screen active">
+            <div class="welcome-card">
+                <div class="welcome-icon">🧠</div>
+                <h1>Q-CHAT</h1>
+                <h2>Cuestionario de Detección del Autismo</h2>
+                <p class="welcome-description">
+                    El Q-CHAT es una herramienta de detección temprana para el Trastorno del Espectro Autista (TEA) 
+                    diseñada para niños de diferentes edades. Este cuestionario debe ser completado por un padre, 
+                    cuidador o profesional que conozca bien al niño.
+                </p>
+                
+                <div class="important-notice">
+                    <div class="notice-icon">⚠️</div>
+                    <div class="notice-content">
+                        <strong>Importante:</strong> Este cuestionario es solo una herramienta de detección inicial. 
+                        Los resultados no constituyen un diagnóstico médico y siempre debe consultarse con un profesional 
+                        de la salud para una evaluación completa.
+                    </div>
+                </div>
+
+                <!-- Selección de Grupo de Edad -->
+                <div class="age-selection">
+                    <h3>Selecciona el grupo de edad del niño:</h3>
+                    <div class="age-buttons">
+                        <button class="age-btn" data-age="toddlers">
+                            <div class="age-icon">👶</div>
+                            <div class="age-info">
+                                <strong>18-24 meses</strong>
+                                <span>Niños pequeños</span>
+                                <small>25 preguntas • 5-7 min</small>
+                            </div>
+                        </button>
+                        <button class="age-btn" data-age="children">
+                            <div class="age-icon">🧒</div>
+                            <div class="age-info">
+                                <strong>2-6 años</strong>
+                                <span>Preescolar</span>
+                                <small>30 preguntas • 8-10 min</small>
+                            </div>
+                        </button>
+                        <button class="age-btn" data-age="schoolage">
+                            <div class="age-icon">👦</div>
+                            <div class="age-info">
+                                <strong>7-12 años</strong>
+                                <span>Escolar</span>
+                                <small>35 preguntas • 10-12 min</small>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <button id="startQuizBtn" class="start-btn" disabled>
+                    Comenzar Cuestionario
+                </button>
+            </div>
+        </section>
+
+        <!-- Pantalla del Quiz -->
+        <section id="quizScreen" class="screen">
+            <!-- Barra de Progreso -->
+            <div class="progress-container">
+                <div class="progress-info">
+                    <span id="questionCounter">1 / 25</span>
+                    <span id="progressPercentage">4%</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Contenedor de la Pregunta -->
+            <div class="question-container">
+                <div class="question-header">
+                    <div id="categoryBadge" class="category-badge">Comunicación</div>
+                    <div id="questionId" class="question-id">Pregunta 1</div>
+                </div>
+                
+                <h2 id="questionText" class="question-text">
+                    ¿Su hijo/a le mira cuando le habla?
+                </h2>
+                
+                <div id="questionDescription" class="question-description">
+                    Esta pregunta evalúa el contacto visual y la atención social del niño.
+                </div>
+
+                <!-- Opciones de Respuesta -->
+                <div id="optionsContainer" class="options-container">
+                    <!-- Las opciones se generan dinámicamente -->
+                </div>
+
+                <!-- Controles de Navegación -->
+                <div class="navigation-controls">
+                    <button id="prevBtn" class="nav-btn secondary" disabled>
+                        ← Anterior
+                    </button>
+                    <button id="nextBtn" class="nav-btn primary" disabled>
+                        Siguiente →
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla de Resultados -->
+        <section id="resultsScreen" class="screen">
+            <div class="results-container">
+                <!-- Header de Resultados -->
+                <div class="results-header">
+                    <div id="resultsIcon" class="results-icon">📊</div>
+                    <h1 id="resultsTitle">Resultados del Q-CHAT</h1>
+                    <p id="resultsSubtitle">Evaluación completada</p>
+                </div>
+
+                <!-- Resumen de Puntuación -->
+                <div class="score-summary">
+                    <div class="score-card">
+                        <div class="score-number" id="totalScore">0</div>
+                        <div class="score-label">Puntuación Total</div>
+                        <div class="score-max" id="scoreRange">de 25</div>
+                    </div>
+                    <div class="risk-indicator">
+                        <div id="riskLevel" class="risk-badge">Evaluando...</div>
+                        <div id="riskDescription" class="risk-description">
+                            Analizando respuestas...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desglose por Categorías -->
+                <div class="categories-breakdown">
+                    <h3>Análisis por Áreas</h3>
+                    <div id="categoriesContainer" class="categories-container">
+                        <!-- Se genera dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Interpretación y Recomendaciones -->
+                <div class="interpretation-section">
+                    <h3>Interpretación</h3>
+                    <div id="interpretationText" class="interpretation-text">
+                        <!-- Se genera dinámicamente -->
+                    </div>
+                </div>
+
+                <div class="recommendations-section">
+                    <h3>Recomendaciones</h3>
+                    <div id="recommendationsText" class="recommendations-text">
+                        <!-- Se genera dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="results-actions">
+                    <button id="printResultsBtn" class="action-btn secondary">
+                        🖨️ Imprimir Resultados
+                    </button>
+                    <button id="shareResultsBtn" class="action-btn secondary">
+                        📤 Compartir
+                    </button>
+                    <button id="newTestBtn" class="action-btn primary">
+                        🔄 Nueva Evaluación
+                    </button>
+                    <a href="../index.html" class="action-btn tertiary">
+                        🏠 Volver al Inicio
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Ayuda -->
+    <div id="helpModal" class="modal" role="dialog" aria-labelledby="helpTitle" aria-hidden="true">
+        <div class="modal-overlay" id="helpOverlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="helpTitle">Ayuda - Q-CHAT</h2>
+                <button id="closeHelpBtn" class="close-btn" aria-label="Cerrar ayuda">×</button>
+            </div>
+            <div class="modal-body">
+                <h3>¿Qué es el Q-CHAT?</h3>
+                <p>El Q-CHAT (Quantitative Checklist for Autism in Toddlers) es una herramienta de detección 
+                   desarrollada para identificar características del Trastorno del Espectro Autista (TEA) en niños.</p>
+                
+                <h3>¿Cómo responder?</h3>
+                <p>Para cada pregunta, selecciona la opción que mejor describe el comportamiento habitual del niño. 
+                   Responde basándote en lo que observas la mayoría del tiempo.</p>
+                
+                <h3>¿Qué significan los resultados?</h3>
+                <ul>
+                    <li><strong>Riesgo Bajo:</strong> El desarrollo parece típico</li>
+                    <li><strong>Riesgo Moderado:</strong> Algunas características que requieren observación</li>
+                    <li><strong>Riesgo Alto:</strong> Se recomienda evaluación profesional</li>
+                </ul>
+                
+                <div class="important-note">
+                    <strong>Recordatorio:</strong> Este cuestionario es solo una herramienta de detección. 
+                    Un resultado no constituye un diagnóstico médico.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificaciones -->
+    <div id="notificationContainer" class="notification-container" aria-live="polite">
+        <!-- Las notificaciones se generan dinámicamente -->
+    </div>
+
+    <!-- JavaScript -->
+    <script src="../js/qchat-quiz.js"></script>
+</body>
+</html>

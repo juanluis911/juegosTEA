@@ -1,2794 +1,2310 @@
-{
-            id: 20,
-            text: "¿Su hijo/a busca apoyo emocional de manera apropiada?",
-            help: "Evalúe si pide ayuda emocional cuando enfrenta desafíos.",
-            domain: "social",
-            scoring: "reverse"
-        }
-    ],
+/**
+ * Q-CHAT Quiz - Sistema completo de evaluación TEA
+ * Basado en el Quantitative Checklist for Autism in Toddlers
+ * 
+ * Funcionalidades:
+ * - Quiz adaptativo por edad
+ * - Cálculo de puntuación y riesgo
+ * - Análisis por categorías
+ * - Recomendaciones personalizadas
+ * - Accesibilidad completa
+ * - PWA compatible
+ */
 
-    "15-18": [
-        {
-            id: 1,
-            text: "¿Su hijo/a mantiene relaciones de amistad recíprocas y significativas?",
-            help: "Evalúe la profundidad y reciprocidad en las relaciones interpersonales.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 2,
-            text: "¿Su hijo/a comprende las sutilezas sociales y comunicativas?",
-            help: "Observe habilidad para interpretar comunicación indirecta y contextos sociales complejos.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 3,
-            text: "¿Su hijo/a puede interpretar emociones complejas en otros?",
-            help: "Considere capacidad para reconocer estados emocionales sutiles en otros.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 4,
-            text: "¿Su hijo/a tiene intereses especiales que interfieren con responsabilidades?",
-            help: "Fíjese si los intereses intensos afectan tareas académicas o sociales.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 5,
-            text: "¿Su hijo/a adapta su comunicación a diferentes audiencias?",
-            help: "Observe flexibilidad comunicativa con autoridades, pares, y diferentes contextos.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 6,
-            text: "¿Su hijo/a comprende el humor sarcástico y referencias culturales?",
-            help: "Evalúe entendimiento de humor complejo y referencias compartidas.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 7,
-            text: "¿Su hijo/a maneja bien la incertidumbre y cambios de planes?",
-            help: "Considere adaptabilidad ante situaciones imprevistas.",
-            domain: "flexibility",
-            scoring: "reverse"
-        },
-        {
-            id: 8,
-            text: "¿Su hijo/a busca independencia y autonomía apropiada?",
-            help: "Observe desarrollo de habilidades de vida independiente.",
-            domain: "development",
-            scoring: "reverse"
-        },
-        {
-            id: 9,
-            text: "¿Su hijo/a tiene rutinas rígidas que no puede alterar?",
-            help: "Fíjese en inflexibilidad extrema hacia cambios en rutinas establecidas.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 10,
-            text: "¿Su hijo/a regula emociones de manera apropiada para su edad?",
-            help: "Evalúe control emocional y estrategias de afrontamiento.",
-            domain: "regulation",
-            scoring: "reverse"
-        },
-        {
-            id: 11,
-            text: "¿Su hijo/a participa en actividades sociales grupales voluntariamente?",
-            help: "Observe motivación intrínseca para participar en eventos sociales.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 12,
-            text: "¿Su hijo/a tiene sensibilidades sensoriales que limitan actividades?",
-            help: "Considere impacto de sensibilidades en vida académica, social y laboral.",
-            domain: "sensory",
-            scoring: "direct"
-        },
-        {
-            id: 13,
-            text: "¿Su hijo/a demuestra teoría de la mente avanzada?",
-            help: "Fíjese en capacidad para entender perspectivas complejas de otros.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 14,
-            text: "¿Su hijo/a tiene dificultades significativas con autorregulación?",
-            help: "Observe control de impulsos y gestión de estrés.",
-            domain: "regulation",
-            scoring: "direct"
-        },
-        {
-            id: 15,
-            text: "¿Su hijo/a inicia y mantiene relaciones románticas apropiadas?",
-            help: "Evalúe habilidades para relaciones íntimas apropiadas para la edad.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 16,
-            text: "¿Su hijo/a comprende límites sociales en diferentes contextos?",
-            help: "Observe entendimiento de normas sociales en contextos variados.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 17,
-            text: "¿Su hijo/a presenta comportamientos repetitivos o ritualizados?",
-            help: "Fíjese en estereotipias o rutinas que persisten en la adolescencia.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 18,
-            text: "¿Su hijo/a planifica efectivamente para el futuro?",
-            help: "Considere habilidades de planificación a largo plazo y toma de decisiones.",
-            domain: "executive",
-            scoring: "reverse"
-        },
-        {
-            id: 19,
-            text: "¿Su hijo/a demuestra flexibilidad cognitiva en situaciones complejas?",
-            help: "Observe adaptabilidad mental ante desafíos multifacéticos.",
-            domain: "flexibility",
-            scoring: "reverse"
-        },
-        {
-            id: 20,
-            text: "¿Su hijo/a busca y acepta apoyo emocional apropiadamente?",
-            help: "Evalúe capacidad para solicitar y recibir apoyo emocional cuando es necesario.",
-            domain: "social",
-            scoring: "reverse"
-        }
-    ]
+console.log('🧩 Iniciando Q-CHAT Quiz v2.0...');
+
+// === CONFIGURACIÓN GLOBAL ===
+const CONFIG = {
+    version: '2.0',
+    debug: false,
+    autoSave: true,
+    animations: true,
+    audioFeedback: true
 };
 
-// Opciones de respuesta (sin cambios)
-const answerOptions = [
-    { value: 1, text: "Nunca", description: "No ocurre en absoluto" },
-    { value: 2, text: "Raramente", description: "Ocurre muy pocas veces" },
-    { value: 3, text: "A veces", description: "Ocurre ocasionalmente" },
-    { value: 4, text: "Con frecuencia", description: "Ocurre regularmente" },
-    { value: 5, text: "Siempre", description: "Ocurre constantemente" }
-];
+// === DATOS DEL Q-CHAT EMBEBIDOS ===
+const QCHAT_DATA = {
+    metadata: {
+        version: "2.0",
+        title: "Q-CHAT - Cuestionario de Detección del Autismo",
+        description: "Cuestionario de detección temprana para el Trastorno del Espectro Autista (TEA)",
+        authors: "JuegoTEA - Adaptado de Allison et al.",
+        language: "es",
+        lastUpdated: "2025-01-25"
+    },
+    
+    ageGroups: {
+        toddlers: {
+            id: "toddlers",
+            name: "Niños Pequeños",
+            ageRange: "18-24 meses",
+            minAge: 18,
+            maxAge: 24,
+            description: "Cuestionario Q-CHAT original para detección temprana",
+            totalQuestions: 25,
+            completionTime: "5-7 minutos",
+            scoringThreshold: {
+                lowRisk: { min: 0, max: 2 },
+                moderateRisk: { min: 3, max: 7 },
+                highRisk: { min: 8, max: 25 }
+            }
+        },
+        children: {
+            id: "children",
+            name: "Niños Escolares",
+            ageRange: "2-6 años",
+            minAge: 24,
+            maxAge: 72,
+            description: "Cuestionario adaptado para edad preescolar",
+            totalQuestions: 30,
+            completionTime: "8-10 minutos",
+            scoringThreshold: {
+                lowRisk: { min: 0, max: 3 },
+                moderateRisk: { min: 4, max: 8 },
+                highRisk: { min: 9, max: 30 }
+            }
+        },
+        schoolage: {
+            id: "schoolage",
+            name: "Escolares",
+            ageRange: "7-12 años",
+            minAge: 84,
+            maxAge: 144,
+            description: "Cuestionario adaptado para edad escolar",
+            totalQuestions: 35,
+            completionTime: "10-12 minutos",
+            scoringThreshold: {
+                lowRisk: { min: 0, max: 4 },
+                moderateRisk: { min: 5, max: 11 },
+                highRisk: { min: 12, max: 35 }
+            }
+        }
+    },
+    
+    questions: {
+        toddlers: [
+            {
+                id: 1,
+                text: "¿Su hijo/a le mira cuando le habla?",
+                category: "social",
+                subcategory: "eye_contact",
+                options: [
+                    { value: 0, text: "Siempre", description: "Mi hijo/a siempre me mira cuando le hablo" },
+                    { value: 0, text: "Casi siempre", description: "Mi hijo/a me mira la mayoría de las veces" },
+                    { value: 1, text: "A veces", description: "Mi hijo/a me mira algunas veces" },
+                    { value: 1, text: "Raramente", description: "Mi hijo/a raramente me mira cuando le hablo" },
+                    { value: 1, text: "Nunca", description: "Mi hijo/a nunca me mira cuando le hablo" }
+                ]
+            },
+            {
+                id: 2,
+                text: "¿Qué tan fácil es para usted hacer contacto visual con su hijo/a?",
+                category: "social",
+                subcategory: "eye_contact",
+                options: [
+                    { value: 0, text: "Muy fácil", description: "Es muy fácil establecer contacto visual" },
+                    { value: 0, text: "Bastante fácil", description: "Generalmente puedo establecer contacto visual sin dificultad" },
+                    { value: 1, text: "Bastante difícil", description: "Me cuesta trabajo que me mire a los ojos" },
+                    { value: 1, text: "Muy difícil", description: "Es muy difícil conseguir que me mire" },
+                    { value: 1, text: "Imposible", description: "No puedo conseguir que me mire a los ojos" }
+                ]
+            },
+            {
+                id: 3,
+                text: "¿Su hijo/a señala para pedir algo (por ejemplo, un juguete que está fuera de su alcance)?",
+                category: "communication",
+                subcategory: "pointing",
+                options: [
+                    { value: 0, text: "Muchas veces al día", description: "Señala frecuentemente para pedir cosas" },
+                    { value: 0, text: "Algunas veces al día", description: "Señala regularmente cuando necesita algo" },
+                    { value: 0, text: "Algunas veces por semana", description: "Ocasionalmente señala para pedir" },
+                    { value: 1, text: "Menos de una vez por semana", description: "Raramente señala para pedir" },
+                    { value: 1, text: "Nunca", description: "No señala para pedir cosas" }
+                ]
+            },
+            {
+                id: 4,
+                text: "¿Su hijo/a señala para compartir interés con usted (por ejemplo, señalar un avión interesante en el cielo)?",
+                category: "communication",
+                subcategory: "joint_attention",
+                options: [
+                    { value: 0, text: "Muchas veces al día", description: "Frecuentemente señala para compartir interés" },
+                    { value: 0, text: "Algunas veces al día", description: "Regularmente comparte su interés señalando" },
+                    { value: 0, text: "Algunas veces por semana", description: "Ocasionalmente señala cosas interesantes" },
+                    { value: 1, text: "Menos de una vez por semana", description: "Raramente señala para compartir" },
+                    { value: 1, text: "Nunca", description: "No señala para compartir interés" }
+                ]
+            },
+            {
+                id: 5,
+                text: "¿Su hijo/a pretende (por ejemplo, hacer té con una tetera y tazas de juguete, o pretender alimentar a una muñeca)?",
+                category: "play",
+                subcategory: "pretend_play",
+                options: [
+                    { value: 0, text: "Muchas veces al día", description: "Juega imaginativamente con frecuencia" },
+                    { value: 0, text: "Algunas veces al día", description: "Regularmente participa en juego simbólico" },
+                    { value: 0, text: "Algunas veces por semana", description: "Ocasionalmente juega de manera imaginativa" },
+                    { value: 1, text: "Menos de una vez por semana", description: "Raramente participa en juego simbólico" },
+                    { value: 1, text: "Nunca", description: "No muestra juego imaginativo" }
+                ]
+            },
+            {
+                id: 6,
+                text: "¿Su hijo/a muestra interés en otros niños?",
+                category: "social",
+                subcategory: "peer_interest",
+                options: [
+                    { value: 0, text: "Muy interesado", description: "Muestra mucho interés en otros niños" },
+                    { value: 0, text: "Bastante interesado", description: "Generalmente se interesa por otros niños" },
+                    { value: 1, text: "Ligeramente interesado", description: "Muestra poco interés en otros niños" },
+                    { value: 1, text: "No muestra interés", description: "No parece interesado en otros niños" }
+                ]
+            },
+            {
+                id: 7,
+                text: "¿Su hijo/a responde a su nombre cuando lo llama?",
+                category: "communication",
+                subcategory: "response_to_name",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre responde cuando lo llamo por su nombre" },
+                    { value: 0, text: "Casi siempre", description: "Generalmente responde a su nombre" },
+                    { value: 1, text: "A veces", description: "Algunas veces responde a su nombre" },
+                    { value: 1, text: "Raramente", description: "Raramente responde cuando lo llamo" },
+                    { value: 1, text: "Nunca", description: "No responde a su nombre" }
+                ]
+            },
+            {
+                id: 8,
+                text: "Si usted o alguien más de la familia se ve claramente angustiado, ¿su hijo/a muestra signos de querer consolarlo (acariciando o abrazando)?",
+                category: "social",
+                subcategory: "empathy",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre trata de consolar cuando alguien está triste" },
+                    { value: 0, text: "Casi siempre", description: "Generalmente muestra preocupación y trata de ayudar" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente muestra empatía" },
+                    { value: 1, text: "Raramente", description: "Raramente responde al malestar de otros" },
+                    { value: 1, text: "Nunca", description: "No muestra signos de empatía" }
+                ]
+            },
+            {
+                id: 9,
+                text: "¿Cómo describiría las primeras palabras de su hijo/a?",
+                category: "communication",
+                subcategory: "first_words",
+                options: [
+                    { value: 0, text: "Muy típicas", description: "Sus primeras palabras fueron completamente normales" },
+                    { value: 0, text: "Bastante típicas", description: "Sus primeras palabras fueron mayormente normales" },
+                    { value: 1, text: "Ligeramente inusuales", description: "Sus primeras palabras fueron algo diferentes" },
+                    { value: 1, text: "Muy inusuales", description: "Sus primeras palabras fueron bastante inusuales" },
+                    { value: 1, text: "Mi hijo/a no habla", description: "Aún no dice palabras reconocibles" }
+                ]
+            },
+            {
+                id: 10,
+                text: "¿Su hijo/a hace gestos simples (por ejemplo, agitar la mano para decir adiós)?",
+                category: "communication",
+                subcategory: "gestures",
+                options: [
+                    { value: 0, text: "Muchas veces al día", description: "Hace gestos frecuentemente" },
+                    { value: 0, text: "Algunas veces al día", description: "Regularmente usa gestos simples" },
+                    { value: 0, text: "Algunas veces por semana", description: "Ocasionalmente hace gestos" },
+                    { value: 1, text: "Menos de una vez por semana", description: "Raramente hace gestos" },
+                    { value: 1, text: "Nunca", description: "No hace gestos simples" }
+                ]
+            },
+            {
+                id: 11,
+                text: "¿Su hijo/a mira hacia donde usted está señalando?",
+                category: "communication",
+                subcategory: "following_pointing",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre sigue mi señalamiento con la mirada" },
+                    { value: 0, text: "Casi siempre", description: "Generalmente mira hacia donde señalo" },
+                    { value: 1, text: "A veces", description: "Algunas veces sigue mi señalamiento" },
+                    { value: 1, text: "Raramente", description: "Raramente mira hacia donde señalo" },
+                    { value: 1, text: "Nunca", description: "No sigue mi señalamiento con la mirada" }
+                ]
+            },
+            {
+                id: 12,
+                text: "¿Su hijo/a puede caminar?",
+                category: "motor",
+                subcategory: "walking",
+                options: [
+                    { value: 0, text: "Sí", description: "Mi hijo/a ya camina" },
+                    { value: 0, text: "No", description: "Mi hijo/a aún no camina" }
+                ]
+            },
+            {
+                id: 13,
+                text: "Cuando usted está mirando algo, ¿su hijo/a mira para ver lo que usted está mirando?",
+                category: "communication",
+                subcategory: "joint_attention",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre sigue mi mirada" },
+                    { value: 0, text: "Casi siempre", description: "Generalmente mira hacia donde estoy mirando" },
+                    { value: 1, text: "A veces", description: "Algunas veces sigue mi mirada" },
+                    { value: 1, text: "Raramente", description: "Raramente mira hacia donde estoy mirando" },
+                    { value: 1, text: "Nunca", description: "No sigue mi mirada" }
+                ]
+            },
+            {
+                id: 14,
+                text: "¿Su hijo/a trata de llamar su atención hacia su propia actividad?",
+                category: "social",
+                subcategory: "attention_seeking",
+                options: [
+                    { value: 0, text: "Muchas veces al día", description: "Frecuentemente trata de llamar mi atención" },
+                    { value: 0, text: "Algunas veces al día", description: "Regularmente busca mi atención" },
+                    { value: 0, text: "Algunas veces por semana", description: "Ocasionalmente busca mi atención" },
+                    { value: 1, text: "Menos de una vez por semana", description: "Raramente trata de llamar mi atención" },
+                    { value: 1, text: "Nunca", description: "No trata de llamar mi atención hacia sus actividades" }
+                ]
+            },
+            {
+                id: 15,
+                text: "¿Su hijo/a entendería si usted le dijera 'mira' o 'mira eso'?",
+                category: "communication",
+                subcategory: "understanding_directions",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre entiende cuando le digo que mire algo" },
+                    { value: 0, text: "Casi siempre", description: "Generalmente entiende estas instrucciones" },
+                    { value: 1, text: "A veces", description: "Algunas veces entiende 'mira'" },
+                    { value: 1, text: "Raramente", description: "Raramente entiende estas instrucciones" },
+                    { value: 1, text: "Nunca", description: "No entiende cuando le digo 'mira'" }
+                ]
+            },
+            {
+                id: 16,
+                text: "¿Su hijo/a camina de puntitas?",
+                category: "motor",
+                subcategory: "toe_walking",
+                options: [
+                    { value: 0, text: "Nunca", description: "No camina en puntitas" },
+                    { value: 0, text: "Ocasionalmente", description: "Raramente camina en puntitas" },
+                    { value: 1, text: "A menudo", description: "Frecuentemente camina en puntitas" },
+                    { value: 1, text: "Siempre", description: "Siempre o casi siempre camina en puntitas" }
+                ]
+            },
+            {
+                id: 17,
+                text: "¿Qué tan fácil es para su hijo/a adaptarse cuando su rutina cambia o cuando las cosas están fuera de lugar?",
+                category: "behavioral",
+                subcategory: "routine_changes",
+                options: [
+                    { value: 0, text: "Muy fácil", description: "Se adapta muy fácilmente a los cambios" },
+                    { value: 0, text: "Bastante fácil", description: "Generalmente se adapta bien a los cambios" },
+                    { value: 1, text: "Bastante difícil", description: "Le cuesta adaptarse a los cambios" },
+                    { value: 1, text: "Muy difícil", description: "Le resulta muy difícil adaptarse a cambios" },
+                    { value: 1, text: "Imposible", description: "No puede manejar cambios en la rutina" }
+                ]
+            },
+            {
+                id: 18,
+                text: "Si hay ruido fuerte, ¿su hijo/a se cubre los oídos?",
+                category: "sensory",
+                subcategory: "sound_sensitivity",
+                options: [
+                    { value: 0, text: "Nunca", description: "No se cubre los oídos con ruidos fuertes" },
+                    { value: 0, text: "Ocasionalmente", description: "Raramente se cubre los oídos" },
+                    { value: 1, text: "A menudo", description: "Frecuentemente se cubre los oídos con ruidos" },
+                    { value: 1, text: "Siempre", description: "Siempre se cubre los oídos ante ruidos fuertes" }
+                ]
+            },
+            {
+                id: 19,
+                text: "¿Su hijo/a juega con peekaboo/cucú?",
+                category: "social",
+                subcategory: "social_games",
+                options: [
+                    { value: 0, text: "Muy interesado", description: "Le encanta jugar al cucú" },
+                    { value: 0, text: "Bastante interesado", description: "Disfruta del juego del cucú" },
+                    { value: 1, text: "Ligeramente interesado", description: "Muestra poco interés en el cucú" },
+                    { value: 1, text: "No muestra interés", description: "No le interesa jugar al cucú" }
+                ]
+            },
+            {
+                id: 20,
+                text: "¿Su hijo/a imita?",
+                category: "social",
+                subcategory: "imitation",
+                options: [
+                    { value: 0, text: "Muchas veces al día", description: "Imita frecuentemente durante el día" },
+                    { value: 0, text: "Algunas veces al día", description: "Regularmente imita acciones o sonidos" },
+                    { value: 0, text: "Algunas veces por semana", description: "Ocasionalmente imita" },
+                    { value: 1, text: "Menos de una vez por semana", description: "Raramente imita" },
+                    { value: 1, text: "Nunca", description: "No imita acciones o sonidos" }
+                ]
+            },
+            {
+                id: 21,
+                text: "¿Su hijo/a examina su cara para información sobre cómo reaccionar en una situación desconocida?",
+                category: "social",
+                subcategory: "social_referencing",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre me mira para saber cómo reaccionar" },
+                    { value: 0, text: "Casi siempre", description: "Generalmente busca mi reacción en situaciones nuevas" },
+                    { value: 1, text: "A veces", description: "Algunas veces me mira para orientarse" },
+                    { value: 1, text: "Raramente", description: "Raramente busca mi orientación" },
+                    { value: 1, text: "Nunca", description: "No me mira para saber cómo reaccionar" }
+                ]
+            },
+            {
+                id: 22,
+                text: "Si usted o alguien más se lastima ligeramente, ¿su hijo/a muestra preocupación o tristeza?",
+                category: "social",
+                subcategory: "empathy",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre muestra preocupación cuando alguien se lastima" },
+                    { value: 0, text: "Casi siempre", description: "Generalmente se preocupa por otros" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente muestra preocupación" },
+                    { value: 1, text: "Raramente", description: "Raramente muestra preocupación por otros" },
+                    { value: 1, text: "Nunca", description: "No muestra preocupación cuando otros se lastiman" }
+                ]
+            },
+            {
+                id: 23,
+                text: "¿Su hijo/a repite acciones una y otra vez?",
+                category: "behavioral",
+                subcategory: "repetitive_behaviors",
+                options: [
+                    { value: 0, text: "Nunca", description: "No repite acciones de manera obsesiva" },
+                    { value: 0, text: "Ocasionalmente", description: "Raramente repite acciones" },
+                    { value: 1, text: "A menudo", description: "Frecuentemente repite las mismas acciones" },
+                    { value: 1, text: "Siempre", description: "Constantemente repite acciones una y otra vez" }
+                ]
+            },
+            {
+                id: 24,
+                text: "¿Su hijo/a tiene una mirada inusual?",
+                category: "social",
+                subcategory: "unusual_gaze",
+                options: [
+                    { value: 0, text: "Nunca", description: "Su mirada es completamente normal" },
+                    { value: 0, text: "Ocasionalmente", description: "Raramente tiene una mirada inusual" },
+                    { value: 1, text: "A menudo", description: "Frecuentemente tiene una mirada extraña" },
+                    { value: 1, text: "Siempre", description: "Su mirada es constantemente inusual" }
+                ]
+            },
+            {
+                id: 25,
+                text: "¿Su hijo/a prefiere estar solo?",
+                category: "social",
+                subcategory: "social_isolation",
+                options: [
+                    { value: 0, text: "Nunca", description: "No prefiere estar solo, busca compañía" },
+                    { value: 0, text: "Ocasionalmente", description: "Raramente prefiere la soledad" },
+                    { value: 1, text: "A menudo", description: "Frecuentemente prefiere estar solo" },
+                    { value: 1, text: "Siempre", description: "Siempre prefiere la soledad a la compañía" }
+                ]
+            }
+        ],
+        
+        children: [
+            {
+                id: 1,
+                text: "¿Su hijo/a hace contacto visual cuando le habla?",
+                category: "social",
+                subcategory: "eye_contact",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre me mira cuando hablamos" },
+                    { value: 0, text: "Frecuentemente", description: "La mayoría de las veces mantiene contacto visual" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente me mira cuando hablamos" },
+                    { value: 1, text: "Raramente", description: "Casi nunca hace contacto visual" },
+                    { value: 1, text: "Nunca", description: "No hace contacto visual cuando hablamos" }
+                ]
+            },
+            {
+                id: 2,
+                text: "¿Su hijo/a comparte sus intereses con usted mostrándole cosas?",
+                category: "communication",
+                subcategory: "sharing_interest",
+                options: [
+                    { value: 0, text: "Muy frecuentemente", description: "Constantemente me muestra cosas que le interesan" },
+                    { value: 0, text: "Frecuentemente", description: "Regularmente comparte sus intereses conmigo" },
+                    { value: 1, text: "Ocasionalmente", description: "A veces me muestra cosas" },
+                    { value: 1, text: "Raramente", description: "Casi nunca comparte sus intereses" },
+                    { value: 1, text: "Nunca", description: "No me muestra cosas que le interesan" }
+                ]
+            },
+            {
+                id: 3,
+                text: "¿Su hijo/a participa en juegos imaginativos?",
+                category: "play",
+                subcategory: "imaginative_play",
+                options: [
+                    { value: 0, text: "Muy creativamente", description: "Tiene juegos imaginativos muy creativos" },
+                    { value: 0, text: "Creativamente", description: "Participa en juego simbólico regularmente" },
+                    { value: 1, text: "Limitadamente", description: "Su juego imaginativo es limitado" },
+                    { value: 1, text: "Muy poco", description: "Casi no participa en juego imaginativo" },
+                    { value: 1, text: "Nunca", description: "No muestra juego imaginativo" }
+                ]
+            },
+            {
+                id: 4,
+                text: "¿Cómo responde su hijo/a cuando otros niños se acercan durante el juego?",
+                category: "social",
+                subcategory: "peer_interaction",
+                options: [
+                    { value: 0, text: "Se une alegremente", description: "Se integra fácilmente al juego con otros" },
+                    { value: 0, text: "Responde positivamente", description: "Generalmente acepta la interacción" },
+                    { value: 1, text: "Responde con cautela", description: "Es cauteloso pero acepta la interacción" },
+                    { value: 1, text: "Se retira", description: "Tiende a alejarse de otros niños" },
+                    { value: 1, text: "Los ignora completamente", description: "No responde a las aproximaciones de otros niños" }
+                ]
+            },
+            {
+                id: 5,
+                text: "¿Su hijo/a entiende emociones simples en otros (feliz, triste, enojado)?",
+                category: "social",
+                subcategory: "emotion_recognition",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Entiende perfectamente las emociones básicas" },
+                    { value: 0, text: "Bien", description: "Generalmente reconoce emociones simples" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta reconocer emociones" },
+                    { value: 1, text: "Muy poco", description: "Raramente reconoce emociones en otros" },
+                    { value: 1, text: "No las entiende", description: "No muestra comprensión de emociones" }
+                ]
+            },
+            {
+                id: 6,
+                text: "¿Su hijo/a utiliza gestos complejos para comunicarse (además de señalar)?",
+                category: "communication",
+                subcategory: "complex_gestures",
+                options: [
+                    { value: 0, text: "Frecuentemente", description: "Usa variedad de gestos expresivos" },
+                    { value: 0, text: "Regularmente", description: "Ocasionalmente usa gestos complejos" },
+                    { value: 1, text: "Ocasionalmente", description: "Pocos gestos más allá de señalar" },
+                    { value: 1, text: "Raramente", description: "Muy limitado en gestos" },
+                    { value: 1, text: "Nunca", description: "No usa gestos complejos" }
+                ]
+            },
+            {
+                id: 7,
+                text: "¿Su hijo/a inicia juegos sociales simples (como correr y que lo persigan)?",
+                category: "social",
+                subcategory: "social_games",
+                options: [
+                    { value: 0, text: "Frecuentemente", description: "A menudo inicia juegos con otros" },
+                    { value: 0, text: "Ocasionalmente", description: "A veces inicia juegos sociales" },
+                    { value: 1, text: "Raramente", description: "Pocas veces inicia juegos" },
+                    { value: 1, text: "Muy raramente", description: "Casi nunca inicia juegos sociales" },
+                    { value: 1, text: "Nunca", description: "No inicia juegos sociales" }
+                ]
+            },
+            {
+                id: 8,
+                text: "¿Su hijo/a imita acciones en juegos (como aplaudir en canciones)?",
+                category: "social",
+                subcategory: "imitation",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre imita en actividades grupales" },
+                    { value: 0, text: "Frecuentemente", description: "Generalmente participa imitando" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente imita acciones" },
+                    { value: 1, text: "Raramente", description: "Pocas veces imita" },
+                    { value: 1, text: "Nunca", description: "No imita acciones en juegos" }
+                ]
+            },
+            {
+                id: 9,
+                text: "¿Su hijo/a responde cuando usted le dice su nombre desde otra habitación?",
+                category: "communication",
+                subcategory: "response_to_name",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre responde cuando lo llamo" },
+                    { value: 0, text: "Casi siempre", description: "Generalmente responde a su nombre" },
+                    { value: 1, text: "A veces", description: "Algunas veces responde" },
+                    { value: 1, text: "Raramente", description: "Pocas veces responde cuando lo llamo" },
+                    { value: 1, text: "Nunca", description: "No responde cuando lo llamo" }
+                ]
+            },
+            {
+                id: 10,
+                text: "¿Su hijo/a señala objetos para compartir interés (no solo para pedir)?",
+                category: "communication",
+                subcategory: "joint_attention",
+                options: [
+                    { value: 0, text: "Frecuentemente", description: "A menudo señala para mostrar cosas interesantes" },
+                    { value: 0, text: "Ocasionalmente", description: "A veces señala para compartir" },
+                    { value: 1, text: "Raramente", description: "Pocas veces señala para compartir" },
+                    { value: 1, text: "Muy raramente", description: "Casi nunca señala para compartir" },
+                    { value: 1, text: "Nunca", description: "Solo señala para pedir, no para compartir" }
+                ]
+            },
+            {
+                id: 11,
+                text: "¿Su hijo/a puede seguir instrucciones simples de dos pasos?",
+                category: "communication",
+                subcategory: "following_instructions",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre sigue instrucciones de dos pasos" },
+                    { value: 0, text: "Frecuentemente", description: "Generalmente puede seguir instrucciones complejas" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente sigue instrucciones de dos pasos" },
+                    { value: 1, text: "Raramente", description: "Le cuesta seguir instrucciones complejas" },
+                    { value: 1, text: "Nunca", description: "No puede seguir instrucciones de dos pasos" }
+                ]
+            },
+            {
+                id: 12,
+                text: "¿Su hijo/a muestra objetos a otros sin ser solicitado?",
+                category: "social",
+                subcategory: "sharing_interest",
+                options: [
+                    { value: 0, text: "Frecuentemente", description: "A menudo comparte objetos espontáneamente" },
+                    { value: 0, text: "Ocasionalmente", description: "A veces muestra objetos a otros" },
+                    { value: 1, text: "Raramente", description: "Pocas veces comparte objetos" },
+                    { value: 1, text: "Muy raramente", description: "Casi nunca muestra objetos" },
+                    { value: 1, text: "Nunca", description: "No comparte objetos espontáneamente" }
+                ]
+            },
+            {
+                id: 13,
+                text: "¿Su hijo/a demuestra preocupación cuando otros están heridos o molestos?",
+                category: "social",
+                subcategory: "empathy",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre muestra empatía hacia otros" },
+                    { value: 0, text: "Frecuentemente", description: "Generalmente se preocupa por otros" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente muestra preocupación" },
+                    { value: 1, text: "Raramente", description: "Pocas veces muestra empatía" },
+                    { value: 1, text: "Nunca", description: "No muestra preocupación por otros" }
+                ]
+            },
+            {
+                id: 14,
+                text: "¿Su hijo/a juega apropiadamente con juguetes (los usa para su propósito previsto)?",
+                category: "play",
+                subcategory: "functional_play",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre usa juguetes apropiadamente" },
+                    { value: 0, text: "Frecuentemente", description: "Generalmente juega funcionalmente" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente usa juguetes apropiadamente" },
+                    { value: 1, text: "Raramente", description: "Pocas veces juega funcionalmente" },
+                    { value: 1, text: "Nunca", description: "No usa juguetes para su propósito" }
+                ]
+            },
+            {
+                id: 15,
+                text: "¿Su hijo/a se adapta a cambios en rutinas con apoyo mínimo?",
+                category: "behavioral",
+                subcategory: "flexibility",
+                options: [
+                    { value: 0, text: "Fácilmente", description: "Se adapta bien a cambios" },
+                    { value: 0, text: "Con algo de apoyo", description: "Se adapta con ayuda mínima" },
+                    { value: 1, text: "Con mucho apoyo", description: "Necesita mucha ayuda para adaptarse" },
+                    { value: 1, text: "Con gran dificultad", description: "Le resulta muy difícil adaptarse" },
+                    { value: 1, text: "No se adapta", description: "No puede manejar cambios en rutinas" }
+                ]
+            },
+            {
+                id: 16,
+                text: "¿Su hijo/a busca confort cuando está herido o molesto?",
+                category: "social",
+                subcategory: "seeking_comfort",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre busca consuelo cuando lo necesita" },
+                    { value: 0, text: "Frecuentemente", description: "Generalmente busca apoyo" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente busca confort" },
+                    { value: 1, text: "Raramente", description: "Pocas veces busca consuelo" },
+                    { value: 1, text: "Nunca", description: "No busca confort de otros" }
+                ]
+            },
+            {
+                id: 17,
+                text: "¿Su hijo/a tiene sensibilidades sensoriales marcadas (sonidos, texturas, luces)?",
+                category: "sensory",
+                subcategory: "sensory_sensitivity",
+                options: [
+                    { value: 0, text: "Nunca", description: "No muestra sensibilidades sensoriales" },
+                    { value: 0, text: "Ocasionalmente", description: "Pocas sensibilidades sensoriales" },
+                    { value: 1, text: "A veces", description: "Algunas sensibilidades sensoriales" },
+                    { value: 1, text: "Frecuentemente", description: "Muchas sensibilidades sensoriales" },
+                    { value: 1, text: "Siempre", description: "Sensibilidades sensoriales marcadas" }
+                ]
+            },
+            {
+                id: 18,
+                text: "¿Su hijo/a disfruta de actividades físicas simples (balancearse, girar)?",
+                category: "motor",
+                subcategory: "physical_activities",
+                options: [
+                    { value: 0, text: "Mucho", description: "Disfruta mucho de actividades físicas" },
+                    { value: 0, text: "Moderadamente", description: "Le gustan las actividades físicas" },
+                    { value: 1, text: "Poco", description: "Muestra poco interés en actividades físicas" },
+                    { value: 1, text: "Muy poco", description: "Muy poco interés en actividades físicas" },
+                    { value: 1, text: "Nada", description: "No disfruta actividades físicas" }
+                ]
+            },
+            {
+                id: 19,
+                text: "¿Su hijo/a intenta comunicarse cuando no puede hacer algo solo?",
+                category: "communication",
+                subcategory: "help_seeking",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre pide ayuda cuando la necesita" },
+                    { value: 0, text: "Frecuentemente", description: "Generalmente comunica cuando necesita ayuda" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente pide ayuda" },
+                    { value: 1, text: "Raramente", description: "Pocas veces pide ayuda" },
+                    { value: 1, text: "Nunca", description: "No comunica cuando necesita ayuda" }
+                ]
+            },
+            {
+                id: 20,
+                text: "¿Su hijo/a mira a las personas cuando están hablando en grupo?",
+                category: "social",
+                subcategory: "group_attention",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre presta atención en grupos" },
+                    { value: 0, text: "Frecuentemente", description: "Generalmente mira a quien habla" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente presta atención al grupo" },
+                    { value: 1, text: "Raramente", description: "Pocas veces mira a quien habla" },
+                    { value: 1, text: "Nunca", description: "No presta atención en situaciones grupales" }
+                ]
+            },
+            {
+                id: 21,
+                text: "¿Su hijo/a participa en juegos de imitación simple (como 'Simón dice')?",
+                category: "social",
+                subcategory: "imitation_games",
+                options: [
+                    { value: 0, text: "Entusiastamente", description: "Participa activamente en juegos de imitación" },
+                    { value: 0, text: "Dispuestamente", description: "Le gustan los juegos de imitación" },
+                    { value: 1, text: "Con reluctancia", description: "Participa pero sin entusiasmo" },
+                    { value: 1, text: "Raramente", description: "Pocas veces participa en imitación" },
+                    { value: 1, text: "Nunca", description: "No participa en juegos de imitación" }
+                ]
+            },
+            {
+                id: 22,
+                text: "¿Su hijo/a responde a expresiones faciales de otros?",
+                category: "social",
+                subcategory: "facial_expressions",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre responde a expresiones faciales" },
+                    { value: 0, text: "Frecuentemente", description: "Generalmente nota expresiones faciales" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente responde a expresiones" },
+                    { value: 1, text: "Raramente", description: "Pocas veces nota expresiones faciales" },
+                    { value: 1, text: "Nunca", description: "No responde a expresiones faciales" }
+                ]
+            },
+            {
+                id: 23,
+                text: "¿Su hijo/a muestra comportamientos repetitivos con objetos (girar, alinear)?",
+                category: "behavioral",
+                subcategory: "repetitive_behaviors",
+                options: [
+                    { value: 0, text: "Nunca", description: "No muestra comportamientos repetitivos" },
+                    { value: 0, text: "Ocasionalmente", description: "Pocas veces muestra comportamientos repetitivos" },
+                    { value: 1, text: "A veces", description: "Algunos comportamientos repetitivos" },
+                    { value: 1, text: "Frecuentemente", description: "Muchos comportamientos repetitivos" },
+                    { value: 1, text: "Constantemente", description: "Comportamientos repetitivos constantes" }
+                ]
+            },
+            {
+                id: 24,
+                text: "¿Su hijo/a disfruta estar en brazos o ser abrazado?",
+                category: "sensory",
+                subcategory: "physical_affection",
+                options: [
+                    { value: 0, text: "Mucho", description: "Le encanta el contacto físico afectuoso" },
+                    { value: 0, text: "Moderadamente", description: "Disfruta del contacto físico" },
+                    { value: 1, text: "Poco", description: "Tolera pero no busca contacto físico" },
+                    { value: 1, text: "Muy poco", description: "Evita la mayoría del contacto físico" },
+                    { value: 1, text: "Nada", description: "Rechaza contacto físico afectuoso" }
+                ]
+            },
+            {
+                id: 25,
+                text: "¿Su hijo/a intenta obtener su atención para mostrarle cosas?",
+                category: "social",
+                subcategory: "attention_seeking",
+                options: [
+                    { value: 0, text: "Frecuentemente", description: "A menudo busca mi atención para compartir" },
+                    { value: 0, text: "Ocasionalmente", description: "A veces me busca para mostrar cosas" },
+                    { value: 1, text: "Raramente", description: "Pocas veces busca mi atención" },
+                    { value: 1, text: "Muy raramente", description: "Casi nunca busca mi atención" },
+                    { value: 1, text: "Nunca", description: "No busca mi atención para compartir" }
+                ]
+            },
+            {
+                id: 26,
+                text: "¿Su hijo/a usa palabras de manera apropiada para su edad?",
+                category: "communication",
+                subcategory: "language_use",
+                options: [
+                    { value: 0, text: "Completamente apropiado", description: "Usa palabras muy apropiadamente para su edad" },
+                    { value: 0, text: "Mayormente apropiado", description: "Generalmente usa palabras apropiadamente" },
+                    { value: 1, text: "Algo inapropiado", description: "Uso de palabras algo inmaduro" },
+                    { value: 1, text: "Muy inapropiado", description: "Uso de palabras muy inmaduro" },
+                    { value: 1, text: "No usa palabras", description: "No ha desarrollado lenguaje hablado" }
+                ]
+            },
+            {
+                id: 27,
+                text: "¿Su hijo/a parece entender lo que otros están sintiendo?",
+                category: "social",
+                subcategory: "emotional_understanding",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Entiende muy bien las emociones de otros" },
+                    { value: 0, text: "Bien", description: "Generalmente entiende las emociones de otros" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta entender emociones de otros" },
+                    { value: 1, text: "Muy poco", description: "Entiende muy poco las emociones" },
+                    { value: 1, text: "No entiende", description: "No muestra comprensión de emociones" }
+                ]
+            },
+            {
+                id: 28,
+                text: "¿Su hijo/a puede mantener atención en actividades apropiadas para su edad?",
+                category: "behavioral",
+                subcategory: "attention_span",
+                options: [
+                    { value: 0, text: "Tiempo apropiado", description: "Mantiene atención por tiempo apropiado" },
+                    { value: 0, text: "Casi apropiado", description: "Atención casi apropiada para su edad" },
+                    { value: 1, text: "Algo corta", description: "Atención algo corta para su edad" },
+                    { value: 1, text: "Muy corta", description: "Atención muy corta para su edad" },
+                    { value: 1, text: "Extremadamente corta", description: "Atención extremadamente limitada" }
+                ]
+            },
+            {
+                id: 29,
+                text: "¿Su hijo/a se frustra fácilmente cuando las cosas no salen como espera?",
+                category: "behavioral",
+                subcategory: "frustration_tolerance",
+                options: [
+                    { value: 0, text: "Raramente", description: "Maneja bien la frustración" },
+                    { value: 0, text: "Ocasionalmente", description: "Se frustra ocasionalmente" },
+                    { value: 1, text: "Frecuentemente", description: "Se frustra frecuentemente" },
+                    { value: 1, text: "Muy frecuentemente", description: "Se frustra muy fácilmente" },
+                    { value: 1, text: "Constantemente", description: "Frustración constante e intensa" }
+                ]
+            },
+            {
+                id: 30,
+                text: "¿Su hijo/a disfruta de rutinas y se molesta cuando cambian?",
+                category: "behavioral",
+                subcategory: "routine_preference",
+                options: [
+                    { value: 0, text: "Flexible con cambios", description: "Se adapta fácilmente a cambios en rutinas" },
+                    { value: 0, text: "Algo flexible", description: "Se adapta con apoyo mínimo" },
+                    { value: 1, text: "Prefiere rutinas", description: "Le gustan las rutinas pero tolera cambios" },
+                    { value: 1, text: "Muy apegado a rutinas", description: "Se molesta con cambios en rutinas" },
+                    { value: 1, text: "Extremadamente rígido", description: "No tolera ningún cambio en rutinas" }
+                ]
+            }
+        ],
+        
+        schoolage: [
+            {
+                id: 1,
+                text: "¿Su hijo/a inicia conversaciones con otros niños?",
+                category: "social",
+                subcategory: "conversation_initiation",
+                options: [
+                    { value: 0, text: "Frecuentemente", description: "A menudo inicia conversaciones con sus pares" },
+                    { value: 0, text: "Regularmente", description: "Inicia conversaciones de vez en cuando" },
+                    { value: 1, text: "Ocasionalmente", description: "Raramente inicia conversaciones" },
+                    { value: 1, text: "Muy raramente", description: "Casi nunca inicia conversaciones" },
+                    { value: 1, text: "Nunca", description: "No inicia conversaciones con otros niños" }
+                ]
+            },
+            {
+                id: 2,
+                text: "¿Su hijo/a entiende el sarcasmo o las bromas simples?",
+                category: "communication",
+                subcategory: "humor_understanding",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Entiende perfectamente el humor y sarcasmo" },
+                    { value: 0, text: "Bien", description: "Generalmente entiende bromas simples" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta entender el humor" },
+                    { value: 1, text: "Muy poco", description: "Raramente entiende bromas o sarcasmo" },
+                    { value: 1, text: "No lo entiende", description: "No comprende el humor o sarcasmo" }
+                ]
+            },
+            {
+                id: 3,
+                text: "¿Su hijo/a mantiene amistades apropiadas para su edad?",
+                category: "social",
+                subcategory: "friendships",
+                options: [
+                    { value: 0, text: "Varias amistades sólidas", description: "Tiene múltiples amistades saludables" },
+                    { value: 0, text: "Algunas amistades", description: "Mantiene algunas amistades apropiadas" },
+                    { value: 1, text: "Pocas amistades", description: "Tiene dificultad manteniendo amistades" },
+                    { value: 1, text: "Muy pocas amistades", description: "Muy pocas relaciones de amistad" },
+                    { value: 1, text: "No tiene amistades", description: "No mantiene relaciones de amistad" }
+                ]
+            },
+            {
+                id: 4,
+                text: "¿Su hijo/a entiende reglas sociales no escritas (espacio personal, turnos)?",
+                category: "social",
+                subcategory: "social_rules",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Entiende perfectamente las reglas sociales" },
+                    { value: 0, text: "Bien", description: "Generalmente sigue reglas sociales apropiadas" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta entender reglas sociales" },
+                    { value: 1, text: "Muy poco", description: "Entiende muy pocas reglas sociales" },
+                    { value: 1, text: "No las entiende", description: "No comprende reglas sociales básicas" }
+                ]
+            },
+            {
+                id: 5,
+                text: "¿Su hijo/a puede participar en conversaciones de ida y vuelta?",
+                category: "communication",
+                subcategory: "reciprocal_conversation",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Mantiene conversaciones recíprocas fluidamente" },
+                    { value: 0, text: "Bien", description: "Generalmente participa en conversaciones bidireccionales" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta mantener conversaciones recíprocas" },
+                    { value: 1, text: "Muy poco", description: "Participación muy limitada en conversaciones" },
+                    { value: 1, text: "No puede", description: "No puede mantener conversaciones recíprocas" }
+                ]
+            },
+            {
+                id: 6,
+                text: "¿Su hijo/a muestra interés en actividades grupales organizadas?",
+                category: "social",
+                subcategory: "group_activities",
+                options: [
+                    { value: 0, text: "Mucho interés", description: "Le encantan las actividades grupales" },
+                    { value: 0, text: "Interés moderado", description: "Disfruta algunas actividades grupales" },
+                    { value: 1, text: "Poco interés", description: "Muestra poco interés en grupos" },
+                    { value: 1, text: "Muy poco interés", description: "Evita la mayoría de actividades grupales" },
+                    { value: 1, text: "No muestra interés", description: "Rechaza actividades grupales" }
+                ]
+            },
+            {
+                id: 7,
+                text: "¿Su hijo/a puede cambiar de tema de conversación apropiadamente?",
+                category: "communication",
+                subcategory: "conversation_skills",
+                options: [
+                    { value: 0, text: "Muy apropiadamente", description: "Cambia de tema muy naturalmente" },
+                    { value: 0, text: "Apropiadamente", description: "Generalmente cambia de tema apropiadamente" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta cambiar de tema apropiadamente" },
+                    { value: 1, text: "Muy rígido", description: "Muy rígido en conversaciones" },
+                    { value: 1, text: "No puede", description: "No puede cambiar de tema apropiadamente" }
+                ]
+            },
+            {
+                id: 8,
+                text: "¿Su hijo/a entiende perspectivas diferentes a la suya?",
+                category: "social",
+                subcategory: "perspective_taking",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Entiende muy bien diferentes perspectivas" },
+                    { value: 0, text: "Bien", description: "Generalmente entiende otras perspectivas" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta entender otras perspectivas" },
+                    { value: 1, text: "Muy poco", description: "Muy limitado en entender perspectivas" },
+                    { value: 1, text: "No entiende", description: "No puede considerar perspectivas diferentes" }
+                ]
+            },
+            {
+                id: 9,
+                text: "¿Su hijo/a adapta su comunicación según con quién habla?",
+                category: "communication",
+                subcategory: "communication_adaptation",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Adapta comunicación muy apropiadamente" },
+                    { value: 0, text: "Bien", description: "Generalmente adapta su comunicación" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta adaptar su comunicación" },
+                    { value: 1, text: "Muy poco", description: "Muy poca adaptación comunicativa" },
+                    { value: 1, text: "No adapta", description: "No adapta su comunicación al contexto" }
+                ]
+            },
+            {
+                id: 10,
+                text: "¿Su hijo/a puede trabajar cooperativamente en proyectos grupales?",
+                category: "social",
+                subcategory: "cooperation",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Coopera muy bien en grupos" },
+                    { value: 0, text: "Bien", description: "Generalmente coopera en proyectos grupales" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta cooperar en grupos" },
+                    { value: 1, text: "Muy poco", description: "Cooperación muy limitada" },
+                    { value: 1, text: "No puede", description: "No puede cooperar en proyectos grupales" }
+                ]
+            },
+            {
+                id: 11,
+                text: "¿Su hijo/a entiende cuando otros están bromeando vs. siendo serios?",
+                category: "social",
+                subcategory: "social_context",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre distingue entre broma y seriedad" },
+                    { value: 0, text: "Frecuentemente", description: "Generalmente entiende el contexto social" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente malinterpreta el contexto" },
+                    { value: 1, text: "Raramente", description: "Frecuentemente malinterpreta situaciones" },
+                    { value: 1, text: "Nunca", description: "No puede distinguir contexto social" }
+                ]
+            },
+            {
+                id: 12,
+                text: "¿Su hijo/a muestra flexibilidad cuando sus planes cambian?",
+                category: "behavioral",
+                subcategory: "flexibility",
+                options: [
+                    { value: 0, text: "Muy flexible", description: "Se adapta muy fácilmente a cambios de planes" },
+                    { value: 0, text: "Flexible", description: "Generalmente se adapta a cambios" },
+                    { value: 1, text: "Algo rígido", description: "Le cuesta adaptarse a cambios de planes" },
+                    { value: 1, text: "Muy rígido", description: "Muy difícil para él adaptarse a cambios" },
+                    { value: 1, text: "Extremadamente rígido", description: "No tolera cambios en planes" }
+                ]
+            },
+            {
+                id: 13,
+                text: "¿Su hijo/a puede resolver conflictos sociales apropiadamente?",
+                category: "social",
+                subcategory: "conflict_resolution",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Resuelve conflictos muy apropiadamente" },
+                    { value: 0, text: "Bien", description: "Generalmente maneja conflictos apropiadamente" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta resolver conflictos sociales" },
+                    { value: 1, text: "Muy poco", description: "Muy limitado en resolución de conflictos" },
+                    { value: 1, text: "No puede", description: "No puede resolver conflictos sociales" }
+                ]
+            },
+            {
+                id: 14,
+                text: "¿Su hijo/a tiene intereses obsesivos o muy intensos?",
+                category: "behavioral",
+                subcategory: "intense_interests",
+                options: [
+                    { value: 0, text: "No", description: "No muestra intereses obsesivos" },
+                    { value: 0, text: "Intereses normales", description: "Tiene intereses apropiados para su edad" },
+                    { value: 1, text: "Algo intensos", description: "Algunos intereses algo intensos" },
+                    { value: 1, text: "Muy intensos", description: "Intereses muy intensos o limitados" },
+                    { value: 1, text: "Obsesivos", description: "Intereses obsesivos que interfieren con otras actividades" }
+                ]
+            },
+            {
+                id: 15,
+                text: "¿Su hijo/a puede mantener atención en tareas académicas apropiadas para su edad?",
+                category: "behavioral",
+                subcategory: "academic_attention",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Mantiene atención académica muy apropiadamente" },
+                    { value: 0, text: "Bien", description: "Generalmente mantiene buena atención académica" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta mantener atención en tareas académicas" },
+                    { value: 1, text: "Muy poco", description: "Atención académica muy limitada" },
+                    { value: 1, text: "No puede", description: "No puede mantener atención en tareas académicas" }
+                ]
+            },
+            {
+                id: 16,
+                text: "¿Su hijo/a busca apoyo emocional cuando se siente abrumado?",
+                category: "social",
+                subcategory: "emotional_support_seeking",
+                options: [
+                    { value: 0, text: "Siempre", description: "Siempre busca apoyo cuando lo necesita" },
+                    { value: 0, text: "Frecuentemente", description: "Generalmente busca apoyo emocional apropiado" },
+                    { value: 1, text: "A veces", description: "Ocasionalmente busca apoyo emocional" },
+                    { value: 1, text: "Raramente", description: "Raramente busca apoyo cuando está abrumado" },
+                    { value: 1, text: "Nunca", description: "No busca apoyo emocional de otros" }
+                ]
+            },
+            {
+                id: 17,
+                text: "¿Su hijo/a puede seguir instrucciones de múltiples pasos en entornos ruidosos?",
+                category: "communication",
+                subcategory: "complex_instructions",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Sigue instrucciones complejas incluso con distracciones" },
+                    { value: 0, text: "Bien", description: "Generalmente sigue instrucciones de múltiples pasos" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta seguir instrucciones complejas" },
+                    { value: 1, text: "Muy poco", description: "Muy limitado siguiendo instrucciones complejas" },
+                    { value: 1, text: "No puede", description: "No puede seguir instrucciones de múltiples pasos" }
+                ]
+            },
+            {
+                id: 18,
+                text: "¿Su hijo/a demuestra comprensión de emociones complejas (orgullo, vergüenza, celos)?",
+                category: "social",
+                subcategory: "complex_emotions",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Entiende muy bien emociones complejas" },
+                    { value: 0, text: "Bien", description: "Generalmente entiende emociones complejas" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta entender emociones complejas" },
+                    { value: 1, text: "Muy poco", description: "Comprensión muy limitada de emociones complejas" },
+                    { value: 1, text: "No entiende", description: "No comprende emociones más allá de básicas" }
+                ]
+            },
+            {
+                id: 19,
+                text: "¿Su hijo/a puede participar en juegos con reglas complejas?",
+                category: "play",
+                subcategory: "rule_based_games",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Participa muy bien en juegos con reglas complejas" },
+                    { value: 0, text: "Bien", description: "Generalmente sigue reglas de juegos complejos" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta seguir reglas complejas de juegos" },
+                    { value: 1, text: "Muy poco", description: "Muy limitado en juegos con reglas complejas" },
+                    { value: 1, text: "No puede", description: "No puede participar en juegos con reglas complejas" }
+                ]
+            },
+            {
+                id: 20,
+                text: "¿Su hijo/a tiene movimientos repetitivos o estereotipados?",
+                category: "motor",
+                subcategory: "repetitive_movements",
+                options: [
+                    { value: 0, text: "Nunca", description: "No muestra movimientos repetitivos" },
+                    { value: 0, text: "Ocasionalmente", description: "Muy ocasionalmente movimientos repetitivos" },
+                    { value: 1, text: "A veces", description: "Algunos movimientos repetitivos" },
+                    { value: 1, text: "Frecuentemente", description: "Movimientos repetitivos frecuentes" },
+                    { value: 1, text: "Constantemente", description: "Movimientos repetitivos constantes" }
+                ]
+            },
+            {
+                id: 21,
+                text: "¿Su hijo/a puede interpretar lenguaje no verbal (gestos, expresiones faciales)?",
+                category: "communication",
+                subcategory: "nonverbal_communication",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Interpreta muy bien el lenguaje no verbal" },
+                    { value: 0, text: "Bien", description: "Generalmente entiende lenguaje no verbal" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta interpretar lenguaje no verbal" },
+                    { value: 1, text: "Muy poco", description: "Interpretación muy limitada de lenguaje no verbal" },
+                    { value: 1, text: "No puede", description: "No interpreta lenguaje no verbal" }
+                ]
+            },
+            {
+                id: 22,
+                text: "¿Su hijo/a se involucra en juego imaginativo complejo con otros?",
+                category: "play",
+                subcategory: "complex_imaginative_play",
+                options: [
+                    { value: 0, text: "Frecuentemente", description: "A menudo participa en juego imaginativo complejo" },
+                    { value: 0, text: "Ocasionalmente", description: "A veces se involucra en juego imaginativo con otros" },
+                    { value: 1, text: "Raramente", description: "Raramente participa en juego imaginativo complejo" },
+                    { value: 1, text: "Muy raramente", description: "Casi nunca se involucra en juego imaginativo" },
+                    { value: 1, text: "Nunca", description: "No participa en juego imaginativo con otros" }
+                ]
+            },
+            {
+                id: 23,
+                text: "¿Su hijo/a puede manejar situaciones sociales impredecibles?",
+                category: "social",
+                subcategory: "social_flexibility",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Maneja muy bien situaciones sociales impredecibles" },
+                    { value: 0, text: "Bien", description: "Generalmente se adapta a situaciones sociales nuevas" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta manejar situaciones sociales impredecibles" },
+                    { value: 1, text: "Muy poco", description: "Muy limitado en situaciones sociales nuevas" },
+                    { value: 1, text: "No puede", description: "No puede manejar situaciones sociales impredecibles" }
+                ]
+            },
+            {
+                id: 24,
+                text: "¿Su hijo/a muestra comportamientos autoestimulatorios (balancearse, aletear manos)?",
+                category: "motor",
+                subcategory: "self_stimulatory_behaviors",
+                options: [
+                    { value: 0, text: "Nunca", description: "No muestra comportamientos autoestimulatorios" },
+                    { value: 0, text: "Ocasionalmente", description: "Muy ocasionalmente comportamientos autoestimulatorios" },
+                    { value: 1, text: "A veces", description: "Algunos comportamientos autoestimulatorios" },
+                    { value: 1, text: "Frecuentemente", description: "Comportamientos autoestimulatorios frecuentes" },
+                    { value: 1, text: "Constantemente", description: "Comportamientos autoestimulatorios constantes" }
+                ]
+            },
+            {
+                id: 25,
+                text: "¿Su hijo/a puede generalizar habilidades aprendidas a nuevas situaciones?",
+                category: "behavioral",
+                subcategory: "skill_generalization",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Generaliza habilidades muy fácilmente" },
+                    { value: 0, text: "Bien", description: "Generalmente puede generalizar habilidades" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta generalizar habilidades" },
+                    { value: 1, text: "Muy poco", description: "Generalización muy limitada de habilidades" },
+                    { value: 1, text: "No puede", description: "No puede generalizar habilidades a nuevas situaciones" }
+                ]
+            },
+            {
+                id: 26,
+                text: "¿Su hijo/a tiene sensibilidades sensoriales que interfieren con actividades diarias?",
+                category: "sensory",
+                subcategory: "sensory_interference",
+                options: [
+                    { value: 0, text: "Nunca", description: "No tiene sensibilidades que interfieran" },
+                    { value: 0, text: "Ocasionalmente", description: "Pocas sensibilidades que ocasionalmente interfieren" },
+                    { value: 1, text: "A veces", description: "Algunas sensibilidades que interfieren moderadamente" },
+                    { value: 1, text: "Frecuentemente", description: "Sensibilidades que frecuentemente interfieren" },
+                    { value: 1, text: "Constantemente", description: "Sensibilidades que constantemente interfieren con actividades" }
+                ]
+            },
+            {
+                id: 27,
+                text: "¿Su hijo/a puede comunicar sus necesidades de manera efectiva?",
+                category: "communication",
+                subcategory: "needs_communication",
+                options: [
+                    { value: 0, text: "Muy efectivamente", description: "Comunica necesidades muy claramente" },
+                    { value: 0, text: "Efectivamente", description: "Generalmente comunica necesidades bien" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta comunicar necesidades efectivamente" },
+                    { value: 1, text: "Muy poco", description: "Comunicación de necesidades muy limitada" },
+                    { value: 1, text: "No puede", description: "No puede comunicar necesidades efectivamente" }
+                ]
+            },
+            {
+                id: 28,
+                text: "¿Su hijo/a demuestra creatividad apropiada para su edad?",
+                category: "play",
+                subcategory: "creativity",
+                options: [
+                    { value: 0, text: "Muy creativo", description: "Muestra creatividad muy apropiada para su edad" },
+                    { value: 0, text: "Creativo", description: "Demuestra creatividad apropiada" },
+                    { value: 1, text: "Algo limitado", description: "Creatividad algo limitada para su edad" },
+                    { value: 1, text: "Muy limitado", description: "Creatividad muy limitada" },
+                    { value: 1, text: "No creativo", description: "No demuestra creatividad apropiada" }
+                ]
+            },
+            {
+                id: 29,
+                text: "¿Su hijo/a puede manejar críticas constructivas apropiadamente?",
+                category: "social",
+                subcategory: "criticism_handling",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Maneja críticas constructivas muy apropiadamente" },
+                    { value: 0, text: "Bien", description: "Generalmente acepta críticas constructivas" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta manejar críticas constructivas" },
+                    { value: 1, text: "Muy poco", description: "Muy sensible a cualquier crítica" },
+                    { value: 1, text: "No puede", description: "No puede manejar ninguna crítica" }
+                ]
+            },
+            {
+                id: 30,
+                text: "¿Su hijo/a muestra iniciativa en actividades sociales?",
+                category: "social",
+                subcategory: "social_initiative",
+                options: [
+                    { value: 0, text: "Mucha iniciativa", description: "Toma mucha iniciativa en situaciones sociales" },
+                    { value: 0, text: "Iniciativa apropiada", description: "Muestra iniciativa social apropiada" },
+                    { value: 1, text: "Poca iniciativa", description: "Poca iniciativa en situaciones sociales" },
+                    { value: 1, text: "Muy poca iniciativa", description: "Muy poca iniciativa social" },
+                    { value: 1, text: "No muestra iniciativa", description: "No toma iniciativa en actividades sociales" }
+                ]
+            },
+            {
+                id: 31,
+                text: "¿Su hijo/a puede mantener conversaciones sobre temas que no son de su interés particular?",
+                category: "communication",
+                subcategory: "conversation_flexibility",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Puede conversar sobre cualquier tema apropiadamente" },
+                    { value: 0, text: "Bien", description: "Generalmente puede conversar sobre diversos temas" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta conversar sobre temas que no le interesan" },
+                    { value: 1, text: "Muy poco", description: "Solo conversa sobre sus intereses específicos" },
+                    { value: 1, text: "No puede", description: "No puede mantener conversaciones fuera de sus intereses" }
+                ]
+            },
+            {
+                id: 32,
+                text: "¿Su hijo/a demuestra comprensión de conceptos abstractos apropiados para su edad?",
+                category: "behavioral",
+                subcategory: "abstract_thinking",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Entiende conceptos abstractos muy apropiadamente" },
+                    { value: 0, text: "Bien", description: "Generalmente entiende conceptos abstractos" },
+                    { value: 1, text: "Con dificultad", description: "Le cuesta entender conceptos abstractos" },
+                    { value: 1, text: "Muy poco", description: "Comprensión muy limitada de conceptos abstractos" },
+                    { value: 1, text: "No entiende", description: "No comprende conceptos abstractos apropiados para su edad" }
+                ]
+            },
+            {
+                id: 33,
+                text: "¿Su hijo/a puede tolerar ruidos fuertes o ambientes ruidosos?",
+                category: "sensory",
+                subcategory: "noise_tolerance",
+                options: [
+                    { value: 0, text: "Muy bien", description: "Tolera ruidos y ambientes ruidosos muy bien" },
+                    { value: 0, text: "Bien", description: "Generalmente tolera ruidos apropiadamente" },
+                    { value: 1, text: "Con dificultad", description: "Le molestan los ruidos fuertes moderadamente" },
+                    { value: 1, text: "Muy poco", description: "Muy sensible a ruidos" },
+                    { value: 1, text: "No tolera", description: "No puede tolerar ruidos fuertes o ambientes ruidosos" }
+                ]
+            },
+            {
+                id: 34,
+                text: "¿Su hijo/a puede seguir rutinas escolares sin apoyo excesivo?",
+                category: "behavioral",
+                subcategory: "school_routines",
+                options: [
+                    { value: 0, text: "Independientemente", description: "Sigue rutinas escolares completamente independiente" },
+                    { value: 0, text: "Con apoyo mínimo", description: "Sigue rutinas con apoyo mínimo ocasional" },
+                    { value: 1, text: "Con apoyo moderado", description: "Necesita apoyo moderado para rutinas escolares" },
+                    { value: 1, text: "Con mucho apoyo", description: "Necesita mucho apoyo para seguir rutinas" },
+                    { value: 1, text: "No puede sin apoyo intensivo", description: "No puede seguir rutinas sin apoyo intensivo constante" }
+                ]
+            },
+            {
+                id: 35,
+                text: "¿Su hijo/a muestra comportamientos apropiados en diferentes contextos sociales?",
+                category: "social",
+                subcategory: "contextual_behavior",
+                options: [
+                    { value: 0, text: "Siempre apropiados", description: "Comportamiento siempre apropiado al contexto" },
+                    { value: 0, text: "Generalmente apropiados", description: "Comportamiento generalmente apropiado al contexto" },
+                    { value: 1, text: "A veces inapropiados", description: "Comportamiento ocasionalmente inapropiado al contexto" },
+                    { value: 1, text: "Frecuentemente inapropiados", description: "Comportamiento frecuentemente inapropiado" },
+                    { value: 1, text: "Consistentemente inapropiados", description: "Comportamiento consistentemente inapropiado al contexto" }
+                ]
+            }
+        ]
+    },
+    
+    categories: {
+        social: { name: "Habilidades Sociales", icon: "👥", color: "#4299e1" },
+        communication: { name: "Comunicación", icon: "💬", color: "#38b2ac" },
+        play: { name: "Juego", icon: "🎮", color: "#ed8936" },
+        behavioral: { name: "Comportamiento", icon: "🔄", color: "#9f7aea" },
+        sensory: { name: "Sensorial", icon: "👂", color: "#48bb78" },
+        motor: { name: "Motor", icon: "🏃", color: "#e53e3e" }
+    }
+};
 
 // === ESTADO DEL QUIZ ===
-const quizState = {
-    currentQuestion: 0,
-    answers: {},
-    childInfo: {},
-    startTime: null,
-    endTime: null,
-    currentQuestions: [],
-    showingResults: false
-};
-
-// === FUNCIONES DE NAVEGACIÓN ===
-
-function showLoading() {
-    document.getElementById('loadingOverlay').classList.add('show');
-}
-
-function hideLoading() {
-    document.getElementById('loadingOverlay').classList.remove('show');
-}
-
-function updateAgeOptions() {
-    const ageGroup = document.getElementById('childAgeGroup').value;
-    const specificAgeSelect = document.getElementById('childSpecificAge');
-    const specificAgeGroup = document.getElementById('specificAgeGroup');
-    
-    // Limpiar opciones anteriores
-    specificAgeSelect.innerHTML = '<option value="">Seleccionar edad específica...</option>';
-    
-    if (ageGroup) {
-        specificAgeGroup.style.display = 'block';
+class QChatQuiz {
+    constructor() {
+        this.currentQuestion = 0;
+        this.selectedAgeGroup = null;
+        this.responses = {};
+        this.startTime = null;
+        this.endTime = null;
+        this.totalScore = 0;
+        this.categoryScores = {};
+        this.currentScreen = 'welcome';
         
-        // Agregar opciones específicas según el grupo
-        const ageRanges = {
-            "0-2": ["6 meses", "12 meses", "18 meses", "24 meses"],
-            "3-6": ["3 años", "4 años", "5 años", "6 años"],
-            "6-10": ["6 años", "7 años", "8 años", "9 años", "10 años"],
-            "11-14": ["11 años", "12 años", "13 años", "14 años"],
-            "15-18": ["15 años", "16 años", "17 años", "18 años"]
-        };
+        this.init();
+    }
+
+    init() {
+        console.log('🚀 Inicializando Q-CHAT Quiz...');
+        this.hideLoading();
+        this.setupEventListeners();
+        this.showScreen('welcome');
+        console.log('✅ Q-CHAT Quiz inicializado correctamente');
+    }
+
+    // === GESTIÓN DE PANTALLAS ===
+    showScreen(screenName) {
+        console.log(`📱 Mostrando pantalla: ${screenName}`);
         
-        ageRanges[ageGroup].forEach(age => {
-            const option = document.createElement('option');
-            option.value = age;
-            option.textContent = age;
-            specificAgeSelect.appendChild(option);
+        // Ocultar todas las pantallas
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
         });
-    } else {
-        specificAgeGroup.style.display = 'none';
-    }
-}
-
-function startQuiz() {
-    showLoading();
-    setTimeout(() => {
-        hideLoading();
-        showSection('ageSection');
-    }, 1000);
-}
-
-function showIntro() {
-    showSection('introSection');
-}
-
-function validateAndStartQuestions() {
-    const ageGroup = document.getElementById('childAgeGroup').value;
-    const specificAge = document.getElementById('childSpecificAge').value;
-    const relationship = document.getElementById('relationship').value;
-
-    if (!ageGroup || !specificAge || !relationship) {
-        alert('Por favor, completa todos los campos obligatorios.');
-        return;
+        
+        // Mostrar la pantalla solicitada
+        const targetScreen = document.getElementById(`${screenName}Screen`);
+        if (targetScreen) {
+            targetScreen.classList.add('active');
+            this.currentScreen = screenName;
+        }
     }
 
-    proceedToQuestions();
-}
-
-function proceedToQuestions() {
-    // Guardar información del niño
-    quizState.childInfo = {
-        ageGroup: document.getElementById('childAgeGroup').value,
-        specificAge: document.getElementById('childSpecificAge').value,
-        gender: document.getElementById('childGender').value,
-        previousConcerns: document.getElementById('previousConcerns').value,
-        relationship: document.getElementById('relationship').value
-    };
-
-    // Obtener preguntas apropiadas para la edad
-    quizState.currentQuestions = questionsByAgeGroup[quizState.childInfo.ageGroup] || [];
-
-    quizState.startTime = new Date();
-    showSection('questionsSection');
-    loadQuestion(0);
-}
-
-function showSection(sectionId) {
-    // Ocultar todas las secciones
-    const sections = ['introSection', 'ageSection', 'questionsSection', 'resultsSection'];
-    sections.forEach(id => {
-        const section = document.getElementById(id);
-        if (section) section.style.display = 'none';
-    });
-
-    // Mostrar la sección solicitada
-    const targetSection = document.getElementById(sectionId);
-    if (targetSection) {
-        targetSection.style.display = 'block';
-        targetSection.classList.add('fade-in');
+    hideLoading() {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+            loadingOverlay.classList.add('hidden');
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 300);
+        }
     }
 
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+    // === EVENT LISTENERS ===
+    setupEventListeners() {
+        // Selección de grupo de edad
+        document.querySelectorAll('.age-btn').forEach(btn => {
+            btn.addEventListener('click', () => this.selectAgeGroup(btn.dataset.age));
+        });
 
-// === FUNCIONES DE PREGUNTAS ===
-
-function loadQuestion(questionIndex) {
-    if (questionIndex >= quizState.currentQuestions.length) {
-        calculateAndShowResults();
-        return;
-    }
-
-    quizState.currentQuestion = questionIndex;
-    const question = quizState.currentQuestions[questionIndex];
-
-    // Actualizar elementos de la UI
-    document.getElementById('currentQuestion').textContent = questionIndex + 1;
-    document.getElementById('totalQuestions').textContent = quizState.currentQuestions.length;
-    document.getElementById('questionNumber').textContent = questionIndex + 1;
-    document.getElementById('questionText').textContent = question.text;
-    document.getElementById('questionHelp').textContent = question.help;
-
-    // Actualizar barra de progreso
-    const progress = ((questionIndex + 1) / quizState.currentQuestions.length) * 100;
-    document.getElementById('progressFill').style.width = `${progress}%`;
-    document.getElementById('progressPercentage').textContent = `${Math.round(progress)}%`;
-
-    // Generar opciones de respuesta
-    generateAnswerOptions(question.id);
-
-    // Actualizar botones de navegación
-    updateNavigationButtons();
-}
-
-function generateAnswerOptions(questionId) {
-    const container = document.getElementById('answerOptions');
-    container.innerHTML = '';
-
-    answerOptions.forEach(option => {
-        const optionElement = document.createElement('div');
-        optionElement.className = 'answer-option';
-        optionElement.setAttribute('data-value', option.value);
-        optionElement.setAttribute('tabindex', '0');
-        optionElement.setAttribute('role', 'radio');
-        optionElement.setAttribute('aria-label', `${option.text}: ${option.description}`);
-
-        // Verificar si esta opción ya está seleccionada
-        if (quizState.answers[questionId] === option.value) {
-            optionElement.classList.add('selected');
+        // Botón de inicio
+        const startBtn = document.getElementById('startQuizBtn');
+        if (startBtn) {
+            startBtn.addEventListener('click', () => this.startQuiz());
         }
 
-        optionElement.innerHTML = `
-            <div class="option-radio"></div>
-            <div class="option-content">
-                <div class="option-text">${option.text}</div>
+        // Navegación del quiz
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => this.nextQuestion());
+        }
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => this.previousQuestion());
+        }
+
+        // Modal de ayuda
+        const helpBtn = document.getElementById('helpBtn');
+        const helpModal = document.getElementById('helpModal');
+        const closeHelpBtn = document.getElementById('closeHelpBtn');
+        const helpOverlay = document.getElementById('helpOverlay');
+
+        if (helpBtn && helpModal) {
+            helpBtn.addEventListener('click', () => this.showModal('help'));
+        }
+
+        if (closeHelpBtn) {
+            closeHelpBtn.addEventListener('click', () => this.hideModal('help'));
+        }
+
+        if (helpOverlay) {
+            helpOverlay.addEventListener('click', () => this.hideModal('help'));
+        }
+
+        // Acciones de resultados
+        const newTestBtn = document.getElementById('newTestBtn');
+        const printResultsBtn = document.getElementById('printResultsBtn');
+        const shareResultsBtn = document.getElementById('shareResultsBtn');
+
+        if (newTestBtn) {
+            newTestBtn.addEventListener('click', () => this.resetQuiz());
+        }
+
+        if (printResultsBtn) {
+            printResultsBtn.addEventListener('click', () => this.printResults());
+        }
+
+        if (shareResultsBtn) {
+            shareResultsBtn.addEventListener('click', () => this.shareResults());
+        }
+
+        // Atajos de teclado
+        document.addEventListener('keydown', (e) => this.handleKeyPress(e));
+    }
+
+    // === SELECCIÓN DE GRUPO DE EDAD ===
+    selectAgeGroup(ageGroup) {
+        console.log(`👶 Seleccionando grupo de edad: ${ageGroup}`);
+        
+        // Remover selección anterior
+        document.querySelectorAll('.age-btn').forEach(btn => {
+            btn.classList.remove('selected');
+        });
+
+        // Marcar como seleccionado
+        const selectedBtn = document.querySelector(`[data-age="${ageGroup}"]`);
+        if (selectedBtn) {
+            selectedBtn.classList.add('selected');
+            this.selectedAgeGroup = ageGroup;
+            
+            // Habilitar botón de inicio
+            const startBtn = document.getElementById('startQuizBtn');
+            if (startBtn) {
+                startBtn.disabled = false;
+            }
+            
+            // Feedback de audio
+            if (CONFIG.audioFeedback) {
+                this.playSound(600, 0.1);
+            }
+        }
+    }
+
+    // === INICIO DEL QUIZ ===
+    startQuiz() {
+        if (!this.selectedAgeGroup) {
+            this.showNotification('Por favor selecciona un grupo de edad', 'warning');
+            return;
+        }
+
+        console.log(`🎯 Iniciando quiz para grupo: ${this.selectedAgeGroup}`);
+        
+        this.startTime = Date.now();
+        this.currentQuestion = 0;
+        this.responses = {};
+        this.totalScore = 0;
+        this.categoryScores = {};
+
+        // Inicializar puntuaciones por categoría
+        Object.keys(QCHAT_DATA.categories).forEach(category => {
+            this.categoryScores[category] = 0;
+        });
+
+        this.showScreen('quiz');
+        this.displayQuestion();
+    }
+
+    // === MOSTRAR PREGUNTA ===
+    displayQuestion() {
+        const questions = QCHAT_DATA.questions[this.selectedAgeGroup];
+        const question = questions[this.currentQuestion];
+        const ageGroupData = QCHAT_DATA.ageGroups[this.selectedAgeGroup];
+
+        if (!question) {
+            console.error('❌ No se encontró la pregunta');
+            return;
+        }
+
+        console.log(`❓ Mostrando pregunta ${this.currentQuestion + 1}: ${question.text}`);
+
+        // Actualizar contador y progreso
+        this.updateProgress();
+
+        // Mostrar información de la pregunta
+        document.getElementById('questionText').textContent = question.text;
+        document.getElementById('questionId').textContent = `Pregunta ${this.currentQuestion + 1}`;
+        
+        // Badge de categoría
+        const categoryInfo = QCHAT_DATA.categories[question.category];
+        const categoryBadge = document.getElementById('categoryBadge');
+        if (categoryBadge && categoryInfo) {
+            categoryBadge.textContent = `${categoryInfo.icon} ${categoryInfo.name}`;
+            categoryBadge.style.backgroundColor = categoryInfo.color;
+        }
+
+        // Descripción de la pregunta (opcional)
+        const questionDescription = document.getElementById('questionDescription');
+        if (questionDescription) {
+            questionDescription.textContent = question.description || '';
+        }
+
+        // Renderizar opciones
+        this.renderOptions(question);
+
+        // Actualizar botones de navegación
+        this.updateNavigationButtons();
+
+        // Scroll hacia arriba
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // === RENDERIZAR OPCIONES ===
+    renderOptions(question) {
+        const container = document.getElementById('optionsContainer');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        question.options.forEach((option, index) => {
+            const optionBtn = document.createElement('button');
+            optionBtn.className = 'option-btn';
+            optionBtn.dataset.value = option.value;
+            optionBtn.dataset.index = index;
+
+            // Verificar si esta opción está seleccionada
+            const savedResponse = this.responses[question.id];
+            if (savedResponse !== undefined && savedResponse.selectedIndex === index) {
+                optionBtn.classList.add('selected');
+            }
+
+            optionBtn.innerHTML = `
+                <div class="option-value">${option.text}</div>
                 <div class="option-description">${option.description}</div>
-            </div>
-        `;
+            `;
 
-        // Event listeners
-        optionElement.addEventListener('click', () => selectAnswer(questionId, option.value));
-        optionElement.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                selectAnswer(questionId, option.value);
+            optionBtn.addEventListener('click', () => {
+                this.selectOption(question.id, option.value, index, question.category);
+            });
+
+            container.appendChild(optionBtn);
+        });
+    }
+
+    // === SELECCIONAR OPCIÓN ===
+    selectOption(questionId, value, selectedIndex, category) {
+        console.log(`✅ Seleccionando opción: Q${questionId} = ${value} (índice: ${selectedIndex})`);
+
+        // Remover selección anterior
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.classList.remove('selected');
+        });
+
+        // Marcar como seleccionada
+        const selectedBtn = document.querySelector(`[data-index="${selectedIndex}"]`);
+        if (selectedBtn) {
+            selectedBtn.classList.add('selected');
+        }
+
+        // Guardar respuesta
+        this.responses[questionId] = {
+            value: parseInt(value),
+            selectedIndex: selectedIndex,
+            category: category,
+            timestamp: Date.now()
+        };
+
+        // Habilitar botón siguiente
+        const nextBtn = document.getElementById('nextBtn');
+        if (nextBtn) {
+            nextBtn.disabled = false;
+        }
+
+        // Feedback de audio
+        if (CONFIG.audioFeedback) {
+            this.playSound(800, 0.1);
+        }
+
+        // Auto-avance después de un breve delay (opcional)
+        if (CONFIG.autoSave) {
+            setTimeout(() => {
+                // Solo auto-avanzar si el usuario no ha cambiado de pregunta
+                const currentResponse = this.responses[questionId];
+                if (currentResponse && currentResponse.selectedIndex === selectedIndex) {
+                    // No hacer auto-avance en la última pregunta
+                    const questions = QCHAT_DATA.questions[this.selectedAgeGroup];
+                    if (this.currentQuestion < questions.length - 1) {
+                        // Opcional: descomentar para auto-avance
+                        // this.nextQuestion();
+                    }
+                }
+            }, 800);
+        }
+    }
+
+    // === ACTUALIZAR PROGRESO ===
+    updateProgress() {
+        const questions = QCHAT_DATA.questions[this.selectedAgeGroup];
+        const totalQuestions = questions.length;
+        const progress = ((this.currentQuestion + 1) / totalQuestions) * 100;
+
+        // Actualizar elementos de progreso
+        const questionCounter = document.getElementById('questionCounter');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const progressFill = document.getElementById('progressFill');
+
+        if (questionCounter) {
+            questionCounter.textContent = `${this.currentQuestion + 1} / ${totalQuestions}`;
+        }
+
+        if (progressPercentage) {
+            progressPercentage.textContent = `${Math.round(progress)}%`;
+        }
+
+        if (progressFill) {
+            progressFill.style.width = `${progress}%`;
+        }
+    }
+
+    // === NAVEGACIÓN ===
+    nextQuestion() {
+        const questions = QCHAT_DATA.questions[this.selectedAgeGroup];
+        const currentQuestionData = questions[this.currentQuestion];
+
+        // Verificar que hay una respuesta seleccionada
+        if (!this.responses[currentQuestionData.id]) {
+            this.showNotification('Por favor selecciona una respuesta antes de continuar', 'warning');
+            return;
+        }
+
+        console.log(`➡️ Avanzando a la siguiente pregunta (${this.currentQuestion + 1} → ${this.currentQuestion + 2})`);
+
+        if (this.currentQuestion < questions.length - 1) {
+            this.currentQuestion++;
+            this.displayQuestion();
+        } else {
+            this.completeQuiz();
+        }
+
+        // Feedback de audio
+        if (CONFIG.audioFeedback) {
+            this.playSound(700, 0.15);
+        }
+    }
+
+    previousQuestion() {
+        if (this.currentQuestion > 0) {
+            console.log(`⬅️ Retrocediendo a la pregunta anterior (${this.currentQuestion + 1} → ${this.currentQuestion})`);
+            this.currentQuestion--;
+            this.displayQuestion();
+
+            // Feedback de audio
+            if (CONFIG.audioFeedback) {
+                this.playSound(500, 0.15);
+            }
+        }
+    }
+
+    updateNavigationButtons() {
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const questions = QCHAT_DATA.questions[this.selectedAgeGroup];
+        const currentQuestionData = questions[this.currentQuestion];
+
+        // Botón anterior
+        if (prevBtn) {
+            prevBtn.disabled = this.currentQuestion === 0;
+        }
+
+        // Botón siguiente
+        if (nextBtn) {
+            const hasResponse = this.responses[currentQuestionData.id] !== undefined;
+            nextBtn.disabled = !hasResponse;
+            
+            // Cambiar texto en última pregunta
+            if (this.currentQuestion === questions.length - 1) {
+                nextBtn.textContent = 'Finalizar →';
+            } else {
+                nextBtn.textContent = 'Siguiente →';
+            }
+        }
+    }
+
+    // === COMPLETAR QUIZ ===
+    completeQuiz() {
+        this.endTime = Date.now();
+        console.log('🏁 Completando quiz y calculando resultados...');
+
+        // Calcular puntuaciones
+        this.calculateScores();
+
+        // Mostrar resultados
+        this.showResults();
+
+        // Feedback de audio de completación
+        if (CONFIG.audioFeedback) {
+            this.playCompletionSound();
+        }
+    }
+
+    // === CALCULAR PUNTUACIONES ===
+    calculateScores() {
+        console.log('🔢 Calculando puntuaciones...');
+
+        this.totalScore = 0;
+        this.categoryScores = {};
+
+        // Inicializar puntuaciones por categoría
+        Object.keys(QCHAT_DATA.categories).forEach(category => {
+            this.categoryScores[category] = { score: 0, total: 0 };
+        });
+
+        // Sumar puntuaciones
+        Object.values(this.responses).forEach(response => {
+            this.totalScore += response.value;
+            
+            if (this.categoryScores[response.category]) {
+                this.categoryScores[response.category].score += response.value;
+                this.categoryScores[response.category].total += 1;
             }
         });
 
-        container.appendChild(optionElement);
-    });
-}
+        console.log('💯 Puntuación total:', this.totalScore);
+        console.log('📊 Puntuaciones por categoría:', this.categoryScores);
+    }
 
-function selectAnswer(questionId, value) {
-    // Guardar respuesta
-    quizState.answers[questionId] = value;
+    // === MOSTRAR RESULTADOS ===
+    showResults() {
+        console.log('📋 Mostrando resultados...');
 
-    // Actualizar UI
-    const options = document.querySelectorAll('.answer-option');
-    options.forEach(option => {
-        option.classList.remove('selected');
-        if (parseInt(option.getAttribute('data-value')) === value) {
-            option.classList.add('selected');
+        const ageGroupData = QCHAT_DATA.ageGroups[this.selectedAgeGroup];
+        const riskLevel = this.calculateRiskLevel(this.totalScore, ageGroupData.scoringThreshold);
+        const duration = this.endTime - this.startTime;
+
+        // Actualizar elementos de la pantalla de resultados
+        this.updateResultsDisplay(riskLevel, ageGroupData, duration);
+
+        // Mostrar pantalla de resultados
+        this.showScreen('results');
+
+        // Guardar resultados (opcional)
+        if (CONFIG.autoSave) {
+            this.saveResults();
         }
-    });
-
-    // Actualizar botones de navegación
-    updateNavigationButtons();
-
-    // Feedback de audio
-    playSelectionSound();
-
-    console.log(`Respuesta guardada - Pregunta ${questionId}: ${value}`);
-}
-
-function updateNavigationButtons() {
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-
-    // Botón anterior
-    prevBtn.disabled = quizState.currentQuestion === 0;
-
-    // Botón siguiente - habilitar solo si hay respuesta seleccionada
-    const currentQuestionId = quizState.currentQuestions[quizState.currentQuestion].id;
-    nextBtn.disabled = !quizState.answers.hasOwnProperty(currentQuestionId);
-
-    // Cambiar texto del botón siguiente en la última pregunta
-    if (quizState.currentQuestion === quizState.currentQuestions.length - 1) {
-        nextBtn.innerHTML = 'Ver Resultados →';
-    } else {
-        nextBtn.innerHTML = 'Siguiente →';
-    }
-}
-
-function previousQuestion() {
-    if (quizState.currentQuestion > 0) {
-        loadQuestion(quizState.currentQuestion - 1);
-        playNavigationSound();
-    }
-}
-
-function nextQuestion() {
-    const currentQuestionId = quizState.currentQuestions[quizState.currentQuestion].id;
-    
-    if (!quizState.answers.hasOwnProperty(currentQuestionId)) {
-        alert('Por favor, selecciona una respuesta antes de continuar.');
-        return;
     }
 
-    if (quizState.currentQuestion < quizState.currentQuestions.length - 1) {
-        loadQuestion(quizState.currentQuestion + 1);
-        playNavigationSound();
-    } else {
-        // Última pregunta - mostrar resultados
-        calculateAndShowResults();
-    }
-}
-
-// === CÁLCULO DE RESULTADOS ===
-
-function calculateAndShowResults() {
-    quizState.endTime = new Date();
-    const duration = (quizState.endTime - quizState.startTime) / 1000; // segundos
-
-    showLoading();
-
-    setTimeout(() => {
-        hideLoading();
-        
-        // Calcular puntuación total
-        const results = calculateComprehensiveScore();
-        
-        // Mostrar resultados
-        displayResults(results, duration);
-        
-        // Guardar resultados
-        saveResults(results);
-        
-        showSection('resultsSection');
-    }, 2000);
-}
-
-function calculateComprehensiveScore() {
-    let totalScore = 0;
-    const domainScores = {
-        social: { total: 0, count: 0 },
-        communication: { total: 0, count: 0 },
-        repetitive: { total: 0, count: 0 },
-        sensory: { total: 0, count: 0 },
-        flexibility: { total: 0, count: 0 },
-        regulation: { total: 0, count: 0 },
-        play: { total: 0, count: 0 },
-        executive: { total: 0, count: 0 },
-        development: { total: 0, count: 0 }
-    };
-
-    // Calcular puntuación para cada pregunta
-    quizState.currentQuestions.forEach(question => {
-        const rawAnswer = quizState.answers[question.id];
-        let score;
-
-        // Aplicar sistema de puntuación
-        if (question.scoring === 'reverse') {
-            // Para preguntas de desarrollo típico: 5=siempre se convierte en 1 punto, 1=nunca se convierte en 5 puntos
-            score = 6 - rawAnswer;
+    calculateRiskLevel(score, thresholds) {
+        if (score >= thresholds.lowRisk.min && score <= thresholds.lowRisk.max) {
+            return 'low';
+        } else if (score >= thresholds.moderateRisk.min && score <= thresholds.moderateRisk.max) {
+            return 'moderate';
         } else {
-            // Para preguntas de señales de alerta: mantener puntuación directa
-            score = rawAnswer;
+            return 'high';
         }
-
-        totalScore += score;
-
-        // Acumular por dominio
-        if (domainScores[question.domain]) {
-            domainScores[question.domain].total += score;
-            domainScores[question.domain].count += 1;
-        }
-    });
-
-    // Calcular promedios por dominio
-    Object.keys(domainScores).forEach(domain => {
-        if (domainScores[domain].count > 0) {
-            domainScores[domain].average = domainScores[domain].total / domainScores[domain].count;
-        }
-    });
-
-    // Determinar nivel de riesgo y nivel de autismo
-    const maxScore = quizState.currentQuestions.length * 5;
-    const scorePercentage = (totalScore / maxScore) * 100;
-    
-    let riskLevel, interpretation, autismLevel;
-
-    // Determinar niveles basados en puntuación
-    if (scorePercentage <= 35) {
-        riskLevel = 'bajo';
-        interpretation = 'Desarrollo dentro del rango típico';
-        autismLevel = null;
-    } else if (scorePercentage <= 55) {
-        riskLevel = 'moderado';
-        interpretation = 'Algunas características de TEA observadas';
-        autismLevel = {
-            level: 1,
-            name: "Nivel 1 - Necesita ayuda",
-            description: "Requiere apoyo para desenvolverse en situaciones sociales y comunicativas"
-        };
-    } else if (scorePercentage <= 75) {
-        riskLevel = 'alto';
-        interpretation = 'Características significativas de TEA observadas';
-        autismLevel = {
-            level: 2,
-            name: "Nivel 2 - Necesita ayuda notable",
-            description: "Requiere apoyo sustancial en comunicación social y flexibilidad comportamental"
-        };
-    } else {
-        riskLevel = 'muy-alto';
-        interpretation = 'Características muy marcadas de TEA observadas';
-        autismLevel = {
-            level: 3,
-            name: "Nivel 3 - Necesita ayuda muy notable",
-            description: "Requiere apoyo muy sustancial en comunicación social y comportamientos restrictivos"
-        };
     }
 
-    const recommendations = getRecommendationsByLevel(riskLevel);
-    const homeSupport = getHomeSupportByLevel(riskLevel, quizState.childInfo.ageGroup);
+    updateResultsDisplay(riskLevel, ageGroupData, duration) {
+        // Icono y título de resultados
+        const resultsIcon = document.getElementById('resultsIcon');
+        const resultsTitle = document.getElementById('resultsTitle');
+        const resultsSubtitle = document.getElementById('resultsSubtitle');
 
-    return {
-        totalScore,
-        maxScore,
-        scorePercentage: Math.round(scorePercentage),
-        riskLevel,
-        interpretation,
-        autismLevel,
-        domainScores,
-        recommendations,
-        homeSupport,
-        childInfo: quizState.childInfo
-    };
-}
-
-// === MOSTRAR RESULTADOS ===
-
-function displayResults(results, duration) {
-    // Configurar ícono y título según nivel de riesgo
-    const resultsIcon = document.getElementById('resultsIcon');
-    const resultsTitle = document.getElementById('resultsTitle');
-    const resultsSubtitle = document.getElementById('resultsSubtitle');
-
-    if (results.riskLevel === 'bajo') {
-        resultsIcon.textContent = '✅';
-        resultsTitle.textContent = 'Desarrollo Típico';
-        resultsSubtitle.textContent = 'Las características observadas están dentro del rango típico';
-    } else if (results.riskLevel === 'moderado') {
-        resultsIcon.textContent = '⚠️';
-        resultsTitle.textContent = 'Algunas Características TEA';
-        resultsSubtitle.textContent = 'Se observan algunas características del espectro autista';
-    } else if (results.riskLevel === 'alto') {
-        resultsIcon.textContent = '🔍';
-        resultsTitle.textContent = 'Características Significativas TEA';
-        resultsSubtitle.textContent = 'Se observan características significativas del espectro autista';
-    } else {
-        resultsIcon.textContent = '🚨';
-        resultsTitle.textContent = 'Características Muy Marcadas TEA';
-        resultsSubtitle.textContent = 'Se observan características muy marcadas del espectro autista';
-    }
-
-    // Mostrar resumen de puntuación
-    displayScoreSummary(results);
-
-    // Mostrar nivel de autismo si aplica
-    displayAutismLevel(results);
-
-    // Mostrar desglose por dominios
-    displayDomainBreakdown(results);
-
-    // Mostrar recomendaciones
-    displayRecommendations(results);
-
-    // Mostrar apoyo en casa
-    displayHomeSupport(results);
-
-    // Mostrar recomendación profesional
-    displayProfessionalGuidance(results);
-}
-
-function displayScoreSummary(results) {
-    const summaryContainer = document.getElementById('resultsSummary');
-
-    summaryContainer.innerHTML = `
-        <div class="score-display">${results.totalScore}/${results.maxScore}</div>
-        <div class="score-interpretation">${results.interpretation}</div>
-        <div class="score-description">
-            Puntuación total: ${results.totalScore} puntos de ${results.maxScore} posibles (${results.scorePercentage}%)
-            <br>
-            <em>Evaluación para: ${results.childInfo.ageGroup} años - ${results.childInfo.specificAge}</em>
-        </div>
-    `;
-}
-
-function displayAutismLevel(results) {
-    const autismLevelContainer = document.getElementById('autismLevel');
-    
-    if (results.autismLevel) {
-        autismLevelContainer.innerHTML = `
-            <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 15px; padding: 2rem; margin: 2rem 0;">
-                <h3 style="color: #856404; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                    🎯 Nivel de Apoyo Identificado
-                </h3>
-                <div style="background: white; padding: 1.5rem; border-radius: 10px; border-left: 4px solid #ffc107;">
-                    <h4 style="color: #856404; font-size: 1.3rem; margin-bottom: 0.5rem;">
-                        ${results.autismLevel.name}
-                    </h4>
-                    <p style="color: #333; font-size: 1rem; line-height: 1.6; margin: 0;">
-                        ${results.autismLevel.description}
-                    </p>
-                </div>
-            </div>
-        `;
-    } else {
-        autismLevelContainer.innerHTML = `
-            <div style="background: #d4edda; border: 2px solid #28a745; border-radius: 15px; padding: 2rem; margin: 2rem 0;">
-                <h3 style="color: #155724; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                    ✅ Desarrollo Típico
-                </h3>
-                <p style="color: #155724; font-size: 1rem; line-height: 1.6; margin: 0;">
-                    Las características observadas están dentro del rango de desarrollo típico para la edad. 
-                    Continúa con seguimiento regular del desarrollo.
-                </p>
-            </div>
-        `;
-    }
-}
-
-function displayDomainBreakdown(results) {
-    const breakdownContainer = document.getElementById('resultsBreakdown');
-    
-    const domainNames = {
-        social: 'Interacción Social',
-        communication: 'Comunicación',
-        repetitive: 'Comportamientos Repetitivos/Intereses',
-        sensory: 'Procesamiento Sensorial',
-        flexibility: 'Flexibilidad Cognitiva',
-        regulation: 'Regulación Emocional',
-        play: 'Juego e Imaginación',
-        executive: 'Funciones Ejecutivas',
-        development: 'Desarrollo General'
-    };
-
-    let breakdownHTML = '<h3>📊 Análisis por Áreas del Desarrollo</h3>';
-    
-    Object.keys(results.domainScores).forEach(domain => {
-        const score = results.domainScores[domain];
-        if (score.count > 0) {
-            const average = score.average.toFixed(1);
-            let status = '';
-            let statusColor = '';
-            
-            if (average <= 2.5) {
-                status = 'Desarrollo típico';
-                statusColor = '#28a745';
-            } else if (average <= 3.5) {
-                status = 'Algunas diferencias';
-                statusColor = '#ffc107';
-            } else {
-                status = 'Diferencias significativas';
-                statusColor = '#dc3545';
+        const riskConfig = {
+            low: {
+                icon: '✅',
+                title: 'Desarrollo Típico',
+                subtitle: 'Las características observadas están dentro del rango esperado',
+                class: 'low'
+            },
+            moderate: {
+                icon: '⚠️',
+                title: 'Algunas Características TEA',
+                subtitle: 'Se observan algunas características que podrían requerir atención',
+                class: 'moderate'
+            },
+            high: {
+                icon: '🔍',
+                title: 'Características Significativas TEA',
+                subtitle: 'Se recomienda evaluación profesional adicional',
+                class: 'high'
             }
+        };
 
-            breakdownHTML += `
-                <div class="domain-score">
-                    <div class="domain-info">
-                        <h4>${domainNames[domain]}</h4>
-                        <p style="color: ${statusColor}; font-weight: bold;">${status} (${score.count} preguntas evaluadas)</p>
-                    </div>
-                    <div class="domain-value" style="color: ${statusColor};">${average}/5.0</div>
+        const config = riskConfig[riskLevel];
+        
+        if (resultsIcon) resultsIcon.textContent = config.icon;
+        if (resultsTitle) resultsTitle.textContent = config.title;
+        if (resultsSubtitle) resultsSubtitle.textContent = config.subtitle;
+
+        // Puntuación total
+        const totalScore = document.getElementById('totalScore');
+        const scoreRange = document.getElementById('scoreRange');
+        
+        if (totalScore) {
+            totalScore.textContent = this.totalScore;
+        }
+        
+        if (scoreRange) {
+            scoreRange.textContent = `de ${ageGroupData.totalQuestions}`;
+        }
+
+        // Badge de riesgo
+        const riskBadge = document.getElementById('riskLevel');
+        const riskDescription = document.getElementById('riskDescription');
+        
+        if (riskBadge) {
+            riskBadge.textContent = config.title;
+            riskBadge.className = `risk-badge ${config.class}`;
+        }
+        
+        if (riskDescription) {
+            riskDescription.textContent = config.subtitle;
+        }
+
+        // Desglose por categorías
+        this.displayCategoryBreakdown();
+
+        // Interpretación y recomendaciones
+        this.displayInterpretation(riskLevel, ageGroupData);
+        this.displayRecommendations(riskLevel);
+    }
+
+    displayCategoryBreakdown() {
+        const container = document.getElementById('categoriesContainer');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        Object.entries(this.categoryScores).forEach(([categoryKey, data]) => {
+            const categoryInfo = QCHAT_DATA.categories[categoryKey];
+            if (!categoryInfo || data.total === 0) return;
+
+            const categoryItem = document.createElement('div');
+            categoryItem.className = 'category-item';
+            categoryItem.innerHTML = `
+                <div class="category-name">
+                    ${categoryInfo.icon} ${categoryInfo.name}
+                </div>
+                <div class="category-score">
+                    ${data.score}/${data.total}
                 </div>
             `;
-        }
-    });
-
-    breakdownContainer.innerHTML = breakdownHTML;
-}
-
-function displayRecommendations(results) {
-    const recommendationsContainer = document.getElementById('recommendations');
-    
-    recommendationsContainer.innerHTML = `
-        <h3>🎯 Recomendaciones Generales</h3>
-        <ul class="recommendation-list">
-            ${results.recommendations.map(rec => `<li>${rec}</li>`).join('')}
-        </ul>
-    `;
-}
-
-function displayHomeSupport(results) {
-    const homeSupportContainer = document.getElementById('homeSupport');
-    
-    homeSupportContainer.innerHTML = `
-        <div style="background: #e8f5e8; border: 2px solid #28a745; border-radius: 15px; padding: 2rem; margin: 2rem 0;">
-            <h3 style="color: #28a745; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                🏠 Estrategias de Apoyo en Casa
-            </h3>
-            <ul class="recommendation-list">
-                ${results.homeSupport.map(strategy => `<li>${strategy}</li>`).join('')}
-            </ul>
-        </div>
-    `;
-}
-
-function displayProfessionalGuidance(results) {
-    const guidanceContainer = document.getElementById('professionalGuidance');
-    let guidance = '';
-
-    if (results.riskLevel === 'bajo') {
-        guidance = `Los resultados sugieren un desarrollo dentro del rango típico para ${results.childInfo.specificAge}. Continúa con seguimiento pediátrico regular y estimulación apropiada para la edad. Esta herramienta es un screening inicial y no reemplaza la evaluación clínica profesional.`;
-    } else if (results.riskLevel === 'moderado') {
-        guidance = `Los resultados indican algunas características del espectro autista que merecen atención profesional. Te recomendamos discutir estos hallazgos con tu pediatra o un especialista en desarrollo. La intervención temprana puede ser muy beneficiosa cuando se implementa apropiadamente.`;
-    } else if (results.riskLevel === 'alto') {
-        guidance = `Los resultados sugieren características significativas del espectro autista que requieren evaluación profesional. Es importante recordar que este screening no constituye un diagnóstico, pero los hallazgos justifican una evaluación completa por especialistas en desarrollo infantil.`;
-    } else {
-        guidance = `Los resultados indican características muy marcadas del espectro autista que requieren evaluación profesional urgente. Se recomienda contactar con especialistas en TEA dentro de las próximas 2-4 semanas para una evaluación diagnóstica completa y planificación de intervenciones.`;
+            
+            container.appendChild(categoryItem);
+        });
     }
 
-    guidanceContainer.textContent = guidance;
-}
+    displayInterpretation(riskLevel, ageGroupData) {
+        const container = document.getElementById('interpretationText');
+        if (!container) return;
 
-// === FUNCIONES DE RECOMENDACIONES ===
-
-function getRecommendationsByLevel(riskLevel) {
-    const recommendations = {
-        'bajo': [
-            "Continúa con rutinas de estimulación apropiadas para la edad",
-            "Mantén seguimiento regular del desarrollo con su pediatra",
-            "Fomenta habilidades sociales mediante juegos interactivos",
-            "Proporciona experiencias de aprendizaje variadas y enriquecedoras",
-            "Utiliza las herramientas de JuegoTEA para fortalecer diferentes áreas",
-            "Celebra logros y proporciona refuerzo positivo constante"
-        ],
-        'moderado': [
-            "Consulta con un especialista en desarrollo infantil",
-            "Implementa estrategias de comunicación aumentativa si es apropiado",
-            "Crea rutinas estructuradas y predecibles",
-            "Proporciona apoyo adicional en situaciones sociales",
-            "Considera terapias especializadas (habla, ocupacional, conductual)",
-            "Documenta comportamientos para compartir con profesionales"
-        ],
-        'alto': [
-            "Busca evaluación diagnóstica completa con especialistas en TEA",
-            "Implementa intervenciones intensivas tempranas",
-            "Establece rutinas altamente estructuradas",
-            "Utiliza apoyos visuales y sistemas de comunicación alternativos",
-            "Accede a servicios de intervención temprana especializados",
-            "Conecta con grupos de apoyo para familias"
-        ],
-        'muy-alto': [
-            "Obtén evaluación diagnóstica urgente con equipo multidisciplinario",
-            "Implementa plan de intervención intensivo inmediato",
-        'muy-alto': [
-            "Obtén evaluación diagnóstica urgente con equipo multidisciplinario",
-            "Implementa plan de intervención intensivo inmediato",
-            "Considera programas especializados en TEA",
-            "Establece ambientes altamente estructurados y predecibles",
-            "Busca servicios de respiro familiar y apoyo psicológico",
-            "Explora opciones educativas especializadas",
-            "Conecta con organizaciones especializadas en TEA severo"
-        ]
-    };
-
-    return recommendations[riskLevel] || recommendations['moderado'];
-}
-
-function getHomeSupportByLevel(riskLevel, ageGroup) {
-    const baseSupportByAge = {
-        "0-2": [
-            "Establece rutinas diarias consistentes (alimentación, sueño, juego)",
-            "Usa canciones y juegos repetitivos para fomentar la comunicación",
-            "Proporciona estimulación sensorial apropiada (texturas, sonidos suaves)",
-            "Practica contacto visual durante actividades placenteras",
-            "Lee cuentos con imágenes coloridas diariamente",
-            "Celebra cada pequeño logro con entusiasmo"
-        ],
-        "3-6": [
-            "Crea horarios visuales con imágenes para actividades diarias",
-            "Practica habilidades sociales mediante juegos de roles",
-            "Establece espacios tranquilos para autorregulación",
-            "Usa técnicas de juego paralelo para fomentar interacción",
-            "Implementa sistemas de recompensas visuales",
-            "Practica transiciones con avisos anticipados"
-        ],
-        "6-10": [
-            "Desarrolla habilidades de amistad mediante actividades estructuradas",
-            "Enseña estrategias de resolución de problemas paso a paso",
-            "Practica habilidades conversacionales diariamente",
-            "Crea oportunidades para éxito académico y social",
-            "Establece rutinas de tarea y estudio consistentes",
-            "Fomenta intereses especiales de manera constructiva"
-        ],
-        "11-14": [
-            "Practica habilidades sociales complejas en contextos seguros",
-            "Enseña estrategias de manejo del estrés y ansiedad",
-            "Desarrolla habilidades de autodefensa apropiadas",
-            "Fomenta independencia gradual en tareas cotidianas",
-            "Practica habilidades de comunicación asertiva",
-            "Explora actividades extracurriculares basadas en intereses"
-        ],
-        "15-18": [
-            "Desarrolla habilidades de vida independiente progresivamente",
-            "Practica habilidades laborales y de entrevistas",
-            "Enseña manejo de relaciones interpersonales complejas",
-            "Fomenta autoconocimiento y autodefensa",
-            "Planifica transición a la vida adulta paso a paso",
-            "Explora opciones educativas y vocacionales futuras"
-        ]
-    };
-
-    const additionalSupportByRisk = {
-        'bajo': [
-            "Mantén comunicación abierta sobre desafíos diarios",
-            "Proporciona estructura sin ser excesivamente rígido"
-        ],
-        'moderado': [
-            "Implementa más estructura y rutinas predecibles",
-            "Usa apoyos visuales para comunicación e instrucciones",
-            "Practica habilidades sociales de manera más intensiva"
-        ],
-        'alto': [
-            "Crea ambientes altamente estructurados y predecibles",
-            "Implementa sistemas de comunicación alternativos",
-            "Utiliza técnicas de análisis de comportamiento aplicado (ABA)",
-            "Establece rutinas de autorregulación diarias"
-        ],
-        'muy-alto': [
-            "Mantén ambientes extremadamente estructurados",
-            "Implementa planes de manejo de comportamiento intensivos",
-            "Usa apoyos tecnológicos para comunicación",
-            "Establece protocolos claros para situaciones de crisis",
-            "Busca entrenamiento especializado en técnicas de manejo"
-        ]
-    };
-
-    const baseSupport = baseSupportByAge[ageGroup] || baseSupportByAge["3-6"];
-    const additionalSupport = additionalSupportByRisk[riskLevel] || [];
-
-    return [...baseSupport, ...additionalSupport];
-}
-
-// === FUNCIONES DE ACCIÓN ===
-
-function downloadResults() {
-    const results = calculateComprehensiveScore();
-    generatePDFReport(results);
-}
-
-function generatePDFReport(results) {
-    // Crear contenido HTML para impresión
-    const reportContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
-            <header style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #4299e1; padding-bottom: 20px;">
-                <h1 style="color: #4299e1; margin-bottom: 10px;">🧠 Reporte de Evaluación TEA</h1>
-                <h2 style="color: #666; font-weight: normal;">Evaluación Comprensiva del Espectro Autista</h2>
-                <p style="color: #888;">Fecha: ${new Date().toLocaleDateString('es-ES')}</p>
-            </header>
-
-            <section style="margin-bottom: 30px;">
-                <h3 style="color: #4299e1; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Información del Evaluado</h3>
-                <table style="width: 100%; margin-top: 15px;">
-                    <tr><td style="font-weight: bold; padding: 5px;">Grupo de edad:</td><td>${results.childInfo.ageGroup} años</td></tr>
-                    <tr><td style="font-weight: bold; padding: 5px;">Edad específica:</td><td>${results.childInfo.specificAge}</td></tr>
-                    <tr><td style="font-weight: bold; padding: 5px;">Género:</td><td>${results.childInfo.gender || 'No especificado'}</td></tr>
-                    <tr><td style="font-weight: bold; padding: 5px;">Evaluado por:</td><td>${results.childInfo.relationship}</td></tr>
-                    <tr><td style="font-weight: bold; padding: 5px;">Preocupaciones previas:</td><td>${results.childInfo.previousConcerns || 'No especificado'}</td></tr>
-                </table>
-            </section>
-
-            <section style="margin-bottom: 30px;">
-                <h3 style="color: #4299e1; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Resultados</h3>
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 15px;">
-                    <p style="font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 10px;">
-                        ${results.totalScore}/${results.maxScore} puntos (${results.scorePercentage}%)
-                    </p>
-                    <p style="text-align: center; font-size: 18px; color: #666;">
-                        ${results.interpretation}
-                    </p>
-                </div>
-                ${results.autismLevel ? `
-                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #ffc107;">
-                    <h4 style="color: #856404; margin-bottom: 10px;">${results.autismLevel.name}</h4>
-                    <p style="color: #856404; margin: 0;">${results.autismLevel.description}</p>
-                </div>
-                ` : ''}
-            </section>
-
-            <section style="margin-bottom: 30px;">
-                <h3 style="color: #4299e1; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Análisis por Áreas</h3>
-                ${generateDomainTable(results.domainScores)}
-            </section>
-
-            <section style="margin-bottom: 30px;">
-                <h3 style="color: #4299e1; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Recomendaciones Generales</h3>
-                <ul style="margin-top: 15px; line-height: 1.6;">
-                    ${results.recommendations.map(rec => `<li style="margin-bottom: 10px;">${rec}</li>`).join('')}
+        const interpretations = {
+            low: `
+                <p>Los resultados sugieren que su hijo/a muestra un desarrollo típico en las áreas evaluadas por el Q-CHAT. 
+                Las características observadas están dentro del rango esperado para niños de ${ageGroupData.ageRange}.</p>
+                
+                <p>Esto significa que las habilidades sociales, de comunicación y comportamentales evaluadas parecen 
+                desarrollarse de manera apropiada para la edad.</p>
+                
+                <p><strong>Importante:</strong> Este resultado no descarta completamente la posibilidad de TEA, ya que 
+                algunos niños pueden mostrar características más sutiles que requieren evaluación profesional especializada.</p>
+            `,
+            moderate: `
+                <p>Los resultados indican que su hijo/a presenta algunas características que podrían estar asociadas 
+                con el Trastorno del Espectro Autista (TEA), pero que se encuentran en un rango moderado.</p>
+                
+                <p>Esto sugiere que podría beneficiarse de:</p>
+                <ul>
+                    <li>Observación más detallada de su desarrollo</li>
+                    <li>Estrategias de apoyo en casa y en el entorno educativo</li>
+                    <li>Consulta con un profesional especializado si las características persisten o se intensifican</li>
                 </ul>
-            </section>
-
-            <section style="margin-bottom: 30px;">
-                <h3 style="color: #4299e1; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Estrategias de Apoyo en Casa</h3>
-                <ul style="margin-top: 15px; line-height: 1.6;">
-                    ${results.homeSupport.map(strategy => `<li style="margin-bottom: 10px;">${strategy}</li>`).join('')}
+                
+                <p>Es importante recordar que todos los niños se desarrollan a su propio ritmo, y algunas características 
+                pueden ser temporales o parte de la variabilidad normal del desarrollo.</p>
+            `,
+            high: `
+                <p>Los resultados sugieren que su hijo/a presenta características significativas que están asociadas 
+                con el Trastorno del Espectro Autista (TEA).</p>
+                
+                <p><strong>Se recomienda encarecidamente:</strong></p>
+                <ul>
+                    <li>Consulta con un pediatra especializado en desarrollo</li>
+                    <li>Evaluación por un psicólogo clínico infantil o neuropsicólogo</li>
+                    <li>Considerar evaluación multidisciplinaria completa</li>
+                    <li>No esperar - la intervención temprana es clave</li>
                 </ul>
-            </section>
+                
+                <p>Es importante recordar que un diagnóstico formal requiere evaluación profesional especializada, 
+                pero estos resultados indican que sería beneficioso buscar esa evaluación pronto.</p>
+            `
+        };
 
-            <footer style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #ddd; font-size: 12px; color: #666;">
-                <p><strong>Disclaimer Importante:</strong></p>
-                <p>Esta evaluación es una herramienta de screening preliminar y NO constituye un diagnóstico médico. Los resultados deben ser interpretados por un profesional de la salud especializado en desarrollo infantil y TEA. Un resultado que sugiere características del espectro autista no confirma un diagnóstico, así como un resultado típico no descarta completamente la presencia de TEA.</p>
-                <p style="margin-top: 15px;">
-                    <strong>JuegoTEA</strong> - Herramientas basadas en evidencia científica<br>
-                    Para más información: www.juegotea.com
-                </p>
-            </footer>
-        </div>
-    `;
+        container.innerHTML = interpretations[riskLevel];
+    }
 
-    // Crear ventana de impresión
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Reporte TEA - ${results.childInfo.specificAge}</title>
-            <style>
-                @media print {
-                    body { margin: 0; }
-                    @page { margin: 2cm; }
+    displayRecommendations(riskLevel) {
+        const container = document.getElementById('recommendationsText');
+        if (!container) return;
+
+        const recommendations = {
+            low: `
+                <div class="recommendation-section">
+                    <h4>🎯 Continúe el desarrollo típico:</h4>
+                    <ul>
+                        <li>Mantenga rutinas de juego interactivo y lectura</li>
+                        <li>Fomente la comunicación y interacción social</li>
+                        <li>Observe cualquier cambio en el desarrollo</li>
+                        <li>Continúe con controles pediátricos regulares</li>
+                    </ul>
+                </div>
+                
+                <div class="recommendation-section">
+                    <h4>📚 Recursos útiles:</h4>
+                    <ul>
+                        <li>Actividades de JuegoTEA para reforzar habilidades</li>
+                        <li>Guías de desarrollo infantil</li>
+                        <li>Grupos de juego con otros niños</li>
+                    </ul>
+                </div>
+            `,
+            moderate: `
+                <div class="recommendation-section">
+                    <h4>🎯 Estrategias de apoyo:</h4>
+                    <ul>
+                        <li>Establezca rutinas claras y predecibles</li>
+                        <li>Use comunicación visual (imágenes, gestos)</li>
+                        <li>Practique habilidades sociales en situaciones controladas</li>
+                        <li>Fomente el juego estructurado e interactivo</li>
+                    </ul>
+                </div>
+                
+                <div class="recommendation-section">
+                    <h4>👥 Apoyo profesional:</h4>
+                    <ul>
+                        <li>Consulte con el pediatra sobre estos hallazgos</li>
+                        <li>Considere terapia de lenguaje si hay dificultades comunicativas</li>
+                        <li>Busque grupos de apoyo para padres</li>
+                        <li>Monitoree el progreso regularmente</li>
+                    </ul>
+                </div>
+                
+                <div class="recommendation-section">
+                    <h4>🏠 En casa:</h4>
+                    <ul>
+                        <li>Use los juegos de JuegoTEA específicos para TEA</li>
+                        <li>Practique contacto visual durante actividades divertidas</li>
+                        <li>Celebre pequeños logros sociales</li>
+                        <li>Mantenga un diario de observaciones</li>
+                    </ul>
+                </div>
+            `,
+            high: `
+                <div class="recommendation-section urgent">
+                    <h4>🚨 Acción inmediata recomendada:</h4>
+                    <ul>
+                        <li><strong>Contacte a su pediatra esta semana</strong></li>
+                        <li>Solicite referencia a especialista en desarrollo</li>
+                        <li>Documente comportamientos específicos observados</li>
+                        <li>No espere - la intervención temprana es crucial</li>
+                    </ul>
+                </div>
+                
+                <div class="recommendation-section">
+                    <h4>🏥 Evaluación profesional:</h4>
+                    <ul>
+                        <li>Psicólogo clínico infantil especializado en TEA</li>
+                        <li>Neuropsicólogo pediátrico</li>
+                        <li>Equipo multidisciplinario (si está disponible)</li>
+                        <li>Evaluación del habla y lenguaje</li>
+                    </ul>
+                </div>
+                
+                <div class="recommendation-section">
+                    <h4>🎯 Mientras tanto, en casa:</h4>
+                    <ul>
+                        <li>Mantenga rutinas muy consistentes</li>
+                        <li>Use comunicación simple y clara</li>
+                        <li>Reduzca estímulos sensoriales abrumadores</li>
+                        <li>Practique habilidades sociales básicas</li>
+                        <li>Use los recursos especializados de JuegoTEA</li>
+                    </ul>
+                </div>
+                
+                <div class="recommendation-section">
+                    <h4>📞 Recursos de apoyo:</h4>
+                    <ul>
+                        <li>Asociaciones locales de autismo</li>
+                        <li>Grupos de apoyo para padres</li>
+                        <li>Recursos educativos especializados</li>
+                        <li>Servicios de intervención temprana</li>
+                    </ul>
+                </div>
+            `
+        };
+
+        container.innerHTML = recommendations[riskLevel];
+    }
+
+    // === UTILIDADES ===
+    showModal(modalName) {
+        const modal = document.getElementById(`${modalName}Modal`);
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    hideModal(modalName) {
+        const modal = document.getElementById(`${modalName}Modal`);
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+    showNotification(message, type = 'info', duration = 4000) {
+        const container = document.getElementById('notificationContainer');
+        if (!container) return;
+
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+
+        const icons = {
+            success: '✅',
+            warning: '⚠️',
+            error: '❌',
+            info: 'ℹ️'
+        };
+
+        notification.innerHTML = `
+            <div class="notification-icon">${icons[type]}</div>
+            <div class="notification-content">
+                <div class="notification-message">${message}</div>
+            </div>
+            <button class="notification-close">×</button>
+        `;
+
+        // Cerrar notificación
+        const closeBtn = notification.querySelector('.notification-close');
+        closeBtn.addEventListener('click', () => {
+            notification.remove();
+        });
+
+        container.appendChild(notification);
+
+        // Auto-cerrar
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, duration);
+    }
+
+    handleKeyPress(e) {
+        if (this.currentScreen === 'quiz') {
+            // Navegación con teclado
+            if (e.key === 'ArrowRight' || e.key === 'Enter') {
+                const nextBtn = document.getElementById('nextBtn');
+                if (nextBtn && !nextBtn.disabled) {
+                    this.nextQuestion();
                 }
-            </style>
-        </head>
-        <body>
-            ${reportContent}
-        </body>
-        </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-}
-
-function generateDomainTable(domainScores) {
-    const domainNames = {
-        social: 'Interacción Social',
-        communication: 'Comunicación',
-        repetitive: 'Comportamientos Repetitivos/Intereses',
-        sensory: 'Procesamiento Sensorial',
-        flexibility: 'Flexibilidad Cognitiva',
-        regulation: 'Regulación Emocional',
-        play: 'Juego e Imaginación',
-        executive: 'Funciones Ejecutivas',
-        development: 'Desarrollo General'
-    };
-
-    let tableHTML = '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">';
-    tableHTML += '<tr style="background: #f0f9ff;"><th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Área del Desarrollo</th><th style="padding: 10px; border: 1px solid #ddd;">Puntuación Promedio</th><th style="padding: 10px; border: 1px solid #ddd;">Interpretación</th></tr>';
-
-    Object.keys(domainScores).forEach(domain => {
-        const score = domainScores[domain];
-        if (score.count > 0) {
-            const average = score.average.toFixed(1);
-            let interpretation = '';
-            
-            if (average <= 2.5) {
-                interpretation = 'Desarrollo típico';
-            } else if (average <= 3.5) {
-                interpretation = 'Algunas diferencias';
-            } else {
-                interpretation = 'Diferencias significativas';
+            } else if (e.key === 'ArrowLeft') {
+                const prevBtn = document.getElementById('prevBtn');
+                if (prevBtn && !prevBtn.disabled) {
+                    this.previousQuestion();
+                }
             }
-
-            tableHTML += `
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #ddd;">${domainNames[domain]}</td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${average}/5.0</td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${interpretation}</td>
-                </tr>
-            `;
+            // Selección de opciones con números
+            else if (e.key >= '1' && e.key <= '5') {
+                const optionIndex = parseInt(e.key) - 1;
+                const optionBtn = document.querySelector(`[data-index="${optionIndex}"]`);
+                if (optionBtn) {
+                    optionBtn.click();
+                }
+            }
         }
-    });
-
-    tableHTML += '</table>';
-    return tableHTML;
-}
-
-function exploreGames() {
-    const results = calculateComprehensiveScore();
-    let recommendedCategory = 'comunicacion-lenguaje'; // Default
-
-    // Determinar categoría recomendada basada en resultados
-    if (results.domainScores.communication && results.domainScores.communication.average > 3.0) {
-        recommendedCategory = 'comunicacion-lenguaje';
-    } else if (results.domainScores.social && results.domainScores.social.average > 3.0) {
-        recommendedCategory = 'habilidades-sociales';
-    } else if (results.domainScores.sensory && results.domainScores.sensory.average > 3.0) {
-        recommendedCategory = 'integracion-sensorial';
-    } else if (results.domainScores.regulation && results.domainScores.regulation.average > 3.0) {
-        recommendedCategory = 'regulacion-emocional';
-    }
-
-    if (confirm(`Basado en los resultados, te recomendamos explorar los juegos de ${recommendedCategory.replace('-', ' ')}.\n\n¿Quieres ir allá ahora?`)) {
-        window.location.href = `../categorias/${recommendedCategory}.html`;
-    }
-}
-
-function restartQuiz() {
-    if (confirm('¿Estás seguro de que quieres iniciar una nueva evaluación? Se perderán los resultados actuales.')) {
-        // Reiniciar estado
-        quizState.currentQuestion = 0;
-        quizState.answers = {};
-        quizState.childInfo = {};
-        quizState.startTime = null;
-        quizState.endTime = null;
-        quizState.currentQuestions = [];
-        quizState.showingResults = false;
-
-        // Limpiar formularios
-        document.getElementById('childAgeGroup').value = '';
-        document.getElementById('childSpecificAge').value = '';
-        document.getElementById('childGender').value = '';
-        document.getElementById('previousConcerns').value = '';
-        document.getElementById('relationship').value = '';
-        document.getElementById('specificAgeGroup').style.display = 'none';
-
-        // Volver a la introducción
-        showSection('introSection');
-    }
-}
-
-function goBack() {
-    if (quizState.showingResults || Object.keys(quizState.answers).length === 0) {
-        // Si estamos en resultados o no hay respuestas, volver directamente
-        window.location.href = '../index.html';
-    } else {
-        // Si hay progreso, confirmar
-        if (confirm('¿Estás seguro de que quieres salir? Se perderá el progreso actual de la evaluación.')) {
-            window.location.href = '../index.html';
+        
+        // Cerrar modales con Escape
+        if (e.key === 'Escape') {
+            this.hideModal('help');
         }
     }
-}
 
-// === FUNCIONES DE AUDIO ===
-
-function playSelectionSound() {
-    playSound(800, 0.1, 'sine');
-}
-
-function playNavigationSound() {
-    playSound(600, 0.15, 'sine');
-}
-
-function playSound(frequency, duration, type = 'sine') {
-    try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
+    // === AUDIO ===
+    playSound(frequency, duration, type = 'sine') {
+        if (!CONFIG.audioFeedback) return;
         
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-        oscillator.type = type;
-        
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + duration);
-    } catch (error) {
-        console.log('Audio no disponible:', error);
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = type;
+            
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + duration);
+        } catch (error) {
+            console.log('🔇 Audio no disponible:', error);
+        }
     }
-}
 
-// === FUNCIONES DE ALMACENAMIENTO ===
+    playCompletionSound() {
+        if (!CONFIG.audioFeedback) return;
+        
+        // Secuencia de tonos para indicar completación
+        const notes = [523, 659, 784]; // Do, Mi, Sol
+        notes.forEach((freq, index) => {
+            setTimeout(() => {
+                this.playSound(freq, 0.3);
+            }, index * 200);
+        });
+    }
 
-function saveResults(results) {
-    try {
-        const timestamp = new Date().toISOString();
-        const savedResults = {
-            timestamp,
-            results,
-            version: 'TEA-COMPREHENSIVE-1.0',
-            duration: quizState.endTime - quizState.startTime
+    // === ACCIONES DE RESULTADOS ===
+    resetQuiz() {
+        if (confirm('¿Estás seguro de que quieres comenzar una nueva evaluación? Se perderán los resultados actuales.')) {
+            console.log('🔄 Reiniciando quiz...');
+            
+            this.currentQuestion = 0;
+            this.selectedAgeGroup = null;
+            this.responses = {};
+            this.startTime = null;
+            this.endTime = null;
+            this.totalScore = 0;
+            this.categoryScores = {};
+            
+            // Resetear UI
+            document.querySelectorAll('.age-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            const startBtn = document.getElementById('startQuizBtn');
+            if (startBtn) {
+                startBtn.disabled = true;
+            }
+            
+            this.showScreen('welcome');
+            
+            // Feedback
+            this.showNotification('Quiz reiniciado. Selecciona un grupo de edad para comenzar.', 'info');
+        }
+    }
+
+    printResults() {
+        console.log('🖨️ Imprimiendo resultados...');
+        
+        // Ocultar elementos no imprimibles temporalmente
+        const nonPrintElements = document.querySelectorAll('.results-actions, .navigation-controls, .header');
+        nonPrintElements.forEach(el => el.style.display = 'none');
+        
+        // Imprimir
+        window.print();
+        
+        // Restaurar elementos
+        setTimeout(() => {
+            nonPrintElements.forEach(el => el.style.display = '');
+        }, 100);
+    }
+
+    async shareResults() {
+        console.log('📤 Compartiendo resultados...');
+        
+        const ageGroupData = QCHAT_DATA.ageGroups[this.selectedAgeGroup];
+        const riskLevel = this.calculateRiskLevel(this.totalScore, ageGroupData.scoringThreshold);
+        
+        const shareText = `Resultados Q-CHAT (${ageGroupData.name}):
+Puntuación: ${this.totalScore}/${ageGroupData.totalQuestions}
+Nivel de riesgo: ${riskLevel === 'low' ? 'Bajo' : riskLevel === 'moderate' ? 'Moderado' : 'Alto'}
+
+Completado en JuegoTEA - Plataforma educativa para TEA`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Resultados Q-CHAT',
+                    text: shareText,
+                    url: window.location.href
+                });
+            } catch (error) {
+                console.log('Error compartiendo:', error);
+                this.fallbackShare(shareText);
+            }
+        } else {
+            this.fallbackShare(shareText);
+        }
+    }
+
+    fallbackShare(text) {
+        // Copiar al portapapeles como fallback
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+                this.showNotification('Resultados copiados al portapapeles', 'success');
+            }).catch(() => {
+                this.showTextModal('Compartir Resultados', text);
+            });
+        } else {
+            this.showTextModal('Compartir Resultados', text);
+        }
+    }
+
+    showTextModal(title, text) {
+        // Modal simple para mostrar texto copiable
+        const modal = document.createElement('div');
+        modal.className = 'modal active';
+        modal.innerHTML = `
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>${title}</h2>
+                    <button class="close-btn">×</button>
+                </div>
+                <div class="modal-body">
+                    <textarea readonly style="width: 100%; height: 200px; resize: vertical;">${text}</textarea>
+                    <p style="margin-top: 1rem; color: #666;">Selecciona el texto de arriba y cópialo (Ctrl+C o Cmd+C)</p>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        document.body.style.overflow = 'hidden';
+
+        // Cerrar modal
+        const closeBtn = modal.querySelector('.close-btn');
+        const overlay = modal.querySelector('.modal-overlay');
+        
+        const closeModal = () => {
+            document.body.removeChild(modal);
+            document.body.style.overflow = '';
         };
 
-        // Guardar en localStorage
-        localStorage.setItem('tea-evaluation-last-results', JSON.stringify(savedResults));
+        closeBtn.addEventListener('click', closeModal);
+        overlay.addEventListener('click', closeModal);
         
-        // Guardar en historial
-        const history = JSON.parse(localStorage.getItem('tea-evaluation-history') || '[]');
-        history.push(savedResults);
-        
-        // Mantener solo los últimos 5 resultados
-        if (history.length > 5) {
-            history.splice(0, history.length - 5);
-        }
-        
-        localStorage.setItem('tea-evaluation-history', JSON.stringify(history));
-        
-        console.log('Resultados guardados exitosamente');
-    } catch (error) {
-        console.error('Error guardando resultados:', error);
+        // Seleccionar texto automáticamente
+        const textarea = modal.querySelector('textarea');
+        textarea.select();
+        textarea.focus();
     }
-}
 
-function loadPreviousResults() {
-    try {
-        const saved = localStorage.getItem('tea-evaluation-last-results');
-        if (saved) {
-            return JSON.parse(saved);
+    // === GUARDAR RESULTADOS ===
+    saveResults() {
+        try {
+            const results = {
+                timestamp: new Date().toISOString(),
+                version: CONFIG.version,
+                ageGroup: this.selectedAgeGroup,
+                totalScore: this.totalScore,
+                categoryScores: this.categoryScores,
+                responses: this.responses,
+                duration: this.endTime - this.startTime,
+                riskLevel: this.calculateRiskLevel(
+                    this.totalScore, 
+                    QCHAT_DATA.ageGroups[this.selectedAgeGroup].scoringThreshold
+                )
+            };
+
+            // Guardar en localStorage
+            localStorage.setItem('qchat_last_results', JSON.stringify(results));
+            
+            // Mantener historial (últimos 5 resultados)
+            const history = JSON.parse(localStorage.getItem('qchat_history') || '[]');
+            history.unshift(results);
+            
+            if (history.length > 5) {
+                history.splice(5);
+            }
+            
+            localStorage.setItem('qchat_history', JSON.stringify(history));
+            
+            console.log('💾 Resultados guardados correctamente');
+            
+        } catch (error) {
+            console.error('❌ Error guardando resultados:', error);
         }
-    } catch (error) {
-        console.error('Error cargando resultados previos:', error);
     }
-    return null;
+
+    // === ANALYTICS (OPCIONAL) ===
+    trackEvent(eventName, data = {}) {
+        if (!CONFIG.enableAnalytics) return;
+        
+        console.log('📊 Analytics:', eventName, data);
+        
+        // Aquí se podría integrar con Google Analytics, etc.
+        // gtag('event', eventName, data);
+    }
 }
 
 // === INICIALIZACIÓN ===
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ Evaluación TEA Comprensiva inicializada');
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🎉 DOM cargado, inicializando Q-CHAT...');
     
-    // Verificar si hay resultados previos
-    const previousResults = loadPreviousResults();
-    if (previousResults) {
-        const daysSince = Math.floor((Date.now() - new Date(previousResults.timestamp).getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (daysSince < 30) { // Mostrar notificación si es menor a 30 días
-            setTimeout(() => {
-                if (confirm(`Se encontró una evaluación previa de hace ${daysSince} días.\n\n¿Quieres ver esos resultados o hacer una nueva evaluación?`)) {
-                    // Cargar resultados previos
-                    displayResults(previousResults.results, 0);
-                    showSection('resultsSection');
-                }
-            }, 2000);
-        }
+    // Verificar compatibilidad del navegador
+    if (!window.localStorage) {
+        console.warn('⚠️ LocalStorage no disponible');
+    }
+    
+    if (!window.fetch) {
+        console.warn('⚠️ Fetch API no disponible');
+    }
+    
+    // Inicializar quiz
+    window.qchatQuiz = new QChatQuiz();
+    
+    // Registrar service worker para PWA (si está disponible)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('../sw.js').then(() => {
+            console.log('✅ Service Worker registrado');
+        }).catch(err => {
+            console.log('❌ Service Worker falló:', err);
+        });
+    }
+    
+    console.log('🚀 Q-CHAT Quiz completamente inicializado');
+});
+
+// === MANEJO DE ERRORES GLOBALES ===
+window.addEventListener('error', (e) => {
+    console.error('❌ Error global:', e.error);
+    
+    if (window.qchatQuiz) {
+        window.qchatQuiz.showNotification(
+            'Ha ocurrido un error. Por favor, recarga la página.', 
+            'error'
+        );
     }
 });
 
-// === MANEJO DE ERRORES ===
-
-window.addEventListener('error', function(e) {
-    console.error('Error en evaluación TEA:', e.error);
-    alert('Ha ocurrido un error. Por favor, recarga la página e intenta nuevamente.');
-});
-
-// Prevenir pérdida de datos al cerrar
-window.addEventListener('beforeunload', function(e) {
-    if (Object.keys(quizState.answers).length > 0 && !quizState.showingResults) {
+// === PREVENIR PÉRDIDA DE DATOS ===
+window.addEventListener('beforeunload', (e) => {
+    if (window.qchatQuiz && 
+        window.qchatQuiz.currentScreen === 'quiz' && 
+        Object.keys(window.qchatQuiz.responses).length > 0) {
+        
         e.preventDefault();
-        e.returnValue = 'Tienes una evaluación en progreso. ¿Estás seguro de que quieres salir?';
+        e.returnValue = '¿Estás seguro de que quieres salir? Se perderá el progreso del cuestionario.';
         return e.returnValue;
     }
 });
 
-// === ACCESIBILIDAD ADICIONAL ===
-
-// Navegación por teclado en opciones de respuesta
-document.addEventListener('keydown', function(e) {
-    if (e.target.classList.contains('answer-option')) {
-        const options = Array.from(document.querySelectorAll('.answer-option'));
-        const currentIndex = options.indexOf(e.target);
-        
-        switch(e.key) {
-            case 'ArrowDown':
-                e.preventDefault();
-                if (currentIndex < options.length - 1) {
-                    options[currentIndex + 1].focus();
-                }
-                break;
-            case 'ArrowUp':
-                e.preventDefault();
-                if (currentIndex > 0) {
-                    options[currentIndex - 1].focus();
-                }
-                break;
-        }
-    }
-});
-
-console.log('🧠 Evaluación TEA Comprensiva completamente cargada y lista');// 🧠 Evaluación TEA Comprensiva - JavaScript Logic
-console.log('🧠 Evaluación TEA Comprensiva iniciada');
-
-// === DATOS DEL QUIZ POR RANGO DE EDAD ===
-
-// Preguntas específicas por grupo de edad basadas en DSM-5 y herramientas validadas
-const questionsByAgeGroup = {
-    "0-2": [
-        {
-            id: 1,
-            text: "¿Su hijo/a responde cuando lo/la llama por su nombre?",
-            help: "Observe si voltea, mira o muestra alguna respuesta cuando dice su nombre.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 2,
-            text: "¿Su hijo/a hace contacto visual cuando le habla?",
-            help: "Fíjese si mira a sus ojos durante las interacciones.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 3,
-            text: "¿Su hijo/a sonríe en respuesta a su cara o sonrisa?",
-            help: "Considere si responde con sonrisas cuando usted le sonríe.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 4,
-            text: "¿Su hijo/a usa gestos como señalar o hacer adiós con la mano?",
-            help: "Observe si usa gestos para comunicarse o interactuar.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 5,
-            text: "¿Su hijo/a muestra interés en otros niños?",
-            help: "Fíjese si mira, se acerca o trata de interactuar con otros niños.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 6,
-            text: "¿Su hijo/a imita acciones simples (aplaudir, hacer sonidos)?",
-            help: "Observe si copia sus acciones o gestos de manera espontánea.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 7,
-            text: "¿Su hijo/a se calma cuando lo/la consolea?",
-            help: "Considere si responde positivamente a sus intentos de consolarlo.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 8,
-            text: "¿Su hijo/a parece demasiado sensible a ciertos sonidos?",
-            help: "Observe reacciones exageradas a ruidos cotidianos.",
-            domain: "sensory",
-            scoring: "direct"
-        },
-        {
-            id: 9,
-            text: "¿Su hijo/a hace movimientos repetitivos con las manos o cuerpo?",
-            help: "Fíjese en movimientos estereotipados o repetitivos.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 10,
-            text: "¿Su hijo/a juega de manera apropiada con juguetes?",
-            help: "Observe si usa juguetes de manera funcional y apropiada.",
-            domain: "play",
-            scoring: "reverse"
-        },
-        {
-            id: 11,
-            text: "¿Su hijo/a busca atención o consuelo cuando está lastimado o triste?",
-            help: "Considere si viene a usted cuando necesita ayuda emocional.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 12,
-            text: "¿Su hijo/a entiende instrucciones simples?",
-            help: "Observe si comprende órdenes básicas como 'ven aquí' o 'no'.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 13,
-            text: "¿Su hijo/a tiene rabietas intensas por cambios menores?",
-            help: "Fíjese en reacciones extremas a cambios en rutinas.",
-            domain: "flexibility",
-            scoring: "direct"
-        },
-        {
-            id: 14,
-            text: "¿Su hijo/a comparte alegría o logros con usted?",
-            help: "Observe si busca compartir experiencias positivas.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 15,
-            text: "¿Su hijo/a evita ciertos alimentos o texturas?",
-            help: "Considere si tiene aversiones alimentarias marcadas.",
-            domain: "sensory",
-            scoring: "direct"
-        },
-        {
-            id: 16,
-            text: "¿Su hijo/a desarrolla apegos inusuales a objetos específicos?",
-            help: "Observe si se aferra excesivamente a objetos particulares.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 17,
-            text: "¿Su hijo/a disfruta juegos sociales simples como peek-a-boo?",
-            help: "Fíjese si participa y disfruta juegos interactivos básicos.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 18,
-            text: "¿Su hijo/a tiene patrones de sueño muy irregulares?",
-            help: "Considere si tiene dificultades significativas para dormir.",
-            domain: "regulation",
-            scoring: "direct"
-        },
-        {
-            id: 19,
-            text: "¿Su hijo/a muestra miedo excesivo a sonidos cotidianos?",
-            help: "Observe reacciones de miedo a ruidos normales del hogar.",
-            domain: "sensory",
-            scoring: "direct"
-        },
-        {
-            id: 20,
-            text: "¿Su hijo/a busca el contacto físico y los abrazos?",
-            help: "Fíjese si busca o disfruta el contacto físico afectuoso.",
-            domain: "social",
-            scoring: "reverse"
-        }
-    ],
-
-    "3-6": [
-        {
-            id: 1,
-            text: "¿Su hijo/a hace amigos fácilmente?",
-            help: "Observe si establece relaciones con otros niños de su edad.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 2,
-            text: "¿Su hijo/a entiende las reglas de juegos simples?",
-            help: "Considere si comprende y sigue reglas básicas en juegos.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 3,
-            text: "¿Su hijo/a usa el lenguaje de manera apropiada para comunicarse?",
-            help: "Evalúe si se comunica efectivamente con palabras o frases.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 4,
-            text: "¿Su hijo/a muestra empatía cuando otros están tristes?",
-            help: "Observe si reconoce y responde a las emociones de otros.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 5,
-            text: "¿Su hijo/a tiene intereses muy intensos en temas específicos?",
-            help: "Fíjese en obsesiones o intereses extremadamente focalizados.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 6,
-            text: "¿Su hijo/a adapta su comportamiento según la situación social?",
-            help: "Considere si actúa diferente en casa vs. escuela vs. público.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 7,
-            text: "¿Su hijo/a entiende el sarcasmo o bromas simples?",
-            help: "Observe si comprende el humor apropiado para su edad.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 8,
-            text: "¿Su hijo/a tiene rituales específicos que debe seguir?",
-            help: "Fíjese en rutinas rígidas que no puede cambiar.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 9,
-            text: "¿Su hijo/a mantiene conversaciones de ida y vuelta?",
-            help: "Evalúe si puede sostener diálogos apropiados para su edad.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 10,
-            text: "¿Su hijo/a tiene dificultades con cambios en la rutina?",
-            help: "Observe reacciones a cambios inesperados en horarios.",
-            domain: "flexibility",
-            scoring: "direct"
-        },
-        {
-            id: 11,
-            text: "¿Su hijo/a juega de manera imaginativa y creativa?",
-            help: "Considere si desarrolla juegos de fantasía o representación.",
-            domain: "play",
-            scoring: "reverse"
-        },
-        {
-            id: 12,
-            text: "¿Su hijo/a busca atención de manera apropiada?",
-            help: "Observe si busca atención de formas socialmente aceptables.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 13,
-            text: "¿Su hijo/a tiene sensibilidades sensoriales marcadas?",
-            help: "Fíjese en reacciones extremas a texturas, sonidos, o luces.",
-            domain: "sensory",
-            scoring: "direct"
-        },
-        {
-            id: 14,
-            text: "¿Su hijo/a comparte intereses y emociones con otros?",
-            help: "Evalúe si comparte experiencias de manera espontánea.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 15,
-            text: "¿Su hijo/a usa gestos y expresiones faciales apropiadas?",
-            help: "Observe la comunicación no verbal durante interacciones.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 16,
-            text: "¿Su hijo/a tiene movimientos repetitivos o estereotipias?",
-            help: "Fíjese en movimientos como balancearse, aletear manos, etc.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 17,
-            text: "¿Su hijo/a entiende las emociones básicas en otros?",
-            help: "Considere si reconoce felicidad, tristeza, enojo en otros.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 18,
-            text: "¿Su hijo/a prefiere jugar solo que con otros niños?",
-            help: "Observe sus preferencias en situaciones de juego social.",
-            domain: "social",
-            scoring: "direct"
-        },
-        {
-            id: 19,
-            text: "¿Su hijo/a responde apropiadamente a límites y disciplina?",
-            help: "Evalúe cómo reacciona a correcciones y límites.",
-            domain: "regulation",
-            scoring: "reverse"
-        },
-        {
-            id: 20,
-            text: "¿Su hijo/a muestra comportamientos autolesivos?",
-            help: "Observe si se golpea, muerde, o lastima a sí mismo.",
-            domain: "regulation",
-            scoring: "direct"
-        }
-    ],
-
-    "6-10": [
-        {
-            id: 1,
-            text: "¿Su hijo/a tiene amistades cercanas y duraderas?",
-            help: "Evalúe la calidad y duración de las relaciones de amistad.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 2,
-            text: "¿Su hijo/a comprende las reglas sociales no escritas?",
-            help: "Observe si entiende normas sociales implícitas en diferentes contextos.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 3,
-            text: "¿Su hijo/a puede trabajar en equipo en proyectos escolares?",
-            help: "Considere su capacidad para colaborar efectivamente con compañeros.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 4,
-            text: "¿Su hijo/a tiene intereses obsesivos que interfieren con otras actividades?",
-            help: "Fíjese si los intereses especiales limitan otras experiencias.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 5,
-            text: "¿Su hijo/a adapta su comunicación según con quién habla?",
-            help: "Observe si habla diferente con maestros vs. amigos vs. familia.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 6,
-            text: "¿Su hijo/a entiende el lenguaje figurado y metáforas simples?",
-            help: "Evalúe comprensión de expresiones no literales apropiadas para su edad.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 7,
-            text: "¿Su hijo/a maneja bien las transiciones entre actividades?",
-            help: "Observe cómo responde a cambios de una actividad a otra.",
-            domain: "flexibility",
-            scoring: "reverse"
-        },
-        {
-            id: 8,
-            text: "¿Su hijo/a busca apoyo cuando enfrenta problemas?",
-            help: "Considere si pide ayuda de manera apropiada cuando la necesita.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 9,
-            text: "¿Su hijo/a tiene rutinas rígidas que no puede modificar?",
-            help: "Fíjese en inflexibilidad extrema hacia cambios en rutinas.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 10,
-            text: "¿Su hijo/a reconoce cuando ha cometido errores sociales?",
-            help: "Observe si se da cuenta de malentendidos en interacciones.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 11,
-            text: "¿Su hijo/a participa apropiadamente en conversaciones grupales?",
-            help: "Evalúe habilidades para tomar turnos y mantener temas relevantes.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 12,
-            text: "¿Su hijo/a tiene sensibilidades sensoriales que afectan su día a día?",
-            help: "Considere impacto de sensibilidades en actividades escolares y sociales.",
-            domain: "sensory",
-            scoring: "direct"
-        },
-        {
-            id: 13,
-            text: "¿Su hijo/a muestra empeo apropiada hacia otros?",
-            help: "Observe capacidad para ponerse en el lugar de otros.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 14,
-            text: "¿Su hijo/a tiene dificultades para regular sus emociones?",
-            help: "Fíjese en la intensidad y duración de reacciones emocionales.",
-            domain: "regulation",
-            scoring: "direct"
-        },
-        {
-            id: 15,
-            text: "¿Su hijo/a inicia interacciones sociales de manera apropiada?",
-            help: "Evalúe si comienza conversaciones y juegos adecuadamente.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 16,
-            text: "¿Su hijo/a entiende el concepto de intimidad personal?",
-            help: "Observe si comprende límites apropiados de contacto físico.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 17,
-            text: "¿Su hijo/a tiene movimientos o sonidos repetitivos?",
-            help: "Fíjese en estereotipias motoras o vocales.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 18,
-            text: "¿Su hijo/a puede manejar múltiples instrucciones a la vez?",
-            help: "Considere capacidad para seguir secuencias de tareas complejas.",
-            domain: "executive",
-            scoring: "reverse"
-        },
-        {
-            id: 19,
-            text: "¿Su hijo/a demuestra flexibilidad en resolución de problemas?",
-            help: "Observe si puede considerar múltiples soluciones a problemas.",
-            domain: "flexibility",
-            scoring: "reverse"
-        },
-        {
-            id: 20,
-            text: "¿Su hijo/a busca validación social excesiva?",
-            help: "Evalúe dependencia de aprobación externa para autoestima.",
-            domain: "social",
-            scoring: "direct"
-        }
-    ],
-
-    "11-14": [
-        {
-            id: 1,
-            text: "¿Su hijo/a mantiene amistades apropiadas para su edad?",
-            help: "Evalúe la calidad y reciprocidad de las relaciones de amistad.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 2,
-            text: "¿Su hijo/a entiende las dinámicas sociales complejas?",
-            help: "Observe comprensión de jerarquías sociales y relaciones grupales.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 3,
-            text: "¿Su hijo/a puede interpretar el lenguaje corporal y señales sociales?",
-            help: "Considere habilidad para leer comunicación no verbal.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 4,
-            text: "¿Su hijo/a tiene intereses intensos que dominan conversaciones?",
-            help: "Fíjese si los intereses especiales interfieren con interacciones sociales.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 5,
-            text: "¿Su hijo/a adapta su comportamiento a diferentes contextos sociales?",
-            help: "Observe flexibilidad comportamental en escuela, casa, y eventos sociales.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 6,
-            text: "¿Su hijo/a comprende el sarcasmo y humor apropiado para su edad?",
-            help: "Evalúe entendimiento de comunicación indirecta y humor social.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 7,
-            text: "¿Su hijo/a maneja bien los cambios inesperados?",
-            help: "Considere flexibilidad ante modificaciones en planes o rutinas.",
-            domain: "flexibility",
-            scoring: "reverse"
-        },
-        {
-            id: 8,
-            text: "¿Su hijo/a busca independencia apropiada para su edad?",
-            help: "Observe desarrollo de autonomía y toma de decisiones.",
-            domain: "development",
-            scoring: "reverse"
-        },
-        {
-            id: 9,
-            text: "¿Su hijo/a tiene rituales o rutinas rígidas?",
-            help: "Fíjese en comportamientos repetitivos que no puede modificar.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 10,
-            text: "¿Su hijo/a reconoce y expresa emociones complejas?",
-            help: "Evalúe capacidad para identificar y comunicar estados emocionales variados.",
-            domain: "regulation",
-            scoring: "reverse"
-        },
-        {
-            id: 11,
-            text: "¿Su hijo/a participa en actividades grupales voluntariamente?",
-            help: "Observe motivación para unirse a actividades sociales.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 12,
-            text: "¿Su hijo/a tiene sensibilidades sensoriales que afectan su participación social?",
-            help: "Considere impacto de sensibilidades en contextos sociales y académicos.",
-            domain: "sensory",
-            scoring: "direct"
-        },
-        {
-            id: 13,
-            text: "¿Su hijo/a demuestra perspectiva social apropiada?",
-            help: "Fíjese en capacidad para considerar puntos de vista de otros.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 14,
-            text: "¿Su hijo/a tiene dificultades para regular la intensidad emocional?",
-            help: "Observe control de respuestas emocionales en situaciones estresantes.",
-            domain: "regulation",
-            scoring: "direct"
-        },
-        {
-            id: 15,
-            text: "¿Su hijo/a inicia y mantiene conversaciones apropiadamente?",
-            help: "Evalúe habilidades conversacionales bidireccionales.",
-            domain: "communication",
-            scoring: "reverse"
-        },
-        {
-            id: 16,
-            text: "¿Su hijo/a comprende límites sociales y personales?",
-            help: "Observe entendimiento de privacidad y espacio personal.",
-            domain: "social",
-            scoring: "reverse"
-        },
-        {
-            id: 17,
-            text: "¿Su hijo/a muestra comportamientos repetitivos o estereotipados?",
-            help: "Fíjese en movimientos, sonidos o rutinas repetitivas.",
-            domain: "repetitive",
-            scoring: "direct"
-        },
-        {
-            id: 18,
-            text: "¿Su hijo/a puede planificar y organizar tareas complejas?",
-            help: "Considere habilidades de función ejecutiva apropiadas para la edad.",
-            domain: "executive",
-            scoring: "reverse"
-        },
-        {
-            id: 19,
-            text: "¿Su hijo/a demuestra flexibilidad cognitiva en resolución de problemas?",
-            help: "Observe capacidad para cambiar estrategias cuando es necesario.",
-            domain: "flexibility",
-            scoring: "reverse"
-        },
-        {
-            id: 20,
-            text: "¿Su hijo/a busca apoyo emocional de manera apropiada?",
-            help: "Eval// 🧠 Q-CHAT Quiz - JavaScript Logic
-console.log('🧠 Q-CHAT Quiz iniciado');
-
-// === DATOS DEL QUIZ ===
-
-// Preguntas del Q-CHAT validadas científicamente
-const qchatQuestions = [
-    {
-        id: 1,
-        text: "¿Su hijo/a disfruta ser mecido, rebotado en su rodilla, etc.?",
-        help: "Observe si el niño muestra placer durante actividades de movimiento físico y balanceo.",
-        domain: "social",
-        scoring: "reverse" // 5=siempre, 1=nunca
-    },
-    {
-        id: 2,
-        text: "¿Su hijo/a muestra interés en otros niños?",
-        help: "Fíjese si mira, se acerca o trata de interactuar con otros niños de su edad.",
-        domain: "social",
-        scoring: "reverse"
-    },
-    {
-        id: 3,
-        text: "¿Su hijo/a le gusta subir a sitios, como escalones, equipos de juego, o muebles?",
-        help: "Observe si busca activamente oportunidades para trepar y explorar físicamente.",
-        domain: "motor",
-        scoring: "reverse"
-    },
-    {
-        id: 4,
-        text: "¿Su hijo/a disfruta jugar al escondite/peek-a-boo/cu-cu?",
-        help: "Considere si participa activamente y muestra alegría durante estos juegos interactivos.",
-        domain: "social",
-        scoring: "reverse"
-    },
-    {
-        id: 5,
-        text: "¿Su hijo/a alguna vez PRETENDE, por ejemplo, hacer una llamada telefónica, cuidar muñecas, o cualquier otra cosa?",
-        help: "Observe si realiza juegos de imitación o representación simbólica de actividades cotidianas.",
-        domain: "communication",
-        scoring: "reverse"
-    },
-    {
-        id: 6,
-        text: "¿Su hijo/a alguna vez usa su dedo índice para SEÑALAR, para pedir algo?",
-        help: "Fíjese si extiende el dedo índice para indicar objetos que desea obtener.",
-        domain: "communication",
-        scoring: "reverse"
-    },
-    {
-        id: 7,
-        text: "¿Su hijo/a alguna vez usa su dedo índice para SEÑALAR, para indicar interés en algo?",
-        help: "Observe si señala objetos o eventos para compartir su interés con usted.",
-        domain: "communication",
-        scoring: "reverse"
-    },
-    {
-        id: 8,
-        text: "¿Su hijo/a puede jugar apropiadamente con juguetes pequeños (por ej. carros o bloques) sin solo llevárselos a la boca, manosearlos o tirarlos?",
-        help: "Considere si manipula juguetes de manera funcional y apropiada para su propósito.",
-        domain: "motor",
-        scoring: "reverse"
-    },
-    {
-        id: 9,
-        text: "¿Su hijo/a alguna vez le TRAE objetos para MOSTRARLE algo?",
-        help: "Observe si comparte objetos interesantes acercándoselos para que usted los vea.",
-        domain: "social",
-        scoring: "reverse"
-    },
-    {
-        id: 10,
-        text: "¿Su hijo/a le mira a los ojos por más de un segundo o dos?",
-        help: "Fíjese en la duración y calidad del contacto visual durante interacciones.",
-        domain: "social",
-        scoring: "reverse"
-    },
-    {
-        id: 11,
-        text: "¿Su hijo/a alguna vez parece ser demasiado sensible a ruidos (por ej. tapándose los oídos)?",
-        help: "Observe reacciones exageradas a sonidos cotidianos o ambientales.",
-        domain: "sensory",
-        scoring: "direct" // 1=nunca, 5=siempre
-    },
-    {
-        id: 12,
-        text: "¿Su hijo/a sonríe en respuesta a su cara o su sonrisa?",
-        help: "Considere si responde con sonrisas cuando usted le sonríe directamente.",
-        domain: "social",
-        scoring: "reverse"
-    },
-    {
-        id: 13,
-        text: "¿Su hijo/a imita lo que usted hace? (por ej. hacer una mueca, aplaudir, hacer sonidos)",
-        help: "Observe si copia sus acciones, gestos o sonidos de manera espontánea.",
-        domain: "communication",
-        scoring: "reverse"
-    },
-    {
-        id: 14,
-        text: "¿Su hijo/a responde cuando usted lo/la llama por su nombre?",
-        help: "Fíjese si voltea, mira o muestra alguna respuesta cuando dice su nombre.",
-        domain: "communication",
-        scoring: "reverse"
-    },
-    {
-        id: 15,
-        text: "Si usted señala un juguete al otro lado del cuarto, ¿su hijo/a LO MIRA?",
-        help: "Observe si sigue la dirección de su dedo para mirar el objeto señalado.",
-        domain: "communication",
-        scoring: "reverse"
-    },
-    {
-        id: 16,
-        text: "¿Su hijo/a camina?",
-        help: "Considere si puede caminar de forma independiente sin apoyo.",
-        domain: "motor",
-        scoring: "reverse"
-    },
-    {
-        id: 17,
-        text: "¿Su hijo/a mira las cosas que usted está mirando?",
-        help: "Observe si sigue su mirada hacia objetos o eventos de interés.",
-        domain: "social",
-        scoring: "reverse"
-    },
-    {
-        id: 18,
-        text: "¿Su hijo/a hace movimientos raros con los dedos cerca de su cara?",
-        help: "Fíjese en movimientos repetitivos o estereotipados de manos cerca del rostro.",
-        domain: "repetitive",
-        scoring: "direct"
-    },
-    {
-        id: 19,
-        text: "¿Su hijo/a trata de atraer su atención hacia su propia actividad?",
-        help: "Observe si busca que usted mire lo que está haciendo o jugando.",
-        domain: "social",
-        scoring: "reverse"
-    },
-    {
-        id: 20,
-        text: "¿Alguna vez se ha preguntado si su hijo/a podría ser sordo/a?",
-        help: "Considere si ha tenido dudas sobre su audición por falta de respuestas.",
-        domain: "communication",
-        scoring: "direct"
-    },
-    {
-        id: 21,
-        text: "¿Su hijo/a entiende lo que la gente dice?",
-        help: "Observe si comprende instrucciones simples y palabras familiares.",
-        domain: "communication",
-        scoring: "reverse"
-    },
-    {
-        id: 22,
-        text: "¿Su hijo/a a veces se queda mirando al vacío o camina sin rumbo?",
-        help: "Fíjese en períodos de desconexión o movimientos sin propósito aparente.",
-        domain: "attention",
-        scoring: "direct"
-    },
-    {
-        id: 23,
-        text: "¿Su hijo/a mira su cara para verificar su reacción cuando se enfrenta con algo extraño?",
-        help: "Observe si busca su expresión facial en situaciones nuevas o inciertas.",
-        domain: "social",
-        scoring: "reverse"
-    },
-    {
-        id: 24,
-        text: "¿Su hijo/a le gusta las actividades de movimiento (por ej. ser cargado o rebotado en sus rodillas)?",
-        help: "Considere si disfruta y busca activamente experiencias de movimiento.",
-        domain: "sensory",
-        scoring: "reverse"
-    },
-    {
-        id: 25,
-        text: "¿Su hijo/a tiene contacto visual normal?",
-        help: "Evalúe la calidad y frecuencia general del contacto visual en diferentes situaciones.",
-        domain: "social",
-        scoring: "reverse"
-    }
-];
-
-// Opciones de respuesta
-const answerOptions = [
-    { value: 1, text: "Nunca", description: "No ocurre en absoluto" },
-    { value: 2, text: "Raramente", description: "Ocurre muy pocas veces" },
-    { value: 3, text: "A veces", description: "Ocurre ocasionalmente" },
-    { value: 4, text: "Con frecuencia", description: "Ocurre regularmente" },
-    { value: 5, text: "Siempre", description: "Ocurre constantemente" }
-];
-
-// === ESTADO DEL QUIZ ===
-const quizState = {
-    currentQuestion: 0,
-    answers: {},
-    childInfo: {},
-    startTime: null,
-    endTime: null,
-    showingResults: false
-};
-
-// === FUNCIONES DE NAVEGACIÓN ===
-
-function showLoading() {
-    document.getElementById('loadingOverlay').classList.add('show');
-}
-
-function hideLoading() {
-    document.getElementById('loadingOverlay').classList.remove('show');
-}
-
-function startQuiz() {
-    showLoading();
-    setTimeout(() => {
-        hideLoading();
-        showSection('ageSection');
-        speakText("Comenzando la evaluación Q-CHAT. Por favor, proporciona información básica del niño.");
-    }, 1000);
-}
-
-function showIntro() {
-    showSection('introSection');
-}
-
-function validateAndStartQuestions() {
-    const age = document.getElementById('childAge').value;
-    const relationship = document.getElementById('relationship').value;
-
-    if (!age || !relationship) {
-        alert('Por favor, completa todos los campos obligatorios marcados.');
-        return;
-    }
-
-    // Verificar rango de edad apropiado
-    const ageNum = parseInt(age);
-    if (ageNum < 18 || ageNum > 24) {
-        if (confirm(`El Q-CHAT está validado específicamente para niños de 18-24 meses. Tu hijo tiene ${age} meses.\n\n¿Deseas continuar de todas formas? Te recomendamos consultar con un profesional para herramientas más apropiadas para esta edad.`)) {
-            proceedToQuestions();
-        }
-    } else {
-        proceedToQuestions();
-    }
-}
-
-function proceedToQuestions() {
-    // Guardar información del niño
-    quizState.childInfo = {
-        age: document.getElementById('childAge').value,
-        gender: document.getElementById('childGender').value,
-        previousConcerns: document.getElementById('previousConcerns').value,
-        relationship: document.getElementById('relationship').value
-    };
-
-    quizState.startTime = new Date();
-    showSection('questionsSection');
-    loadQuestion(0);
-    speakText("Comenzando las preguntas de evaluación. Lee cada pregunta cuidadosamente y selecciona la respuesta que mejor describa a tu hijo.");
-}
-
-function showSection(sectionId) {
-    // Ocultar todas las secciones
-    const sections = ['introSection', 'ageSection', 'questionsSection', 'resultsSection'];
-    sections.forEach(id => {
-        const section = document.getElementById(id);
-        if (section) section.style.display = 'none';
-    });
-
-    // Mostrar la sección solicitada
-    const targetSection = document.getElementById(sectionId);
-    if (targetSection) {
-        targetSection.style.display = 'block';
-        targetSection.classList.add('fade-in');
-    }
-
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// === FUNCIONES DE PREGUNTAS ===
-
-function loadQuestion(questionIndex) {
-    if (questionIndex >= qchatQuestions.length) {
-        calculateAndShowResults();
-        return;
-    }
-
-    quizState.currentQuestion = questionIndex;
-    const question = qchatQuestions[questionIndex];
-
-    // Actualizar elementos de la UI
-    document.getElementById('currentQuestion').textContent = questionIndex + 1;
-    document.getElementById('totalQuestions').textContent = qchatQuestions.length;
-    document.getElementById('questionNumber').textContent = questionIndex + 1;
-    document.getElementById('questionText').textContent = question.text;
-    document.getElementById('questionHelp').textContent = question.help;
-
-    // Actualizar barra de progreso
-    const progress = ((questionIndex + 1) / qchatQuestions.length) * 100;
-    document.getElementById('progressFill').style.width = `${progress}%`;
-    document.getElementById('progressPercentage').textContent = `${Math.round(progress)}%`;
-
-    // Generar opciones de respuesta
-    generateAnswerOptions(question.id);
-
-    // Actualizar botones de navegación
-    updateNavigationButtons();
-
-    // Leer pregunta en voz alta
-    setTimeout(() => {
-        speakText(`Pregunta ${questionIndex + 1}. ${question.text}`);
-    }, 500);
-}
-
-function generateAnswerOptions(questionId) {
-    const container = document.getElementById('answerOptions');
-    container.innerHTML = '';
-
-    answerOptions.forEach(option => {
-        const optionElement = document.createElement('div');
-        optionElement.className = 'answer-option';
-        optionElement.setAttribute('data-value', option.value);
-        optionElement.setAttribute('tabindex', '0');
-        optionElement.setAttribute('role', 'radio');
-        optionElement.setAttribute('aria-label', `${option.text}: ${option.description}`);
-
-        // Verificar si esta opción ya está seleccionada
-        if (quizState.answers[questionId] === option.value) {
-            optionElement.classList.add('selected');
-        }
-
-        optionElement.innerHTML = `
-            <div class="option-radio"></div>
-            <div class="option-content">
-                <div class="option-text">${option.text}</div>
-                <div class="option-description">${option.description}</div>
-            </div>
-        `;
-
-        // Event listeners
-        optionElement.addEventListener('click', () => selectAnswer(questionId, option.value));
-        optionElement.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                selectAnswer(questionId, option.value);
-            }
-        });
-
-        container.appendChild(optionElement);
-    });
-}
-
-function selectAnswer(questionId, value) {
-    // Guardar respuesta
-    quizState.answers[questionId] = value;
-
-    // Actualizar UI
-    const options = document.querySelectorAll('.answer-option');
-    options.forEach(option => {
-        option.classList.remove('selected');
-        if (parseInt(option.getAttribute('data-value')) === value) {
-            option.classList.add('selected');
-        }
-    });
-
-    // Actualizar botones de navegación
-    updateNavigationButtons();
-
-    // Feedback de audio
-    playSelectionSound();
-    speakText(`Seleccionado: ${answerOptions.find(opt => opt.value === value).text}`);
-
-    console.log(`Respuesta guardada - Pregunta ${questionId}: ${value}`);
-}
-
-function updateNavigationButtons() {
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-
-    // Botón anterior
-    prevBtn.disabled = quizState.currentQuestion === 0;
-
-    // Botón siguiente - habilitar solo si hay respuesta seleccionada
-    const currentQuestionId = qchatQuestions[quizState.currentQuestion].id;
-    nextBtn.disabled = !quizState.answers.hasOwnProperty(currentQuestionId);
-
-    // Cambiar texto del botón siguiente en la última pregunta
-    if (quizState.currentQuestion === qchatQuestions.length - 1) {
-        nextBtn.innerHTML = 'Ver Resultados →';
-    } else {
-        nextBtn.innerHTML = 'Siguiente →';
-    }
-}
-
-function previousQuestion() {
-    if (quizState.currentQuestion > 0) {
-        loadQuestion(quizState.currentQuestion - 1);
-        playNavigationSound();
-    }
-}
-
-function nextQuestion() {
-    const currentQuestionId = qchatQuestions[quizState.currentQuestion].id;
-    
-    if (!quizState.answers.hasOwnProperty(currentQuestionId)) {
-        alert('Por favor, selecciona una respuesta antes de continuar.');
-        return;
-    }
-
-    if (quizState.currentQuestion < qchatQuestions.length - 1) {
-        loadQuestion(quizState.currentQuestion + 1);
-        playNavigationSound();
-    } else {
-        // Última pregunta - mostrar resultados
-        calculateAndShowResults();
-    }
-}
-
-// === CÁLCULO DE RESULTADOS ===
-
-function calculateAndShowResults() {
-    quizState.endTime = new Date();
-    const duration = (quizState.endTime - quizState.startTime) / 1000; // segundos
-
-    showLoading();
-
-    setTimeout(() => {
-        hideLoading();
-        
-        // Calcular puntuación total
-        const results = calculateQChatScore();
-        
-        // Mostrar resultados
-        displayResults(results, duration);
-        
-        // Guardar resultados
-        saveResults(results);
-        
-        showSection('resultsSection');
-        
-        speakText("Evaluación completada. Revisando resultados.");
-    }, 2000);
-}
-
-function calculateQChatScore() {
-    let totalScore = 0;
-    const domainScores = {
-        social: { total: 0, count: 0 },
-        communication: { total: 0, count: 0 },
-        motor: { total: 0, count: 0 },
-        sensory: { total: 0, count: 0 },
-        repetitive: { total: 0, count: 0 },
-        attention: { total: 0, count: 0 }
-    };
-
-    // Calcular puntuación para cada pregunta
-    qchatQuestions.forEach(question => {
-        const rawAnswer = quizState.answers[question.id];
-        let score;
-
-        // Aplicar sistema de puntuación
-        if (question.scoring === 'reverse') {
-            // Para preguntas de desarrollo típico: 5=siempre se convierte en 1 punto, 1=nunca se convierte en 5 puntos
-            score = 6 - rawAnswer;
-        } else {
-            // Para preguntas de señales de alerta: mantener puntuación directa
-            score = rawAnswer;
-        }
-
-        totalScore += score;
-
-        // Acumular por dominio
-        if (domainScores[question.domain]) {
-            domainScores[question.domain].total += score;
-            domainScores[question.domain].count += 1;
-        }
-    });
-
-    // Calcular promedios por dominio
-    Object.keys(domainScores).forEach(domain => {
-        if (domainScores[domain].count > 0) {
-            domainScores[domain].average = domainScores[domain].total / domainScores[domain].count;
-        }
-    });
-
-    // Determinar nivel de riesgo basado en investigación del Q-CHAT
-    let riskLevel, interpretation, recommendations;
-
-    if (totalScore <= 39) {
-        riskLevel = 'bajo';
-        interpretation = 'Desarrollo típico';
-        recommendations = getTypicalDevelopmentRecommendations();
-    } else if (totalScore <= 59) {
-        riskLevel = 'moderado';
-        interpretation = 'Algunas diferencias observadas';
-        recommendations = getModerateConcernRecommendations();
-    } else {
-        riskLevel = 'alto';
-        interpretation = 'Diferencias significativas observadas';
-        recommendations = getHighConcernRecommendations();
-    }
-
-    return {
-        totalScore,
-        maxScore: qchatQuestions.length * 5,
-        riskLevel,
-        interpretation,
-        domainScores,
-        recommendations,
-        childInfo: quizState.childInfo
-    };
-}
-
-// === MOSTRAR RESULTADOS ===
-
-function displayResults(results, duration) {
-    // Configurar ícono y título según nivel de riesgo
-    const resultsIcon = document.getElementById('resultsIcon');
-    const resultsTitle = document.getElementById('resultsTitle');
-    const resultsSubtitle = document.getElementById('resultsSubtitle');
-
-    if (results.riskLevel === 'bajo') {
-        resultsIcon.textContent = '✅';
-        resultsTitle.textContent = 'Desarrollo Dentro del Rango Típico';
-        resultsSubtitle.textContent = 'Las observaciones sugieren un desarrollo típico';
-    } else if (results.riskLevel === 'moderado') {
-        resultsIcon.textContent = '⚠️';
-        resultsTitle.textContent = 'Algunas Diferencias Observadas';
-        resultsSubtitle.textContent = 'Se recomienda seguimiento con profesional';
-    } else {
-        resultsIcon.textContent = '🔍';
-        resultsTitle.textContent = 'Diferencias Significativas Observadas';
-        resultsSubtitle.textContent = 'Se recomienda evaluación profesional';
-    }
-
-    // Mostrar resumen de puntuación
-    displayScoreSummary(results);
-
-    // Mostrar desglose por dominios
-    displayDomainBreakdown(results);
-
-    // Mostrar recomendaciones
-    displayRecommendations(results);
-
-    // Mostrar próximos pasos
-    displayNextSteps(results);
-
-    // Mostrar recomendación profesional
-    displayProfessionalGuidance(results);
-}
-
-function displayScoreSummary(results) {
-    const summaryContainer = document.getElementById('resultsSummary');
-    const percentage = Math.round((results.totalScore / results.maxScore) * 100);
-
-    summaryContainer.innerHTML = `
-        <div class="score-display">${results.totalScore}/${results.maxScore}</div>
-        <div class="score-interpretation">${results.interpretation}</div>
-        <div class="score-description">
-            Puntuación total: ${results.totalScore} puntos de ${results.maxScore} posibles (${percentage}%)
-            <br>
-            <em>Niveles de referencia: Bajo riesgo: ≤39, Riesgo moderado: 40-59, Alto riesgo: ≥60</em>
-        </div>
-    `;
-}
-
-function displayDomainBreakdown(results) {
-    const breakdownContainer = document.getElementById('resultsBreakdown');
-    
-    const domainNames = {
-        social: 'Interacción Social',
-        communication: 'Comunicación',
-        motor: 'Habilidades Motoras',
-        sensory: 'Procesamiento Sensorial',
-        repetitive: 'Comportamientos Repetitivos',
-        attention: 'Atención y Concentración'
-    };
-
-    let breakdownHTML = '<h3>📊 Desglose por Áreas del Desarrollo</h3>';
-    
-    Object.keys(results.domainScores).forEach(domain => {
-        const score = results.domainScores[domain];
-        if (score.count > 0) {
-            const average = score.average.toFixed(1);
-            let status = '';
-            
-            if (average <= 2.0) {
-                status = 'Desarrollo típico';
-            } else if (average <= 3.5) {
-                status = 'Algunas diferencias';
-            } else {
-                status = 'Diferencias significativas';
-            }
-
-            breakdownHTML += `
-                <div class="domain-score">
-                    <div class="domain-info">
-                        <h4>${domainNames[domain]}</h4>
-                        <p>${status} (${score.count} preguntas evaluadas)</p>
-                    </div>
-                    <div class="domain-value">${average}/5.0</div>
-                </div>
-            `;
-        }
-    });
-
-    breakdownContainer.innerHTML = breakdownHTML;
-}
-
-function displayRecommendations(results) {
-    const recommendationsContainer = document.getElementById('recommendations');
-    
-    recommendationsContainer.innerHTML = `
-        <h3>🎯 Recomendaciones Personalizadas</h3>
-        <ul class="recommendation-list">
-            ${results.recommendations.map(rec => `<li>${rec}</li>`).join('')}
-        </ul>
-    `;
-}
-
-function displayNextSteps(results) {
-    const nextStepsContainer = document.getElementById('nextSteps');
-    let stepsHTML = '<h3>📋 Próximos Pasos Recomendados</h3><ul class="recommendation-list">';
-
-    if (results.riskLevel === 'bajo') {
-        stepsHTML += `
-            <li>Continúa observando el desarrollo de tu hijo de manera regular</li>
-            <li>Mantén las rutinas de estimulación temprana y juego interactivo</li>
-            <li>Utiliza los juegos de JuegoTEA para fortalecer áreas específicas</li>
-            <li>Programa controles pediátricos de rutina según recomendaciones médicas</li>
-        `;
-    } else if (results.riskLevel === 'moderado') {
-        stepsHTML += `
-            <li>Programa una cita con tu pediatra para discutir estos resultados</li>
-            <li>Considera una evaluación del desarrollo más detallada</li>
-            <li>Implementa estrategias de estimulación temprana específicas</li>
-            <li>Documenta comportamientos específicos para compartir con profesionales</li>
-            <li>Repite esta evaluación en 3-6 meses para monitorear progreso</li>
-        `;
-    } else {
-        stepsHTML += `
-            <li><strong>Consulta con tu pediatra o especialista en desarrollo infantil dentro de las próximas 2-4 semanas</strong></li>
-            <li>Solicita derivación para evaluación diagnóstica completa (ADOS-2, ADI-R)</li>
-            <li>Considera evaluación de audiología para descartar problemas auditivos</li>
-            <li>Busca servicios de intervención temprana en tu área</li>
-            <li>Conecta con grupos de apoyo para familias</li>
-            <li>Mantén registros detallados de comportamientos y desarrollo</li>
-        `;
-    }
-
-    stepsHTML += '</ul>';
-    nextStepsContainer.innerHTML = stepsHTML;
-}
-
-function displayProfessionalGuidance(results) {
-    const guidanceContainer = document.getElementById('professionalGuidance');
-    let guidance = '';
-
-    if (results.riskLevel === 'bajo') {
-        guidance = `Los resultados sugieren un desarrollo dentro del rango típico para la edad de ${results.childInfo.age} meses. Continúa con seguimiento pediátrico regular y estimulación apropiada. Recuerda que esta herramienta es un screening inicial y no reemplaza la evaluación clínica profesional.`;
-    } else if (results.riskLevel === 'moderado') {
-        guidance = `Los resultados indican algunas diferencias que merecen atención profesional. Te recomendamos discutir estos hallazgos con tu pediatra, quien puede determinar si es necesaria una evaluación más detallada. La intervención temprana, cuando es necesaria, es más efectiva cuanto antes se inicie.`;
-    } else {
-        guidance = `Los resultados sugieren diferencias significativas que requieren evaluación profesional pronto. Es importante recordar que este screening no constituye un diagnóstico, pero los hallazgos justifican una evaluación más detallada por parte de especialistas en desarrollo infantil. La detección temprana permite acceso más rápido a apoyos apropiados.`;
-    }
-
-    guidanceContainer.textContent = guidance;
-}
-
-// === FUNCIONES DE RECOMENDACIONES ===
-
-function getTypicalDevelopmentRecommendations() {
-    return [
-        "Continúa con rutinas de juego interactivo diario y lectura de cuentos",
-        "Fomenta el desarrollo del lenguaje mediante conversaciones frecuentes",
-        "Proporciona oportunidades variadas para exploración sensorial segura",
-        "Mantén rutinas consistentes que promuevan seguridad y predictibilidad",
-        "Utiliza los juegos de JuegoTEA para enriquecer experiencias de aprendizaje",
-        "Celebra logros del desarrollo y proporciona estímulo positivo constante"
-    ];
-}
-
-function getModerateConcernRecommendations() {
-    return [
-        "Incrementa oportunidades para interacciones sociales estructuradas",
-        "Practica habilidades de comunicación mediante juegos de imitación",
-        "Implementa rutinas visuales para apoyar transiciones y comprensión",
-        "Proporciona experiencias sensoriales graduales y controladas",
-        "Utiliza técnicas de atención conjunta durante actividades diarias",
-        "Documenta progreso en áreas específicas para seguimiento profesional",
-        "Explora juegos de JuegoTEA enfocados en comunicación y habilidades sociales"
-    ];
-}
-
-function getHighConcernRecommendations() {
-    return [
-        "Busca evaluación profesional especializada en desarrollo infantil temprano",
-        "Implementa estrategias de comunicación aumentativa si es apropiado",
-        "Crea ambientes estructurados que reduzcan sobreestimulación",
-        "Establece rutinas altamente predecibles y utiliza apoyos visuales",
-        "Practica habilidades de autorregulación mediante técnicas calmantes",
-        "Conecta con recursos de intervención temprana en tu comunidad",
-        "Considera participación en programas de entrenamiento parental especializados",
-        "Utiliza herramientas de JuegoTEA como apoyo complementario bajo orientación profesional"
-    ];
-}
-
-// === FUNCIONES DE ACCIÓN ===
-
-function downloadResults() {
-    const results = calculateQChatScore();
-    generatePDFReport(results);
-}
-
-function generatePDFReport(results) {
-    // Crear contenido HTML para impresión
-    const reportContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
-            <header style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #4299e1; padding-bottom: 20px;">
-                <h1 style="color: #4299e1; margin-bottom: 10px;">🧠 Reporte Q-CHAT</h1>
-                <h2 style="color: #666; font-weight: normal;">Evaluación Temprana del Desarrollo</h2>
-                <p style="color: #888;">Fecha: ${new Date().toLocaleDateString('es-ES')}</p>
-            </header>
-
-            <section style="margin-bottom: 30px;">
-                <h3 style="color: #4299e1; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Información del Niño</h3>
-                <table style="width: 100%; margin-top: 15px;">
-                    <tr><td style="font-weight: bold; padding: 5px;">Edad:</td><td>${results.childInfo.age} meses</td></tr>
-                    <tr><td style="font-weight: bold; padding: 5px;">Género:</td><td>${results.childInfo.gender || 'No especificado'}</td></tr>
-                    <tr><td style="font-weight: bold; padding: 5px;">Evaluado por:</td><td>${results.childInfo.relationship}</td></tr>
-                    <tr><td style="font-weight: bold; padding: 5px;">Preocupaciones previas:</td><td>${results.childInfo.previousConcerns || 'No especificado'}</td></tr>
-                </table>
-            </section>
-
-            <section style="margin-bottom: 30px;">
-                <h3 style="color: #4299e1; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Resultados</h3>
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 15px;">
-                    <p style="font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 10px;">
-                        ${results.totalScore}/${results.maxScore} puntos
-                    </p>
-                    <p style="text-align: center; font-size: 18px; color: #666;">
-                        ${results.interpretation}
-                    </p>
-                </div>
-            </section>
-
-            <section style="margin-bottom: 30px;">
-                <h3 style="color: #4299e1; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Desglose por Áreas</h3>
-                ${generateDomainTable(results.domainScores)}
-            </section>
-
-            <section style="margin-bottom: 30px;">
-                <h3 style="color: #4299e1; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Recomendaciones</h3>
-                <ul style="margin-top: 15px; line-height: 1.6;">
-                    ${results.recommendations.map(rec => `<li style="margin-bottom: 10px;">${rec}</li>`).join('')}
-                </ul>
-            </section>
-
-            <footer style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #ddd; font-size: 12px; color: #666;">
-                <p><strong>Disclaimer Importante:</strong></p>
-                <p>Esta evaluación Q-CHAT es una herramienta de screening preliminar y NO constituye un diagnóstico médico. Los resultados deben ser interpretados por un profesional de la salud especializado en desarrollo infantil. Un resultado atípico no confirma autismo, así como un resultado típico no lo descarta completamente.</p>
-                <p style="margin-top: 15px;">
-                    <strong>JuegoTEA</strong> - Herramientas basadas en evidencia científica<br>
-                    Para más información: www.juegotea.com
-                </p>
-            </footer>
-        </div>
-    `;
-
-    // Crear ventana de impresión
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Reporte Q-CHAT - ${results.childInfo.age} meses</title>
-            <style>
-                @media print {
-                    body { margin: 0; }
-                    @page { margin: 2cm; }
-                }
-            </style>
-        </head>
-        <body>
-            ${reportContent}
-        </body>
-        </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-}
-
-function generateDomainTable(domainScores) {
-    const domainNames = {
-        social: 'Interacción Social',
-        communication: 'Comunicación',
-        motor: 'Habilidades Motoras',
-        sensory: 'Procesamiento Sensorial',
-        repetitive: 'Comportamientos Repetitivos',
-        attention: 'Atención y Concentración'
-    };
-
-    let tableHTML = '<table style="width: 100%; border-collapse: collapse; margin-top: 15px;">';
-    tableHTML += '<tr style="background: #f0f9ff;"><th style="padding: 10px; border: 1px solid #ddd; text-align: left;">Área del Desarrollo</th><th style="padding: 10px; border: 1px solid #ddd;">Puntuación Promedio</th><th style="padding: 10px; border: 1px solid #ddd;">Interpretación</th></tr>';
-
-    Object.keys(domainScores).forEach(domain => {
-        const score = domainScores[domain];
-        if (score.count > 0) {
-            const average = score.average.toFixed(1);
-            let interpretation = '';
-            
-            if (average <= 2.0) {
-                interpretation = 'Desarrollo típico';
-            } else if (average <= 3.5) {
-                interpretation = 'Algunas diferencias';
-            } else {
-                interpretation = 'Diferencias significativas';
-            }
-
-            tableHTML += `
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #ddd;">${domainNames[domain]}</td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${average}/5.0</td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${interpretation}</td>
-                </tr>
-            `;
-        }
-    });
-
-    tableHTML += '</table>';
-    return tableHTML;
-}
-
-function exploreGames() {
-    const results = calculateQChatScore();
-    let recommendedCategory = 'comunicacion-lenguaje'; // Default
-
-    // Determinar categoría recomendada basada en resultados
-    if (results.domainScores.communication && results.domainScores.communication.average > 3.0) {
-        recommendedCategory = 'comunicacion-lenguaje';
-    } else if (results.domainScores.social && results.domainScores.social.average > 3.0) {
-        recommendedCategory = 'habilidades-sociales';
-    } else if (results.domainScores.sensory && results.domainScores.sensory.average > 3.0) {
-        recommendedCategory = 'integracion-sensorial';
-    }
-
-    if (confirm(`Basado en los resultados, te recomendamos explorar los juegos de ${recommendedCategory.replace('-', ' ')}.\n\n¿Quieres ir allá ahora?`)) {
-        window.location.href = `../categorias/${recommendedCategory}.html`;
-    }
-}
-
-function restartQuiz() {
-    if (confirm('¿Estás seguro de que quieres iniciar una nueva evaluación? Se perderán los resultados actuales.')) {
-        // Reiniciar estado
-        quizState.currentQuestion = 0;
-        quizState.answers = {};
-        quizState.childInfo = {};
-        quizState.startTime = null;
-        quizState.endTime = null;
-        quizState.showingResults = false;
-
-        // Limpiar formularios
-        document.getElementById('childAge').value = '';
-        document.getElementById('childGender').value = '';
-        document.getElementById('previousConcerns').value = '';
-        document.getElementById('relationship').value = '';
-
-        // Volver a la introducción
-        showSection('introSection');
-        
-        speakText('Iniciando nueva evaluación Q-CHAT.');
-    }
-}
-
-function goBack() {
-    if (quizState.showingResults || Object.keys(quizState.answers).length === 0) {
-        // Si estamos en resultados o no hay respuestas, volver directamente
-        window.location.href = '../index.html';
-    } else {
-        // Si hay progreso, confirmar
-        if (confirm('¿Estás seguro de que quieres salir? Se perderá el progreso actual de la evaluación.')) {
-            window.location.href = '../index.html';
-        }
-    }
-}
-
-// === FUNCIONES DE AUDIO ===
-
-function speakText(text) {
-    if ('speechSynthesis' in window) {
-        speechSynthesis.cancel(); // Cancelar cualquier speech en curso
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'es-MX';
-        utterance.rate = 0.8;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-        
-        speechSynthesis.speak(utterance);
-    }
-}
-
-function playSelectionSound() {
-    playSound(800, 0.1, 'sine');
-}
-
-function playNavigationSound() {
-    playSound(600, 0.15, 'sine');
-}
-
-function playSound(frequency, duration, type = 'sine') {
-    try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-        oscillator.type = type;
-        
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + duration);
-    } catch (error) {
-        console.log('Audio no disponible:', error);
-    }
-}
-
-// === FUNCIONES DE ALMACENAMIENTO ===
-
-function saveResults(results) {
-    try {
-        const timestamp = new Date().toISOString();
-        const savedResults = {
-            timestamp,
-            results,
-            version: 'Q-CHAT-1.0',
-            duration: quizState.endTime - quizState.startTime
-        };
-
-        // Guardar en localStorage
-        localStorage.setItem('qchat-last-results', JSON.stringify(savedResults));
-        
-        // Guardar en historial
-        const history = JSON.parse(localStorage.getItem('qchat-history') || '[]');
-        history.push(savedResults);
-        
-        // Mantener solo los últimos 5 resultados
-        if (history.length > 5) {
-            history.splice(0, history.length - 5);
-        }
-        
-        localStorage.setItem('qchat-history', JSON.stringify(history));
-        
-        console.log('Resultados guardados exitosamente');
-    } catch (error) {
-        console.error('Error guardando resultados:', error);
-    }
-}
-
-function loadPreviousResults() {
-    try {
-        const saved = localStorage.getItem('qchat-last-results');
-        if (saved) {
-            return JSON.parse(saved);
-        }
-    } catch (error) {
-        console.error('Error cargando resultados previos:', error);
-    }
-    return null;
-}
-
-// === INICIALIZACIÓN ===
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ Q-CHAT Quiz inicializado');
-    
-    // Verificar si hay resultados previos
-    const previousResults = loadPreviousResults();
-    if (previousResults) {
-        const daysSince = Math.floor((Date.now() - new Date(previousResults.timestamp).getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (daysSince < 30) { // Mostrar notificación si es menor a 30 días
-            setTimeout(() => {
-                if (confirm(`Se encontró una evaluación previa de hace ${daysSince} días.\n\n¿Quieres ver esos resultados o hacer una nueva evaluación?`)) {
-                    // Cargar resultados previos
-                    displayResults(previousResults.results, 0);
-                    showSection('resultsSection');
-                }
-            }, 2000);
-        }
-    }
-    
-    // Mostrar mensaje de bienvenida
-    setTimeout(() => {
-        speakText('Bienvenido al Q-CHAT, una herramienta científica de evaluación temprana para niños de 18 a 24 meses.');
-    }, 1000);
-});
-
-// === MANEJO DE ERRORES ===
-
-window.addEventListener('error', function(e) {
-    console.error('Error en Q-CHAT:', e.error);
-    alert('Ha ocurrido un error. Por favor, recarga la página e intenta nuevamente.');
-});
-
-// Prevenir pérdida de datos al cerrar
-window.addEventListener('beforeunload', function(e) {
-    if (Object.keys(quizState.answers).length > 0 && !quizState.showingResults) {
-        e.preventDefault();
-        e.returnValue = 'Tienes una evaluación en progreso. ¿Estás seguro de que quieres salir?';
-        return e.returnValue;
-    }
-});
-
-// === ACCESIBILIDAD ADICIONAL ===
-
-// Navegación por teclado en opciones de respuesta
-document.addEventListener('keydown', function(e) {
-    if (e.target.classList.contains('answer-option')) {
-        const options = Array.from(document.querySelectorAll('.answer-option'));
-        const currentIndex = options.indexOf(e.target);
-        
-        switch(e.key) {
-            case 'ArrowDown':
-                e.preventDefault();
-                if (currentIndex < options.length - 1) {
-                    options[currentIndex + 1].focus();
-                }
-                break;
-            case 'ArrowUp':
-                e.preventDefault();
-                if (currentIndex > 0) {
-                    options[currentIndex - 1].focus();
-                }
-                break;
-        }
-    }
-});
-
-console.log('🧠 Q-CHAT Quiz completamente cargado y listo');
+console.log('📋 Q-CHAT Quiz JavaScript cargado completamente ✅');
