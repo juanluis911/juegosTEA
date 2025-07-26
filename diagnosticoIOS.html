@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuegoTEA - Fix PWA iOS</title>
+    
+    <!-- ===== MANIFEST PWA ===== -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- ===== iOS ESPECÍFICO ===== -->
+    <!-- CRÍTICO: Estos meta tags son obligatorios para iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="JuegoTEA">
+    <meta name="apple-touch-fullscreen" content="yes">
+    
+    <!-- ICONOS iOS - TODOS REQUERIDOS -->
+    <!-- Icono principal - OBLIGATORIO -->
+    <link rel="apple-touch-icon" href="./assets/icons/icon-180x180.png">
+    
+    <!-- Iconos adicionales iOS -->
+    <link rel="apple-touch-icon" sizes="152x152" href="./assets/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="./assets/icons/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="./assets/icons/icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="./assets/icons/icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="./assets/icons/icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="./assets/icons/icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="./assets/icons/icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="57x57" href="./assets/icons/icon-57x57.png">
+    
+    <!-- Favicon estándar -->
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/icons/favicon-16x16.png">
+    
+    <!-- ===== PANTALLA DE SPLASH iOS ===== -->
+    <!-- iPhone 14 Pro Max, 13 Pro Max, 12 Pro Max -->
+    <link rel="apple-touch-startup-image" href="./assets/splash/iphone-14-pro-max.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
+    
+    <!-- iPhone 14 Pro, 13 Pro, 12 Pro -->
+    <link rel="apple-touch-startup-image" href="./assets/splash/iphone-14-pro.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)">
+    
+    <!-- iPhone 14, 13, 12 -->
+    <link rel="apple-touch-startup-image" href="./assets/splash/iphone-14.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)">
+    
+    <!-- iPhone 11 Pro Max, XS Max -->
+    <link rel="apple-touch-startup-image" href="./assets/splash/iphone-11-pro-max.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)">
+    
+    <!-- iPhone 11, XR -->
+    <link rel="apple-touch-startup-image" href="./assets/splash/iphone-11.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)">
+    
+    <!-- iPhone 11 Pro, XS, X -->
+    <link rel="apple-touch-startup-image" href="./assets/splash/iphone-11-pro.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+    
+    <!-- iPhone 8 Plus, 7 Plus, 6s Plus, 6 Plus -->
+    <link rel="apple-touch-startup-image" href="./assets/splash/iphone-8-plus.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)">
+    
+    <!-- iPhone 8, 7, 6s, 6 -->
+    <link rel="apple-touch-startup-image" href="./assets/splash/iphone-8.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+    
+    <!-- ===== METADATOS ADICIONALES ===== -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="background-color" content="#ffffff">
+    
+    <!-- SEO -->
+    <meta name="description" content="Plataforma educativa gratuita con juegos interactivos para niños con Trastorno del Espectro Autista (TEA)">
+    <meta name="keywords" content="autismo, TEA, juegos educativos, terapia, niños">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .diagnostic-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .diagnostic-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #4ade80;
+        }
+        
+        .status {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .status.success { color: #4ade80; }
+        .status.warning { color: #fbbf24; }
+        .status.error { color: #f87171; }
+        
+        .install-button {
+            background: linear-gradient(45deg, #4ade80, #22d3ee);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px 10px;
+            box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .install-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 222, 128, 0.6);
+        }
+        
+        .instructions {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .instructions h3 {
+            color: #4ade80;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ol {
+            margin-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        
+        .warning-box {
+            background: rgba(251, 191, 36, 0.2);
+            border: 2px solid #fbbf24;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .success-box {
+            background: rgba(74, 222, 128, 0.2);
+            border: 2px solid #4ade80;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .diagnostic-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .install-button {
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧩 JuegoTEA - Diagnóstico PWA iOS</h1>
+        
+        <div class="diagnostic-section">
+            <h2>📊 Estado de la PWA</h2>
+            
+            <div class="diagnostic-item">
+                <span>Service Worker</span>
+                <span id="sw-status" class="status">Verificando...</span>
+            </div>
+            
+            <div class="diagnostic-item">
+                <span>Manifest</span>
+                <span id="manifest-status" class="status">Verificando...</span>
+            </div>
+            
+            <div class="diagnostic-item">
+                <span>Iconos iOS</span>
+                <span id="icons-status" class="status">Verificando...</span>
+            </div>
+            
+            <div class="diagnostic-item">
+                <span>Es iOS</span>
+                <span id="ios-status" class="status">Verificando...</span>
+            </div>
+            
+            <div class="diagnostic-item">
+                <span>Ya Instalada</span>
+                <span id="installed-status" class="status">Verificando...</span>
+            </div>
+            
+            <div class="diagnostic-item">
+                <span>Soporta Instalación</span>
+                <span id="support-status" class="status">Verificando...</span>
+            </div>
+        </div>
+        
+        <div id="ios-instructions" class="instructions" style="display: none;">
+            <h3>📱 Instrucciones para iOS (iPhone/iPad)</h3>
+            <ol>
+                <li><strong>Abre Safari</strong> (no Chrome ni otros navegadores)</li>
+                <li><strong>Ve a tu sitio web</strong> JuegoTEA</li>
+                <li><strong>Toca el botón "Compartir"</strong> 📤 (parte inferior de la pantalla)</li>
+                <li><strong>Busca "Añadir a pantalla de inicio"</strong> 📱</li>
+                <li><strong>Toca "Añadir"</strong> para confirmar</li>
+                <li><strong>¡Listo!</strong> La app aparecerá en tu pantalla de inicio</li>
+            </ol>
+        </div>
+        
+        <div id="android-instructions" class="instructions" style="display: none;">
+            <h3>🤖 Instrucciones para Android</h3>
+            <ol>
+                <li><strong>Abre Chrome</strong> o tu navegador preferido</li>
+                <li><strong>Ve a tu sitio web</strong> JuegoTEA</li>
+                <li><strong>Toca el menú</strong> (⋮) en la esquina superior derecha</li>
+                <li><strong>Selecciona "Añadir a pantalla de inicio"</strong></li>
+                <li><strong>Toca "Añadir"</strong> para confirmar</li>
+            </ol>
+        </div>
+        
+        <div class="warning-box" id="safari-warning" style="display: none;">
+            <h3>⚠️ Importante para iOS</h3>
+            <p><strong>Safari es obligatorio:</strong> iOS solo permite instalar PWAs desde Safari. Chrome, Firefox y otros navegadores no funcionarán para la instalación.</p>
+        </div>
+        
+        <div class="success-box" id="installed-message" style="display: none;">
+            <h3>✅ ¡PWA ya instalada!</h3>
+            <p>JuegoTEA ya está instalada en este dispositivo. Puedes acceder desde tu pantalla de inicio.</p>
+        </div>
+        
+        <button class="install-button" onclick="promptInstall()" id="install-btn" style="display: none;">
+            📱 Instalar JuegoTEA
+        </button>
+        
+        <button class="install-button" onclick="showInstructions()">
+            📖 Ver Instrucciones Manuales
+        </button>
+        
+        <button class="install-button" onclick="runDiagnostic()">
+            🔄 Actualizar Diagnóstico
+        </button>
+    </div>
+
+    <script>
+        let deferredPrompt = null;
+        
+        // Detectar evento de instalación
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-btn').style.display = 'inline-block';
+            console.log('✅ beforeinstallprompt event fired');
+        });
+        
+        // Detectar cuando se instala
+        window.addEventListener('appinstalled', (e) => {
+            console.log('✅ PWA was installed');
+            document.getElementById('installed-message').style.display = 'block';
+            document.getElementById('install-btn').style.display = 'none';
+        });
+        
+        // Función para intentar instalación automática
+        async function promptInstall() {
+            if (!deferredPrompt) {
+                alert('La instalación automática no está disponible. Por favor, usa las instrucciones manuales.');
+                showInstructions();
+                return;
+            }
+            
+            try {
+                deferredPrompt.prompt();
+                const choiceResult = await deferredPrompt.userChoice;
+                
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                
+                deferredPrompt = null;
+            } catch (error) {
+                console.error('Error during installation:', error);
+                showInstructions();
+            }
+        }
+        
+        // Mostrar instrucciones según el dispositivo
+        function showInstructions() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isAndroid = /Android/.test(navigator.userAgent);
+            
+            if (isIOS) {
+                document.getElementById('ios-instructions').style.display = 'block';
+                document.getElementById('safari-warning').style.display = 'block';
+                document.getElementById('android-instructions').style.display = 'none';
+            } else if (isAndroid) {
+                document.getElementById('android-instructions').style.display = 'block';
+                document.getElementById('ios-instructions').style.display = 'none';
+                document.getElementById('safari-warning').style.display = 'none';
+            } else {
+                document.getElementById('ios-instructions').style.display = 'block';
+                document.getElementById('android-instructions').style.display = 'block';
+            }
+        }
+        
+        // Ejecutar diagnóstico
+        function runDiagnostic() {
+            console.log('🔍 Ejecutando diagnóstico PWA...');
+            
+            // Verificar Service Worker
+            const swSupported = 'serviceWorker' in navigator;
+            updateStatus('sw-status', swSupported ? 'Soportado' : 'No Soportado', swSupported);
+            
+            // Verificar si ya está instalada
+            const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
+                               window.navigator.standalone === true;
+            updateStatus('installed-status', isInstalled ? 'Sí' : 'No', isInstalled);
+            
+            if (isInstalled) {
+                document.getElementById('installed-message').style.display = 'block';
+                document.getElementById('install-btn').style.display = 'none';
+            }
+            
+            // Verificar iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            updateStatus('ios-status', isIOS ? 'Sí' : 'No', true);
+            
+            // Verificar soporte de instalación
+            const installSupported = 'BeforeInstallPromptEvent' in window || isIOS;
+            updateStatus('support-status', installSupported ? 'Sí' : 'Limitado', installSupported);
+            
+            // Verificar manifest
+            checkManifest();
+            
+            // Verificar iconos
+            checkIcons();
+            
+            // Mostrar instrucciones apropiadas
+            if (isIOS) {
+                showInstructions();
+            }
+        }
+        
+        function updateStatus(elementId, text, success) {
+            const element = document.getElementById(elementId);
+            element.textContent = text;
+            element.className = 'status ' + (success ? 'success' : 'error');
+        }
+        
+        async function checkManifest() {
+            try {
+                const response = await fetch('./manifest.json');
+                const manifest = await response.json();
+                
+                const hasRequiredFields = manifest.name && manifest.start_url && manifest.icons;
+                updateStatus('manifest-status', hasRequiredFields ? 'Válido' : 'Incompleto', hasRequiredFields);
+                
+                console.log('📄 Manifest:', manifest);
+            } catch (error) {
+                updateStatus('manifest-status', 'Error', false);
+                console.error('❌ Error cargando manifest:', error);
+            }
+        }
+        
+        function checkIcons() {
+            const requiredIcons = [
+                './assets/icons/icon-180x180.png',
+                './assets/icons/icon-192x192.png',
+                './assets/icons/icon-512x512.png'
+            ];
+            
+            let iconCount = 0;
+            const totalIcons = requiredIcons.length;
+            
+            requiredIcons.forEach(iconPath => {
+                const img = new Image();
+                img.onload = () => {
+                    iconCount++;
+                    if (iconCount === totalIcons) {
+                        updateStatus('icons-status', 'Todos Presentes', true);
+                    }
+                };
+                img.onerror = () => {
+                    updateStatus('icons-status', 'Faltan Iconos', false);
+                    console.error('❌ Icono faltante:', iconPath);
+                };
+                img.src = iconPath;
+            });
+        }
+        
+        // Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(registration => {
+                    console.log('✅ Service Worker registrado:', registration);
+                })
+                .catch(error => {
+                    console.error('❌ Error registrando Service Worker:', error);
+                });
+        }
+        
+        // Ejecutar diagnóstico al cargar
+        document.addEventListener('DOMContentLoaded', runDiagnostic);
+    </script>
+</body>
+</html>

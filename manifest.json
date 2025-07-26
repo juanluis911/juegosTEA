@@ -1,20 +1,159 @@
 ﻿{
-  "name": "JuegoTEA - Herramientas Interactivas para Autismo",
-  "short_name": "JuegoTEA", 
+  "name": "JuegoTEA - Juegos Educativos para Autismo",
+  "short_name": "JuegoTEA",
+  "description": "Plataforma educativa gratuita con juegos interactivos para niños con Trastorno del Espectro Autista (TEA). Basado en evidencia científica.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#667eea",
-  "theme_color": "#4299e1",
+  "orientation": "portrait",
+  "theme_color": "#667eea",
+  "background_color": "#ffffff",
+  "lang": "es",
+  "dir": "ltr",
+  
   "icons": [
     {
-      "src": "/assets/icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "./assets/icons/icon-57x57.png",
+      "sizes": "57x57",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/assets/icons/icon-512x512.png", 
+      "src": "./assets/icons/icon-60x60.png",
+      "sizes": "60x60",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-76x76.png",
+      "sizes": "76x76",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-114x114.png",
+      "sizes": "114x114",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-120x120.png",
+      "sizes": "120x120",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-180x180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/icons/icon-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  
+  "categories": ["education", "kids", "health", "games"],
+  
+  "screenshots": [
+    {
+      "src": "./assets/screenshots/desktop-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Página principal de JuegoTEA"
+    },
+    {
+      "src": "./assets/screenshots/mobile-1.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Juegos en móvil"
+    }
+  ],
+  
+  "shortcuts": [
+    {
+      "name": "Comunicación y Lenguaje",
+      "short_name": "Comunicación",
+      "description": "Juegos para desarrollar habilidades de comunicación",
+      "url": "/categorias/comunicacion-lenguaje.html",
+      "icons": [
+        {
+          "src": "./assets/icons/shortcut-communication.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Habilidades Sociales",
+      "short_name": "Social",
+      "description": "Actividades para mejorar la interacción social",
+      "url": "/categorias/habilidades-sociales.html",
+      "icons": [
+        {
+          "src": "./assets/icons/shortcut-social.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  
+  "prefer_related_applications": false,
+  
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  
+  "protocol_handlers": [
+    {
+      "protocol": "web+juegotea",
+      "url": "/?target=%s"
     }
   ]
 }
