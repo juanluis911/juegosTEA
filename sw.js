@@ -1,4 +1,4 @@
-﻿// 🔧 Service Worker Mejorado para JuegoTEA PWA
+﻿// 🔧 Service Worker para JuegoTEA PWA
 const CACHE_NAME = 'juegotea-v1.0.0';
 const STATIC_CACHE = 'juegotea-static-v1.0.0';
 const DYNAMIC_CACHE = 'juegotea-dynamic-v1.0.0';
@@ -20,6 +20,7 @@ const STATIC_ASSETS = [
   '/js/index.js',
   '/js/categories.js',
   '/js/games.js',
+  '/js/pwa-install.js',
   
   // Páginas principales
   '/categorias/comunicacion-lenguaje.html',
@@ -40,6 +41,7 @@ const EXCLUDE_FROM_CACHE = [
   'mercadopago.com',
   'mercadolibre.com'
 ];
+
 // Recursos que se cachean bajo demanda
 const DYNAMIC_ASSETS = [
   '/categorias/',
@@ -52,7 +54,7 @@ self.addEventListener('install', (event) => {
   console.log('🔧 Service Worker: Installing...');
   
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(STATIC_CACHE)
       .then((cache) => {
         console.log('📦 Service Worker: Caching static assets');
         return cache.addAll(STATIC_ASSETS);
@@ -68,7 +70,6 @@ self.addEventListener('install', (event) => {
 });
 
 // === ACTIVACIÓN ===
-// Activate event
 self.addEventListener('activate', (event) => {
   console.log('🚀 Service Worker: Activating...');
   
@@ -76,7 +77,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME && cacheName !== API_CACHE_NAME) {
+          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
             console.log('🗑️ Service Worker: Deleting old cache', cacheName);
             return caches.delete(cacheName);
           }
@@ -89,7 +90,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event
+// === INTERCEPTACIÓN DE REQUESTS ===
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -97,7 +98,7 @@ self.addEventListener('fetch', (event) => {
   // NO cachear requests POST, PUT, DELETE, PATCH
   if (request.method !== 'GET') {
     console.log(`🚫 Service Worker: Skipping non-GET request: ${request.method} ${url.pathname}`);
-    return; // Dejar que el navegador maneje la request
+    return;
   }
 
   // NO cachear URLs excluidas
@@ -107,7 +108,7 @@ self.addEventListener('fetch', (event) => {
 
   if (shouldExclude) {
     console.log(`🚫 Service Worker: Skipping excluded URL: ${url.pathname}`);
-    return; // Dejar que el navegador maneje la request
+    return;
   }
 
   // Para archivos estáticos: Cache First
@@ -126,155 +127,112 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(cacheFirstWithFallback(request));
 });
 
-
 // === ESTRATEGIAS DE CACHE ===
+
+// Verificar si es un asset estático
+function isStaticAsset(request) {
+  const url = new URL(request.url);
+  const staticExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.svg', '.ico', '.woff', '.woff2'];
+  return staticExtensions.some(ext => url.pathname.endsWith(ext));
+}
 
 // Estrategia Cache First
 async function cacheFirst(request) {
   try {
     const cachedResponse = await caches.match(request);
-    
     if (cachedResponse) {
-      console.log(`💾 Service Worker: Cache hit for ${request.url}`);
+      console.log(`🎯 Cache hit: ${request.url}`);
       return cachedResponse;
     }
 
-    console.log(`🌐 Service Worker: Cache miss, fetching ${request.url}`);
-    const networkResponse = await fetch(request);
-
-    if (networkResponse.ok) {
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-    }
-
-    return networkResponse;
-  } catch (error) {
-    console.error('❌ Service Worker: Cache first failed', error);
-    return new Response('Network error', { status: 503 });
-  }
-}
-
-// Estrategia Network First (solo para GET requests)
-async function networkFirst(request) {
-  try {
-    console.log(`🌐 Service Worker: Network first for ${request.url}`);
-    const networkResponse = await fetch(request);
-
-    if (networkResponse.ok && request.method === 'GET') {
-      const cache = await caches.open(API_CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-    }
-
-    return networkResponse;
-  } catch (error) {
-    console.log(`💾 Service Worker: Network failed, trying cache for ${request.url}`);
-    
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-
-    return new Response('Network and cache failed', { status: 503 });
-  }
-}
-// Estrategia Cache First con fallback
-async function cacheFirstWithFallback(request) {
-  try {
-    const cachedResponse = await caches.match(request);
-    
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-
+    console.log(`🌐 Fetching from network: ${request.url}`);
     const networkResponse = await fetch(request);
     
     if (networkResponse.ok) {
-      const cache = await caches.open(CACHE_NAME);
+      const cache = await caches.open(STATIC_CACHE);
       cache.put(request, networkResponse.clone());
     }
-
+    
     return networkResponse;
   } catch (error) {
-    // Fallback para páginas
-    if (request.destination === 'document') {
-      const fallbackResponse = await caches.match('/index.html');
-      if (fallbackResponse) {
-        return fallbackResponse;
-      }
-    }
-
-    return new Response('Service unavailable', { status: 503 });
-  }
-}
-// Helper: verificar si es un asset estático
-function isStaticAsset(request) {
-  const url = new URL(request.url);
-  const staticExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2'];
-  
-  return staticExtensions.some(ext => url.pathname.endsWith(ext)) || 
-         url.pathname === '/' || 
-         url.pathname.endsWith('.html');
-}
-
-// Network Only - Para APIs
-async function networkOnly(request) {
-  try {
-    return await fetch(request);
-  } catch (error) {
-    return new Response('API no disponible offline', { 
-      status: 503,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Offline', message: 'API no disponible' })
+    console.error(`❌ Cache First failed: ${request.url}`, error);
+    return new Response('Recurso no disponible offline', { 
+      status: 503, 
+      statusText: 'Service Unavailable' 
     });
   }
 }
 
-// Stale While Revalidate - Para otros recursos
-async function staleWhileRevalidate(request) {
-  const cached = await caches.match(request);
-  const fresh = fetch(request).then(response => {
-    const cache = caches.open(DYNAMIC_CACHE);
-    cache.then(c => c.put(request, response.clone()));
-    return response;
-  }).catch(() => cached);
-  
-  return cached || fresh;
-}
-
-// === UTILIDADES ===
-
-function isStaticAsset(pathname) {
-  return pathname.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/);
-}
-
-function isHTMLPage(pathname) {
-  return pathname.endsWith('.html') || pathname.endsWith('/') || !pathname.includes('.');
-}
-
-function isAPICall(pathname) {
-  return pathname.startsWith('/api/') || pathname.includes('/api/');
-}
-
-// === MENSAJES ===
-self.addEventListener('message', function(event) {
-  console.log('📨 Mensaje recibido:', event.data);
-  
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
+// Estrategia Network First
+async function networkFirst(request) {
+  try {
+    console.log(`🌐 Network first: ${request.url}`);
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse.ok) {
+      const cache = await caches.open(DYNAMIC_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    console.log(`📦 Fallback to cache: ${request.url}`);
+    const cachedResponse = await caches.match(request);
+    
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    console.error(`❌ Network First failed: ${request.url}`, error);
+    return new Response('API no disponible offline', { 
+      status: 503, 
+      statusText: 'Service Unavailable' 
+    });
   }
-  
-  if (event.data && event.data.type === 'GET_VERSION') {
-    event.ports[0].postMessage({ version: CACHE_NAME });
+}
+
+// Estrategia Cache First con fallback a offline
+async function cacheFirstWithFallback(request) {
+  try {
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      console.log(`🎯 Cache hit: ${request.url}`);
+      return cachedResponse;
+    }
+
+    console.log(`🌐 Fetching from network: ${request.url}`);
+    const networkResponse = await fetch(request);
+    
+    if (networkResponse.ok) {
+      const cache = await caches.open(DYNAMIC_CACHE);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    console.error(`❌ Request failed: ${request.url}`, error);
+    
+    // Fallback a página offline para navegación
+    if (request.destination === 'document') {
+      const offlineResponse = await caches.match('/offline.html');
+      if (offlineResponse) {
+        return offlineResponse;
+      }
+    }
+    
+    return new Response('Contenido no disponible offline', { 
+      status: 503, 
+      statusText: 'Service Unavailable' 
+    });
   }
-});
+}
 
-// === EVENTOS PWA ===
-
-// Push notifications (para futuras implementaciones)
-self.addEventListener('push', function(event) {
-  console.log('📱 Push notification recibida');
+// === NOTIFICACIONES PUSH ===
+self.addEventListener('push', (event) => {
+  console.log('📬 Push message received');
   
   const options = {
+    title: 'JuegoTEA',
     body: event.data ? event.data.text() : 'Nueva actualización disponible',
     icon: '/assets/icons/icon-192x192.png',
     badge: '/assets/icons/badge-72x72.png',
@@ -302,7 +260,28 @@ self.addEventListener('push', function(event) {
   );
 });
 
-// Background sync (para futuras implementaciones)
+// === CLICKS EN NOTIFICACIONES ===
+self.addEventListener('notificationclick', (event) => {
+  console.log('🔔 Notification click received');
+  
+  event.notification.close();
+  
+  if (event.action === 'explore') {
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  } else if (event.action === 'close') {
+    // Solo cerrar la notificación
+    return;
+  } else {
+    // Click en el cuerpo de la notificación
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  }
+});
+
+// === BACKGROUND SYNC ===
 self.addEventListener('sync', function(event) {
   console.log('🔄 Background sync:', event.tag);
   
@@ -312,11 +291,11 @@ self.addEventListener('sync', function(event) {
 });
 
 async function doBackgroundSync() {
-  // Implementar sincronización en segundo plano
   console.log('🔄 Ejecutando sincronización en segundo plano');
+  // Implementar sincronización si es necesario
 }
 
-// Error handling
+// === MANEJO DE ERRORES ===
 self.addEventListener('error', (event) => {
   console.error('❌ Service Worker error:', event.error);
 });

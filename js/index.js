@@ -58,7 +58,8 @@ function selectCategory(category) {
         cognitive: "Habilidades Cognitivas", 
         sensory: "Integración Sensorial",
         motor: "Habilidades Motoras",
-        emotional: "Regulación Emocional"
+        emotional: "Regulación Emocional",
+        testRapido: "Prueba Rápida de TEA/TDAH/CI"
     };
     
     const categoryName = categoryNames[category];
