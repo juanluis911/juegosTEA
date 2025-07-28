@@ -12,7 +12,7 @@ app.use(helmet());
 // CORS
 app.use(cors({
   origin: [
-    'https://juegotea.onrender.com',
+    'https://juegostea.onrender.com',
     'https://juegotea.com',
     'http://localhost:3000',
     'http://localhost:8080'
