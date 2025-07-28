@@ -1,0 +1,245 @@
+# ===== GITIGNORE PARA FRONTEND JUEGOTEA =====
+
+# === ARCHIVOS DE CONFIGURACIÓN Y CREDENCIALES ===
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+config.local.js
+firebase-config.js
+api-keys.js
+secrets.json
+
+# === DEPENDENCIAS Y LIBRERÍAS ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# === ARCHIVOS DE BUILD Y DISTRIBUCIÓN ===
+dist/
+build/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+out/
+.vuepress/dist/
+
+# === ARCHIVOS TEMPORALES ===
+*.tmp
+*.temp
+*.log
+*.pid
+*.seed
+*.pid.lock
+.tmp/
+temp/
+
+# === ARCHIVOS DE RESPALDO Y VERSIONADO ===
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+*.swp
+*.swo
+*~
+
+# === ARCHIVOS DE EDITOR Y IDE ===
+# VS Code
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/tasks.json
+.history/
+
+# WebStorm/IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+
+# === ARCHIVOS DEL SISTEMA OPERATIVO ===
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# === ARCHIVOS DE DESARROLLO Y TESTING ===
+coverage/
+.coverage
+.nyc_output/
+lib-cov/
+.grunt/
+.eslintcache
+.stylelintcache
+
+# === ARCHIVOS DE FIREBASE (LOCALES) ===
+# Firebase emulators
+.firebase/
+firebase-debug.log*
+firebase-debug.*.log*
+ui-debug.log
+functions/node_modules/
+
+# Firebase cache
+.firebaserc.local
+
+# === SERVICE WORKERS Y PWA ===
+# Service worker cache
+sw.js.map
+workbox-*.js
+workbox-*.js.map
+
+# === ARCHIVOS DE MEDIA Y ASSETS TEMPORALES ===
+# Archivos grandes temporales
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+uploads/temp/
+assets/temp/
+
+# Archivos de Adobe
+*.psd
+*.ai
+*.eps
+*.pdf
+design-files/
+
+# === LOGS Y MONITOREO ===
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# === ARCHIVOS ESPECÍFICOS DE JUEGOTEA ===
+# Datos de prueba
+test-data/
+mock-data/
+fixtures/
+
+# Archivos de configuración local del proyecto
+juegotea-config.local.js
+local-settings.json
+
+# Archivos de Firebase descargados (contienen credenciales)
+*firebase-adminsdk*.json
+service-account-key.json
+
+# Archivos de MercadoPago
+mercadopago-credentials.json
+
+# === ARCHIVOS DE DEPLOYMENT ===
+# Archivos específicos de Render
+render-build/
+.render/
+
+# Archivos específicos de Netlify
+.netlify/
+netlify.toml.backup
+
+# Archivos específicos de Vercel
+.vercel/
+
+# === CARPETAS DE DOCUMENTACIÓN TEMPORAL ===
+docs/temp/
+documentation/drafts/
+
+# === ARCHIVOS DE HERRAMIENTAS DE DESARROLLO ===
+# Storybook
+storybook-static/
+.storybook/
+stories/
+
+# Jest
+coverage/
+.nyc_output/
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+
+# === ARCHIVOS DE USUARIO Y PERSONALIZACIONES ===
+# Configuraciones personales
+.personal/
+user-settings/
+custom-config/
+
+# === COMENTARIOS Y NOTAS ===
+# Archivos de notas personales
+TODO.md
+NOTES.md
+ideas.txt
+*.draft
+
+# === ARCHIVOS SENSIBLES ESPECÍFICOS DEL PROYECTO ===
+# Cualquier archivo que contenga "secret", "key", "password", "token"
+*secret*
+*password*
+*credentials*
+api-keys/
+tokens/
+
+# === EXCEPCIONES (ARCHIVOS QUE SÍ QUEREMOS INCLUIR) ===
+# Archivos importantes que NO deben ser ignorados
+!.gitkeep
+!.github/
+!assets/icons/
+!assets/images/
+!css/
+!js/
+!games/
+!categorias/
+
+# === FINAL DEL ARCHIVO ===
+# Línea en blanco al final (buena práctica)

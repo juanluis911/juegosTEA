@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error en el Pago - JuegoTEA</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        .failure-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #fed7d7 0%, #fff5f5 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .failure-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        .failure-title {
+            color: #c53030;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        .failure-message {
+            color: #4a5568;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .btn-retry {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-retry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        .btn-home {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn-home:hover {
+            background: #cbd5e0;
+        }
+        .support-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #4299e1;
+        }
+    </style>
+</head>
+<body>
+    <div class="failure-container">
+        <div class="failure-icon">😔</div>
+        <h1 class="failure-title">Error en el Pago</h1>
+        <p class="failure-message">
+            Lo sentimos, hubo un problema procesando tu pago. 
+            Esto puede suceder por varios motivos como problemas con la tarjeta, 
+            fondos insuficientes, o un error temporal del sistema.
+        </p>
+        
+        <div class="support-info">
+            <h3 style="color: #4299e1; margin-top: 0;">💡 ¿Qué puedes hacer?</h3>
+            <ul style="text-align: left; color: #4a5568;">
+                <li>✅ Verificar los datos de tu tarjeta</li>
+                <li>💳 Intentar con otra tarjeta</li>
+                <li>🔄 Esperar unos minutos y volver a intentar</li>
+                <li>💬 Contactar soporte si el problema persiste</li>
+            </ul>
+        </div>
+
+        <div style="margin: 30px 0;">
+            <a href="#" class="btn-retry" onclick="retrySubscription()">
+                🔄 Intentar de Nuevo
+            </a>
+            <a href="../index.html" class="btn-home">
+                🏠 Volver al Inicio
+            </a>
+        </div>
+
+        <p style="font-size: 14px; color: #718096;">
+            Si necesitas ayuda, contáctanos en: 
+            <a href="mailto:soporte@juegotea.com" style="color: #4299e1;">soporte@juegotea.com</a>
+        </p>
+    </div>
+
+    <script>
+        function retrySubscription() {
+            // Recuperar datos de la suscripción pendiente
+            const pendingData = localStorage.getItem('pendingSubscription');
+            
+            if (pendingData) {
+                // Redirigir de vuelta al inicio para reintentar
+                window.location.href = '../index.html?retry=true';
+            } else {
+                // Si no hay datos, mostrar modal de suscripción
+                window.location.href = '../index.html';
+            }
+        }
+
+        // Trackear error de pago
+        console.log('❌ Error en el proceso de pago');
+    </script>
+</body>
+</html>

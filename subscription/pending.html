@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Pendiente - JuegoTEA</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <style>
+        .pending-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #fef5e7 0%, #fffbf0 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .pending-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .pending-title {
+            color: #d69e2e;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        .pending-message {
+            color: #4a5568;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .btn-home {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        .info-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #ed8936;
+        }
+    </style>
+</head>
+<body>
+    <div class="pending-container">
+        <div class="pending-icon">⏳</div>
+        <h1 class="pending-title">Pago Pendiente</h1>
+        <p class="pending-message">
+            Tu pago está siendo procesado. Esto puede tomar unos minutos. 
+            Te notificaremos por email cuando se confirme tu suscripción.
+        </p>
+        
+        <div class="info-box">
+            <h3 style="color: #ed8936; margin-top: 0;">📋 ¿Qué sigue?</h3>
+            <ul style="text-align: left; color: #4a5568;">
+                <li>📧 Recibirás un email de confirmación</li>
+                <li>⏰ El proceso puede tomar hasta 24 horas</li>
+                <li>🔓 Tu acceso se activará automáticamente</li>
+                <li>💬 Te contactaremos si hay algún problema</li>
+            </ul>
+        </div>
+
+        <div style="margin: 30px 0;">
+            <a href="../index.html" class="btn-home">
+                🏠 Volver al Inicio
+            </a>
+        </div>
+
+        <p style="font-size: 14px; color: #718096;">
+            ¿Tienes preguntas? Escríbenos a: 
+            <a href="mailto:soporte@juegotea.com" style="color: #ed8936;">soporte@juegotea.com</a>
+        </p>
+    </div>
+
+    <script>
+        console.log('⏳ Pago pendiente de procesamiento');
+        
+        // Opcional: polling para verificar estado del pago
+        // cada 30 segundos durante los primeros 5 minutos
+        let checkCount = 0;
+        const maxChecks = 10;
+        
+        const checkPaymentStatus = setInterval(() => {
+            checkCount++;
+            console.log(`Verificando estado del pago... (${checkCount}/${maxChecks})`);
+            
+            // Aquí podrías hacer una petición al backend para verificar
+            // el estado del pago y redirigir automáticamente si se confirma
+            
+            if (checkCount >= maxChecks) {
+                clearInterval(checkPaymentStatus);
+                console.log('Fin de verificaciones automáticas');
+            }
+        }, 30000); // 30 segundos
+    </script>
+</body>
+</html>

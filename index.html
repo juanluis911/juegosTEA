@@ -11,6 +11,10 @@
     <!-- CSS -->
     <link rel="stylesheet" href="./css/main.css">
     <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="./css/subscription.css">
+
+
+
     
     <!-- Meta tags para SEO y PWA -->
     <meta name="description" content="Plataforma educativa gratuita con juegos interactivos para niños con Trastorno del Espectro Autista (TEA). Basado en evidencia científica.">
@@ -193,8 +197,14 @@
             <button class="cta-button" onclick="scrollToCategories()">
                 🎮 Comenzar a Jugar
             </button>
-            <br><br><a href="https://gofund.me/d303a3e1" class="cta-button" target="_blank" rel="noopener noreferrer">
-                    ❤️ Donar Mejora el Proyecto</a>
+            <br><br>
+            <div class="premium-cta">
+                <h3>¿Quieres acceso completo?</h3>
+                <p>Desbloquea todos los juegos y funcionalidades premium</p>
+                <button class="btn-premium" onclick="showSubscriptionModal()">
+                    ✨ Suscribirse a Premium - $9.99/mes
+                </button>
+            </div>
             <br><br><button id="installButton" style="display: none;">📲 Instalar App</button>
         </div>
     </section>
@@ -471,6 +481,6 @@
             document.getElementById('installButton').style.display = 'none';
         });
     </script>
-
+    <script src="./js/subscription.js"></script>
 </body>
 </html>
