@@ -22,7 +22,7 @@ app.use(helmet());
 app.use(cors({
   origin: [
     'https://juegostea.onrender.com',
-    'https://juegotea.com',
+    'https://juegostea.com',
     'http://localhost:3000',
     'http://localhost:8080'
   ],
@@ -208,7 +208,9 @@ app.post('/api/subscription/create', async (req, res) => {
         description: 'Acceso completo a todos los juegos y funcionalidades premium'
       }
     };
-
+    console.log('📦 Creando suscripción para el plan:', plan);
+    console.log('📧 Usuario:', userEmail, userName);
+    console.log('💰 Plan seleccionado:', plans[plan]);
     const selectedPlan = plans[plan];
     if (!selectedPlan) {
       return res.status(400).json({
