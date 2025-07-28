@@ -129,7 +129,7 @@ class SubscriptionManager {
       this.updateButtonLoading(true);
 
       const response = await fetch(`${this.apiUrl}/subscription/create`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },

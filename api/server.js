@@ -5,7 +5,16 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const { MercadoPagoConfig, Preference } = require('mercadopago');
 
+// Configurar MercadoPago
+let mercadopago = null;
+if (process.env.MERCADOPAGO_ACCESS_TOKEN) {
+  mercadopago = new MercadoPagoConfig({
+    accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
+  });
+  console.log('💳 MercadoPago configurado en modo:', process.env.MERCADOPAGO_ENVIRONMENT || 'sandbox');
+}
 // Middleware de seguridad
 app.use(helmet());
 
@@ -155,24 +164,6 @@ app.post('/test-mercadopago', async (req, res) => {
   }
 });
 
-// === WEBHOOK BÁSICO ===
-
-// Basic webhook endpoint
-app.post('/api/subscription/webhook', (req, res) => {
-  console.log('📦 Webhook recibido:', req.body);
-  res.status(200).json({ received: true, timestamp: new Date().toISOString() });
-});
-
-// Test webhook
-app.post('/test-webhook', (req, res) => {
-  console.log('🧪 Test webhook:', req.body);
-  res.json({ 
-    success: true, 
-    message: 'Webhook de prueba recibido',
-    timestamp: new Date().toISOString(),
-    body: req.body
-  });
-});
 
 // === ERROR HANDLING ===
 
@@ -196,6 +187,151 @@ app.use('*', (req, res) => {
   });
 });
 
+// Crear suscripción premium
+app.put('/api/subscription/create', async (req, res) => {
+  try {
+    if (!mercadopago) {
+      return res.status(500).json({
+        success: false,
+        error: 'MercadoPago no está configurado'
+      });
+    }
+
+    const { plan = 'premium', userEmail, userName } = req.body;
+
+    // Definir planes disponibles
+    const plans = {
+      premium: {
+        title: 'JuegoTEA Premium',
+        price: 4.99,
+        currency: 'USD',
+        description: 'Acceso completo a todos los juegos y funcionalidades premium'
+      }
+    };
+
+    const selectedPlan = plans[plan];
+    if (!selectedPlan) {
+      return res.status(400).json({
+        success: false,
+        error: 'Plan no válido'
+      });
+    }
+
+    console.log('💳 Creando preferencia de pago para:', { plan, userEmail, userName });
+
+    const preference = new Preference(mercadopago);
+    
+    const preferenceData = {
+      items: [{
+        id: `juegotea-${plan}`,
+        title: selectedPlan.title,
+        description: selectedPlan.description,
+        unit_price: selectedPlan.price,
+        quantity: 1,
+        currency_id: selectedPlan.currency
+      }],
+      payer: {
+        email: userEmail || 'test@example.com',
+        name: userName || 'Usuario JuegoTEA'
+      },
+      back_urls: {
+        success: `${process.env.FRONTEND_URL}/subscription/success`,
+        failure: `${process.env.FRONTEND_URL}/subscription/failure`,
+        pending: `${process.env.FRONTEND_URL}/subscription/pending`
+      },
+      notification_url: `${process.env.API_URL}/api/subscription/webhook`,
+      external_reference: `user-${Date.now()}`, // Cambiar por user ID real cuando tengas auth
+      metadata: {
+        plan: plan,
+        created_at: new Date().toISOString(),
+        environment: process.env.MERCADOPAGO_ENVIRONMENT || 'sandbox'
+      },
+      auto_return: 'approved'
+    };
+
+    const response = await preference.create({ body: preferenceData });
+
+    console.log('✅ Preferencia creada:', response.id);
+
+    // Guardar referencia del pago pendiente (opcional, para tracking)
+    if (firebaseInitialized) {
+      try {
+        await db.collection('pending_payments').doc(response.id).set({
+          plan: plan,
+          preferenceId: response.id,
+          status: 'pending',
+          createdAt: new Date(),
+          amount: selectedPlan.price,
+          userEmail: userEmail,
+          userName: userName
+        });
+      } catch (dbError) {
+        console.error('Error guardando en Firebase:', dbError.message);
+        // No fallar la request por esto
+      }
+    }
+
+    res.json({
+      success: true,
+      preference_id: response.id,
+      init_point: response.init_point,
+      sandbox_init_point: response.sandbox_init_point,
+      plan: selectedPlan,
+      environment: process.env.MERCADOPAGO_ENVIRONMENT || 'sandbox'
+    });
+
+  } catch (error) {
+    console.error('❌ Error creando suscripción:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error creando suscripción',
+      message: error.message
+    });
+  }
+});
+
+// Webhook mejorado para procesar pagos
+app.post('/api/subscription/webhook', async (req, res) => {
+  try {
+    console.log('📦 Webhook recibido de MercadoPago:', JSON.stringify(req.body, null, 2));
+    
+    const { type, data, action } = req.body;
+
+    // Responder rápidamente a MercadoPago (importante)
+    res.status(200).json({ received: true });
+
+    // Procesar la notificación de forma asíncrona
+    if (type === 'payment') {
+      console.log('💳 Procesando notificación de pago:', data.id);
+      
+      // Aquí implementarías la lógica para:
+      // 1. Obtener detalles del pago con data.id
+      // 2. Verificar el estado del pago
+      // 3. Activar suscripción del usuario
+      // 4. Enviar email de confirmación
+      
+      // Por ahora solo guardamos el evento
+      if (firebaseInitialized) {
+        try {
+          await db.collection('webhook_events').add({
+            type: type,
+            paymentId: data.id,
+            action: action,
+            receivedAt: new Date(),
+            processed: false
+          });
+          console.log('✅ Evento de webhook guardado en Firebase');
+        } catch (dbError) {
+          console.error('Error guardando webhook:', dbError.message);
+        }
+      }
+    }
+
+  } catch (error) {
+    console.error('❌ Error procesando webhook:', error);
+    res.status(500).json({ error: 'Error interno' });
+  }
+});
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
