@@ -93,7 +93,7 @@ class SubscriptionManager {
 
       // URL directa como fallback
       const apiUrl = 'https://api-juegostea.onrender.com';
-      const endpoint = `${apiUrl}/api/subscription/create`;
+      const endpoint = `${apiUrl}/subscription/create`;
       
       console.log('📤 Fallback: Enviando request a:', endpoint);
 

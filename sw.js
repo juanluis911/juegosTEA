@@ -35,7 +35,7 @@ const STATIC_ASSETS = [
 
 // URLs que NO deben ser cacheadas
 const EXCLUDE_FROM_CACHE = [
-  '/api/',
+  /*'/api/',*/
   '/subscription/create',
   '/webhook',
   'mercadopago.com',

@@ -53,9 +53,9 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/health',
       subscription: {
-        create: 'POST /api/subscription/create',
-        status: 'GET /api/subscription/status',
-        webhook: 'POST /api/subscription/webhook'
+        create: 'POST /subscription/create',
+        status: 'GET /subscription/status',
+        webhook: 'POST /subscription/webhook'
       }
     }
   });
@@ -74,9 +74,9 @@ app.get('/health', (req, res) => {
 // === RUTAS DE SUSCRIPCIÓN ===
 
 // ✅ CREAR SUSCRIPCIÓN - Cambiar a POST para coincidir con el frontend
-app.post('/api/subscription/create', async (req, res) => {
+app.post('/subscription/create', async (req, res) => {
   try {
-    console.log('📥 Request recibido en /api/subscription/create');
+    console.log('📥 Request recibido en /subscription/create');
     console.log('📋 Body:', req.body);
     console.log('📋 Headers:', req.headers);
 
@@ -137,7 +137,7 @@ app.post('/api/subscription/create', async (req, res) => {
         failure: `https://juegostea.onrender.com/subscription/failure`,
         pending: `https://juegostea.onrender.com/subscription/pending`
       },
-      notification_url: `https://api-juegostea.onrender.com/api/subscription/webhook`,
+      notification_url: `https://api-juegostea.onrender.com/subscription/webhook`,
       external_reference: `user-${Date.now()}`,
       metadata: {
         plan: plan,
@@ -171,7 +171,7 @@ app.post('/api/subscription/create', async (req, res) => {
 });
 
 // WEBHOOK de MercadoPago
-app.post('/api/subscription/webhook', async (req, res) => {
+app.post('/subscription/webhook', async (req, res) => {
   try {
     console.log('🔔 Webhook recibido:', req.body);
     
@@ -191,7 +191,7 @@ app.post('/api/subscription/webhook', async (req, res) => {
 });
 
 // Estado de suscripción
-app.get('/api/subscription/status', (req, res) => {
+app.get('/subscription/status', (req, res) => {
   res.json({
     success: true,
     status: 'free', // Cambiar por lógica real
@@ -226,9 +226,9 @@ app.use('*', (req, res) => {
     availableEndpoints: [
       'GET /',
       'GET /health',
-      'POST /api/subscription/create',
-      'GET /api/subscription/status',
-      'POST /api/subscription/webhook'
+      'POST /subscription/create',
+      'GET /subscription/status',
+      'POST /subscription/webhook'
     ]
   });
 });
@@ -240,7 +240,7 @@ app.listen(PORT, () => {
   console.log(`🎯 Endpoints disponibles:`);
   console.log(`   GET  /`);
   console.log(`   GET  /health`);
-  console.log(`   POST /api/subscription/create`);
-  console.log(`   GET  /api/subscription/status`);
-  console.log(`   POST /api/subscription/webhook`);
+  console.log(`   POST /subscription/create`);
+  console.log(`   GET  /subscription/status`);
+  console.log(`   POST /subscription/webhook`);
 });
