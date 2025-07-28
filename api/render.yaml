@@ -1,0 +1,37 @@
+services:
+  # Backend API Service
+  - type: web
+    name: juegotea-api
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    plan: starter  # o el plan que prefieras
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: API_URL
+        sync: false  # Se configurará manualmente
+      - key: FRONTEND_URL
+        sync: false  # Se configurará manualmente
+      - key: FIREBASE_PROJECT_ID
+        sync: false  # Configurar en dashboard
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false  # Configurar en dashboard
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false  # Configurar en dashboard
+      - key: MERCADOPAGO_ACCESS_TOKEN
+        sync: false  # Configurar en dashboard
+      - key: MERCADOPAGO_PUBLIC_KEY
+        sync: false  # Configurar en dashboard
+
+  # Frontend Static Site (tu sitio actual)
+  - type: static_site
+    name: juegotea-frontend
+    buildCommand: echo "No build needed"
+    staticPublishPath: .
+    pullRequestPreviewsEnabled: false
+    envVars:
+      - key: API_URL
+        value: https://juegotea-api.onrender.com
