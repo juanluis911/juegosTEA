@@ -1,12 +1,122 @@
-// js/subscription.js - Sistema de suscripciones frontend
+// js/subscription.js - URL corregida
 
 class SubscriptionManager {
   constructor() {
+    // 🔧 CORREGIR: URL sin doble slash y con el nombre correcto
     this.apiUrl = 'https://api-juegostea.onrender.com'; // Cambiar por tu URL real
     this.loading = false;
+    
+    // Detectar si estamos en desarrollo local
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      this.apiUrl = 'http://localhost:3000/api';
+      console.log('🔧 Modo desarrollo: usando API local');
+    }
+    
+    console.log('🌐 API URL configurada:', this.apiUrl);
   }
 
-  // Mostrar modal de suscripción
+  // Crear suscripción con mejor manejo de errores
+  async createSubscription() {
+    if (this.loading) return;
+
+    const userEmail = document.getElementById('userEmail')?.value.trim();
+    const userName = document.getElementById('userName')?.value.trim();
+
+    // Validaciones
+    if (!userEmail || !userName) {
+      this.showError('Por favor completa todos los campos');
+      return;
+    }
+
+    if (!this.isValidEmail(userEmail)) {
+      this.showError('Por favor ingresa un email válido');
+      return;
+    }
+
+    try {
+      this.loading = true;
+      this.updateButtonLoading(true);
+
+      console.log('📤 Enviando request a:', `${this.apiUrl}/subscription/create`);
+
+      const response = await fetch(`${this.apiUrl}/subscription/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          plan: 'premium',
+          userEmail: userEmail,
+          userName: userName
+        })
+      });
+
+      console.log('📥 Response status:', response.status);
+      console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
+
+      if (!response.ok) {
+        let errorMessage = `Error ${response.status}: ${response.statusText}`;
+        
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } catch (parseError) {
+          console.error('Error parsing error response:', parseError);
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      console.log('✅ Subscription response:', data);
+
+      if (data.success) {
+        // Redirigir a MercadoPago
+        const checkoutUrl = data.environment === 'sandbox' ? 
+          data.sandbox_init_point : 
+          data.init_point;
+        
+        if (checkoutUrl) {
+          // Guardar datos para después del pago
+          localStorage.setItem('pendingSubscription', JSON.stringify({
+            preferenceId: data.preference_id,
+            email: userEmail,
+            name: userName,
+            plan: data.plan,
+            timestamp: new Date().toISOString()
+          }));
+
+          console.log('🔄 Redirigiendo a:', checkoutUrl);
+          window.location.href = checkoutUrl;
+        } else {
+          throw new Error('No se recibió URL de checkout');
+        }
+      } else {
+        throw new Error(data.error || 'Error desconocido');
+      }
+
+    } catch (error) {
+      console.error('❌ Error en suscripción:', error);
+      
+      // Mensajes de error más específicos
+      let userMessage = error.message;
+      
+      if (error.message.includes('404')) {
+        userMessage = 'Servicio no disponible. Verifica que el backend esté funcionando.';
+      } else if (error.message.includes('Failed to fetch')) {
+        userMessage = 'Error de conexión. Verifica tu conexión a internet.';
+      } else if (error.message.includes('CORS')) {
+        userMessage = 'Error de configuración. Contacta soporte.';
+      }
+      
+      this.showError(userMessage);
+    } finally {
+      this.loading = false;
+      this.updateButtonLoading(false);
+    }
+  }
+
+  // Resto de métodos permanecen igual...
   showSubscriptionModal() {
     const existingModal = document.querySelector('.subscription-modal-overlay');
     if (existingModal) {
@@ -84,10 +194,8 @@ class SubscriptionManager {
 
     document.body.appendChild(modal);
 
-    // Cerrar modal con Escape
+    // Event listeners
     document.addEventListener('keydown', this.handleEscapeKey);
-
-    // Cerrar modal clickeando fuera
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
         modal.remove();
@@ -106,83 +214,6 @@ class SubscriptionManager {
     }
   }
 
-  // Crear suscripción
-  async createSubscription() {
-    if (this.loading) return;
-
-    const userEmail = document.getElementById('userEmail')?.value.trim();
-    const userName = document.getElementById('userName')?.value.trim();
-
-    // Validaciones
-    if (!userEmail || !userName) {
-      this.showError('Por favor completa todos los campos');
-      return;
-    }
-
-    if (!this.isValidEmail(userEmail)) {
-      this.showError('Por favor ingresa un email válido');
-      return;
-    }
-
-    try {
-      this.loading = true;
-      this.updateButtonLoading(true);
-
-      const response = await fetch(`${this.apiUrl}/subscription/create`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          plan: 'premium',
-          userEmail: userEmail,
-          userName: userName
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Error creando suscripción');
-      }
-
-      if (data.success) {
-        console.log('✅ Preferencia creada:', data);
-        
-        // Redirigir a MercadoPago
-        const checkoutUrl = data.environment === 'sandbox' ? 
-          data.sandbox_init_point : 
-          data.init_point;
-        
-        if (checkoutUrl) {
-          // Guardar datos en localStorage para después del pago
-          localStorage.setItem('pendingSubscription', JSON.stringify({
-            preferenceId: data.preference_id,
-            email: userEmail,
-            name: userName,
-            plan: data.plan,
-            timestamp: new Date().toISOString()
-          }));
-
-          // Redirigir a MercadoPago
-          window.location.href = checkoutUrl;
-        } else {
-          throw new Error('No se recibió URL de checkout');
-        }
-      } else {
-        throw new Error(data.error || 'Error desconocido');
-      }
-
-    } catch (error) {
-      console.error('Error en suscripción:', error);
-      this.showError(error.message || 'Error procesando la suscripción');
-    } finally {
-      this.loading = false;
-      this.updateButtonLoading(false);
-    }
-  }
-
-  // Helpers
   updateButtonLoading(loading) {
     const btn = document.querySelector('.btn-subscribe');
     const text = btn?.querySelector('.btn-text');
@@ -209,7 +240,6 @@ class SubscriptionManager {
   }
 
   showError(message) {
-    // Remover errores previos
     const existingError = document.querySelector('.subscription-error');
     if (existingError) {
       existingError.remove();
@@ -232,7 +262,6 @@ class SubscriptionManager {
       document.body.appendChild(errorDiv);
     }
 
-    // Auto-remover después de 5 segundos
     setTimeout(() => {
       if (document.body.contains(errorDiv)) {
         errorDiv.remove();
@@ -244,6 +273,6 @@ class SubscriptionManager {
 // Instancia global
 const subscriptionManager = new SubscriptionManager();
 
-// Funciones globales para compatibilidad
+// Funciones globales
 window.showSubscriptionModal = () => subscriptionManager.showSubscriptionModal();
 window.subscriptionManager = subscriptionManager;
