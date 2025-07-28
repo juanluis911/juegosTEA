@@ -188,7 +188,7 @@ app.use('*', (req, res) => {
 });
 
 // Crear suscripción premium
-app.put('/api/subscription/create', async (req, res) => {
+app.post('/api/subscription/create', async (req, res) => {
   try {
     if (!mercadopago) {
       return res.status(500).json({
