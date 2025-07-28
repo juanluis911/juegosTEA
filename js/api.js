@@ -35,8 +35,11 @@ class APIClient {
   async makeRequest(endpoint, options = {}) {
     try {
       // 🔧 CORREGIR: Construir URL correctamente sin dobles barras
+      console.log(`🔗 Haciendo request a: ${this.baseURL}${endpoint}`);
       const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
       const url = `${this.baseURL}/api${cleanEndpoint}`;
+
+      console.log(`🔗 URL completa: ${url}`);
       
       const config = {
         headers: this.getHeaders(),
