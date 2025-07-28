@@ -2,15 +2,15 @@
 
 class APIClient {
   constructor() {
-    // 🔧 URL CORREGIDA: debe coincidir exactamente con tu dominio de Render
-    this.baseURL = 'https://api-juegostea.onrender.com/api';
+    // 🔧 URL CORREGIDA: SIN /api al final para evitar doble barra
+    this.baseURL = 'https://api-juegostea.onrender.com';
     this.token = localStorage.getItem('authToken');
     
     // Detectar si estamos en desarrollo local
     if (window.location.hostname === 'localhost' || 
         window.location.hostname === '127.0.0.1' ||
         window.location.port === '5500') {
-      this.baseURL = 'http://localhost:3000/api';
+      this.baseURL = 'http://localhost:3000';
       console.log('🔧 Modo desarrollo: usando API local');
     }
     
@@ -34,7 +34,10 @@ class APIClient {
   // Método genérico para hacer requests con mejor manejo de errores
   async makeRequest(endpoint, options = {}) {
     try {
-      const url = `${this.baseURL}${endpoint}`;
+      // 🔧 CORREGIR: Construir URL correctamente sin dobles barras
+      const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+      const url = `${this.baseURL}/api${cleanEndpoint}`;
+      
       const config = {
         headers: this.getHeaders(),
         ...options
@@ -174,7 +177,7 @@ class APIClient {
   // Verificar conectividad con el servidor
   async ping() {
     try {
-      const response = await fetch(`${this.baseURL.replace('/api', '')}/health`);
+      const response = await fetch(`${this.baseURL}/health`);
       return response.ok;
     } catch (error) {
       console.error('❌ Ping failed:', error);
@@ -185,7 +188,7 @@ class APIClient {
   // Obtener información del servidor
   async getServerInfo() {
     try {
-      const response = await fetch(`${this.baseURL.replace('/api', '')}/`);
+      const response = await fetch(`${this.baseURL}/`);
       if (response.ok) {
         return await response.json();
       }
