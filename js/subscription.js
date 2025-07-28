@@ -1,23 +1,15 @@
-// js/subscription.js - Cliente de suscripciones corregido
+// js/subscription.js - Integrado con APIClient corregido
 
 class SubscriptionManager {
   constructor() {
-    // 🔧 URL CORREGIDA - Debe coincidir con tu dominio de API en Render
-    this.apiUrl = 'https://api-juegostea.onrender.com';
+    // Usar el APIClient en lugar de URLs directas
+    this.apiClient = window.apiClient || new APIClient();
     this.loading = false;
     
-    // Detectar si estamos en desarrollo local
-    if (window.location.hostname === 'localhost' || 
-        window.location.hostname === '127.0.0.1' ||
-        window.location.port === '5500') {
-      this.apiUrl = 'http://localhost:3000';
-      console.log('🔧 Modo desarrollo: usando API local');
-    }
-    
-    console.log('🌐 API URL configurada:', this.apiUrl);
+    console.log('🌐 SubscriptionManager usando APIClient');
   }
 
-  // Crear suscripción con mejor manejo de errores
+  // Crear suscripción usando APIClient
   async createSubscription() {
     if (this.loading) {
       console.warn('⚠️ Ya hay una petición en proceso');
@@ -42,53 +34,18 @@ class SubscriptionManager {
       this.loading = true;
       this.updateButtonLoading(true);
 
-      const endpoint = `${this.apiUrl}/api/subscription/create`;
-      console.log('📤 Enviando request a:', endpoint);
+      console.log('📤 Creando suscripción para:', { userEmail, userName });
 
-      const requestData = {
-        plan: 'premium',
-        userEmail: userEmail,
-        userName: userName
-      };
+      // Usar el APIClient en lugar de fetch directo
+      const response = await this.apiClient.createSubscription(userEmail, userName, 'premium');
 
-      console.log('📋 Datos a enviar:', requestData);
+      console.log('✅ Subscription response:', response);
 
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(requestData)
-      });
-
-      console.log('📥 Response status:', response.status);
-      console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
-
-      // Manejar diferentes tipos de respuesta
-      let data;
-      const contentType = response.headers.get('content-type');
-      
-      if (contentType && contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        const textResponse = await response.text();
-        console.error('❌ Respuesta no JSON:', textResponse);
-        throw new Error('El servidor no devolvió una respuesta JSON válida');
-      }
-
-      if (!response.ok) {
-        const errorMessage = data.error || data.message || `Error ${response.status}: ${response.statusText}`;
-        throw new Error(errorMessage);
-      }
-
-      console.log('✅ Subscription response:', data);
-
-      if (data.success && (data.init_point || data.sandbox_init_point)) {
+      if (response.success && (response.init_point || response.sandbox_init_point)) {
         // Determinar qué URL usar según el ambiente
-        const checkoutUrl = data.environment === 'sandbox' ? 
-          data.sandbox_init_point : 
-          data.init_point;
+        const checkoutUrl = response.environment === 'sandbox' ? 
+          response.sandbox_init_point : 
+          response.init_point;
 
         console.log('🔗 Redirigiendo a checkout:', checkoutUrl);
         
@@ -101,20 +58,89 @@ class SubscriptionManager {
         }, 1500);
         
       } else {
-        throw new Error(data.message || 'No se pudo crear la preferencia de pago');
+        throw new Error(response.message || 'No se pudo crear la preferencia de pago');
       }
 
     } catch (error) {
       console.error('❌ Error creando suscripción:', error);
+      this.showError(error.message || 'Error al procesar la suscripción');
+    } finally {
+      this.loading = false;
+      this.updateButtonLoading(false);
+    }
+  }
+
+  // Método alternativo usando fetch directo (fallback)
+  async createSubscriptionFallback() {
+    if (this.loading) return;
+
+    const userEmail = document.getElementById('userEmail')?.value.trim();
+    const userName = document.getElementById('userName')?.value.trim();
+
+    if (!userEmail || !userName) {
+      this.showError('Por favor completa todos los campos');
+      return;
+    }
+
+    if (!this.isValidEmail(userEmail)) {
+      this.showError('Por favor ingresa un email válido');
+      return;
+    }
+
+    try {
+      this.loading = true;
+      this.updateButtonLoading(true);
+
+      // URL directa como fallback
+      const apiUrl = 'https://api-juegostea.onrender.com';
+      const endpoint = `${apiUrl}/api/subscription/create`;
       
-      // Mostrar errores específicos según el tipo
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        this.showError('Error de conexión. Verifica tu conexión a internet.');
-      } else if (error.message.includes('CORS')) {
-        this.showError('Error de configuración del servidor. Intenta más tarde.');
-      } else {
-        this.showError(error.message || 'Error al procesar la suscripción');
+      console.log('📤 Fallback: Enviando request a:', endpoint);
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          plan: 'premium',
+          userEmail: userEmail,
+          userName: userName
+        })
+      });
+
+      if (!response.ok) {
+        let errorMessage = `Error ${response.status}: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } catch (e) {
+          console.error('Error parsing error response:', e);
+        }
+        throw new Error(errorMessage);
       }
+
+      const data = await response.json();
+      console.log('✅ Fallback response:', data);
+
+      if (data.success && (data.init_point || data.sandbox_init_point)) {
+        const checkoutUrl = data.environment === 'sandbox' ? 
+          data.sandbox_init_point : 
+          data.init_point;
+
+        this.showSuccess('¡Suscripción creada! Redirigiendo al checkout...');
+        
+        setTimeout(() => {
+          window.location.href = checkoutUrl;
+        }, 1500);
+      } else {
+        throw new Error(data.message || 'No se pudo crear la preferencia de pago');
+      }
+
+    } catch (error) {
+      console.error('❌ Error en fallback:', error);
+      this.showError(error.message || 'Error al procesar la suscripción');
     } finally {
       this.loading = false;
       this.updateButtonLoading(false);
@@ -177,7 +203,10 @@ class SubscriptionManager {
     `;
 
     // Insertar en la página
-    const form = document.querySelector('.subscription-form') || document.querySelector('.premium-section');
+    const form = document.querySelector('.subscription-form') || 
+                 document.querySelector('.premium-section') ||
+                 document.querySelector('main');
+                 
     if (form) {
       form.appendChild(messageDiv);
       
@@ -191,59 +220,80 @@ class SubscriptionManager {
       }
     }
 
-    // También usar notificaciones del navegador si están disponibles
-    if (Notification.permission === 'granted') {
-      new Notification('JuegoTEA', {
-        body: message,
-        icon: '/favicon.ico'
-      });
-    }
+    // También mostrar en consola
+    const logMethod = type === 'error' ? console.error : console.log;
+    logMethod(`${type.toUpperCase()}: ${message}`);
   }
 
-  // Verificar estado de suscripción
+  // Verificar estado de suscripción usando APIClient
   async checkSubscriptionStatus() {
     try {
-      const response = await fetch(`${this.apiUrl}/api/subscription/status`, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Error verificando estado de suscripción');
-      }
-
-      const data = await response.json();
-      return data;
+      const response = await this.apiClient.checkSubscriptionStatus();
+      return response;
     } catch (error) {
       console.error('❌ Error verificando suscripción:', error);
       return { success: false, status: 'unknown' };
     }
   }
 
-  // Inicializar eventos
-  init() {
+  // Test de conectividad
+  async testConnection() {
+    try {
+      console.log('🔍 Probando conexión con la API...');
+      
+      if (this.apiClient && typeof this.apiClient.testConnection === 'function') {
+        const result = await this.apiClient.testConnection();
+        console.log('🔗 Resultado del test:', result);
+        return result;
+      } else {
+        console.warn('⚠️ APIClient no disponible, usando fallback');
+        return { success: false, error: 'APIClient no disponible' };
+      }
+    } catch (error) {
+      console.error('❌ Error en test de conexión:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  // Inicializar eventos y funcionalidad
+  async init() {
     console.log('🔄 Inicializando SubscriptionManager...');
     
+    // Test de conectividad inicial
+    const connectionTest = await this.testConnection();
+    if (!connectionTest.success) {
+      console.warn('⚠️ Problema de conectividad:', connectionTest.error);
+      this.showMessage('Problema de conexión detectado. Usando modo fallback.', 'info');
+    }
+
     // Eventos del formulario
     const button = document.getElementById('subscriptionButton');
     if (button) {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', async (e) => {
         e.preventDefault();
-        this.createSubscription();
+        
+        // Intentar con APIClient primero, luego fallback
+        try {
+          await this.createSubscription();
+        } catch (error) {
+          console.warn('⚠️ Error con APIClient, intentando fallback...');
+          await this.createSubscriptionFallback();
+        }
       });
+    } else {
+      console.warn('⚠️ Botón de suscripción no encontrado');
     }
 
-    // Verificar estado inicial
+    // Verificar estado inicial de suscripción
     this.checkSubscriptionStatus().then(status => {
-      console.log('📊 Estado de suscripción:', status);
+      console.log('📊 Estado de suscripción inicial:', status);
     });
 
     console.log('✅ SubscriptionManager inicializado');
   }
 }
 
-// Estilos para los mensajes
+// Estilos para los mensajes (mejorados)
 const messageStyles = `
   .subscription-message {
     margin: 15px 0;
@@ -252,6 +302,8 @@ const messageStyles = `
     border: 1px solid;
     font-size: 14px;
     animation: slideIn 0.3s ease-out;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
 
   .subscription-message.error {
@@ -307,10 +359,20 @@ const messageStyles = `
   .loading {
     opacity: 0.7;
     cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  #subscriptionButton {
+    transition: all 0.3s ease;
+  }
+
+  #subscriptionButton:hover:not(.loading) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   }
 `;
 
-// Inyectar estilos
+// Inyectar estilos mejorados
 if (!document.querySelector('#subscription-styles')) {
   const style = document.createElement('style');
   style.id = 'subscription-styles';
@@ -326,4 +388,9 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => subscriptionManager.init());
 } else {
   subscriptionManager.init();
+}
+
+// Exportar para uso en otros módulos
+if (typeof window !== 'undefined') {
+  window.subscriptionManager = subscriptionManager;
 }
