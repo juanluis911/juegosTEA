@@ -2,7 +2,7 @@
 
 class SubscriptionManager {
   constructor() {
-    this.apiUrl = 'https://api-juegostea.onrender.com/'; // Cambiar por tu URL real
+    this.apiUrl = 'https://api-juegostea.onrender.com'; // Cambiar por tu URL real
     this.loading = false;
   }
 
