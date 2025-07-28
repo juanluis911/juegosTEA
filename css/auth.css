@@ -1,0 +1,411 @@
+/* css/auth.css - Estilos para autenticación y suscripciones */
+
+/* === AUTH BUTTONS === */
+.auth-section {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.auth-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.login-btn {
+  background: #4285f4;
+  color: white;
+}
+
+.login-btn:hover {
+  background: #3367d6;
+  transform: translateY(-2px);
+}
+
+.logout-btn {
+  background: #f1f3f4;
+  color: #5f6368;
+  border: 1px solid #dadce0;
+}
+
+.logout-btn:hover {
+  background: #e8eaed;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  padding: 8px 15px;
+  border-radius: 25px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+/* === SUBSCRIPTION STATUS === */
+.subscription-info {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.subscription-active {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.subscription-expired {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.subscription-free {
+  background: #f1f3f4;
+  color: #5f6368;
+}
+
+/* === MODALS === */
+.access-modal-overlay,
+.subscription-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  backdrop-filter: blur(5px);
+}
+
+.access-modal,
+.subscription-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 25px;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.close-modal {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.close-modal:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.modal-body {
+  padding: 25px;
+}
+
+.modal-body p {
+  color: #5f6368;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* === PREMIUM BENEFITS === */
+.premium-benefits {
+  background: #f8f9ff;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.premium-benefits h4 {
+  color: #4285f4;
+  margin: 0 0 15px 0;
+  font-size: 16px;
+}
+
+.premium-benefits ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.premium-benefits li {
+  padding: 8px 0;
+  color: #202124;
+  font-size: 14px;
+}
+
+/* === PRICING === */
+.pricing {
+  text-align: center;
+  margin: 20px 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #e8f4fd 100%);
+  border-radius: 12px;
+}
+
+.price {
+  font-size: 32px;
+  font-weight: 700;
+  color: #4285f4;
+  display: block;
+}
+
+.price span {
+  font-size: 16px;
+  color: #5f6368;
+}
+
+.price-note {
+  font-size: 12px;
+  color: #5f6368;
+  margin-top: 5px;
+  display: block;
+}
+
+/* === MODAL ACTIONS === */
+.modal-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+  color: white;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(66, 133, 244, 0.3);
+}
+
+.btn-secondary {
+  background: #f1f3f4;
+  color: #5f6368;
+}
+
+.btn-secondary:hover {
+  background: #e8eaed;
+}
+
+/* === GAME CARDS STATES === */
+.game-card {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.game-card.locked {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.game-card.locked::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: inherit;
+  backdrop-filter: blur(2px);
+}
+
+.game-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #4285f4;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  z-index: 2;
+}
+
+.free-game .game-badge {
+  background: #34a853;
+}
+
+.locked .game-badge {
+  background: #ea4335;
+}
+
+/* === LOADERS === */
+.auth-loader,
+.access-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.loader-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f1f3f4;
+  border-top: 4px solid #4285f4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* === ERROR MESSAGES === */
+.auth-error,
+.access-error {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fef7f0;
+  color: #ea4335;
+  padding: 15px 25px;
+  border-radius: 8px;
+  border-left: 4px solid #ea4335;
+  box-shadow: 0 4px 12px rgba(234, 67, 53, 0.15);
+  z-index: 10001;
+  animation: errorSlideIn 0.3s ease-out;
+}
+
+@keyframes errorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.error-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.error-icon {
+  font-size: 18px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .auth-section {
+    position: relative;
+    top: auto;
+    right: auto;
+    justify-content: center;
+    margin: 20px 0;
+  }
+
+  .access-modal,
+  .subscription-modal {
+    width: 95%;
+    margin: 10px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pricing {
+    margin: 15px 0;
+    padding: 15px;
+  }
+
+  .price {
+    font-size: 24px;
+  }
+}
