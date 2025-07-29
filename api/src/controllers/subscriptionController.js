@@ -60,7 +60,7 @@ class SubscriptionController {
           failure: `${process.env.FRONTEND_URL}/subscription/failure`,
           pending: `${process.env.FRONTEND_URL}/subscription/pending`
         },
-        notification_url: `${process.env.API_URL}/api/subscription/webhook`,
+        notification_url: `${process.env.API_URL}/subscription/webhook`,
         external_reference: uid,
         metadata: {
           user_id: uid,

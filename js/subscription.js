@@ -130,179 +130,101 @@ class SubscriptionManager {
     }
   }
 
-  // Método principal para crear suscripción
-  async createSubscription() {
-    if (this.loading) {
-      console.warn('⚠️ Operación ya en progreso, ignorando...');
-      return;
-    }
 
-    console.log('🚀 Iniciando proceso de suscripción...');
+  // Método principal para crear suscripción (usando apiClient)
+    async createSubscription() {
+        if (this.loading) {
+            console.warn('⚠️ Operación ya en progreso, ignorando...');
+            return;
+        }
 
-    // Obtener datos del formulario
-    const userEmail = document.getElementById('userEmail')?.value?.trim();
-    const userName = document.getElementById('userName')?.value?.trim();
+        console.log('🚀 Iniciando proceso de suscripción...');
 
-    console.log('📋 Datos del formulario:', {
-      userEmail: userEmail ? userEmail.substring(0, 3) + '***' : 'vacío',
-      userName: userName ? userName.substring(0, 3) + '***' : 'vacío'
-    });
+        const userEmail = document.getElementById('userEmail')?.value?.trim();
+        const userName = document.getElementById('userName')?.value?.trim();
 
-    // Validaciones
-    if (!userEmail || !userName) {
-      this.showError('Por favor completa todos los campos requeridos');
-      return;
-    }
+        console.log('📋 Datos del formulario:', {
+            userEmail: userEmail ? userEmail.substring(0, 3) + '***' : 'vacío',
+            userName: userName ? userName.substring(0, 3) + '***' : 'vacío'
+        });
 
-    if (!this.isValidEmail(userEmail)) {
-      this.showError('Por favor ingresa un email válido');
-      return;
-    }
+        if (!userEmail || !userName) {
+            this.showError('Por favor completa todos los campos requeridos');
+            return;
+        }
 
-    if (userName.length < 2) {
-      this.showError('El nombre debe tener al menos 2 caracteres');
-      return;
-    }
+        if (!this.isValidEmail(userEmail)) {
+            this.showError('Por favor ingresa un email válido');
+            return;
+        }
 
-    try {
-      this.loading = true;
-      this.updateButtonLoading(true);
+        if (userName.length < 2) {
+            this.showError('El nombre debe tener al menos 2 caracteres');
+            return;
+        }
 
-      // Limpiar mensajes anteriores
-      const errorDiv = document.getElementById('subscription-error');
-      const successDiv = document.getElementById('subscription-success');
-      if (errorDiv) errorDiv.style.display = 'none';
-      if (successDiv) successDiv.style.display = 'none';
-
-      console.log('📤 Enviando request a la API...');
-      
-      // Construir URL correctamente (sin doble slash)
-      const endpoint = `${this.apiUrl}/api/subscription/create`;
-      console.log('🎯 Endpoint:', endpoint);
-
-      const requestData = {
-        plan: 'premium',
-        userEmail: userEmail,
-        userName: userName
-      };
-
-      console.log('📦 Datos de request:', {
-        ...requestData,
-        userEmail: userEmail.substring(0, 3) + '***'
-      });
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(requestData)
-      });
-
-      console.log('📡 Response status:', response.status, response.statusText);
-      console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
-
-      if (!response.ok) {
-        let errorMessage = `Error ${response.status}: ${response.statusText}`;
-        
         try {
-          const errorText = await response.text();
-          console.error('❌ Error response body:', errorText);
-          
-          if (errorText) {
-            try {
-              const errorData = JSON.parse(errorText);
-              errorMessage = errorData.error || errorData.message || errorMessage;
-              
-              if (errorData.details) {
-                errorMessage += ` (${errorData.details})`;
-              }
-            } catch (parseError) {
-              console.warn('⚠️ No se pudo parsear error como JSON:', parseError);
-              errorMessage = errorText.substring(0, 200) + (errorText.length > 200 ? '...' : '');
+            this.loading = true;
+            this.updateButtonLoading(true);
+
+            const errorDiv = document.getElementById('subscription-error');
+            const successDiv = document.getElementById('subscription-success');
+            if (errorDiv) errorDiv.style.display = 'none';
+            if (successDiv) successDiv.style.display = 'none';
+
+            console.log('📤 Llamando a API Client para crear suscripción...');
+
+            const data = await window.createSubscriptionRequest(userEmail, userName, 'premium');
+
+            console.log('✅ Respuesta recibida desde apiClient:', data);
+
+            if (data.success && (data.init_point || data.sandbox_init_point)) {
+            const checkoutUrl = data.environment === 'sandbox' || data.environment === 'development'
+                ? data.sandbox_init_point
+                : data.init_point;
+
+            if (!checkoutUrl) {
+                throw new Error('No se recibió URL de checkout de MercadoPago');
             }
-          }
-        } catch (textError) {
-          console.error('❌ Error leyendo response text:', textError);
+
+            localStorage.setItem('pendingSubscription', JSON.stringify({
+                userEmail,
+                userName,
+                plan: 'premium',
+                timestamp: Date.now()
+            }));
+
+            this.showSuccess('¡Suscripción creada exitosamente! Redirigiendo al checkout...');
+
+            setTimeout(() => {
+                console.log('🚀 Redirigiendo a MercadoPago...');
+                window.location.href = checkoutUrl;
+            }, 2000);
+            } else {
+            throw new Error(data.message || data.error || 'No se pudo crear la preferencia de pago');
+            }
+        } catch (error) {
+            console.error('❌ Error en createSubscription:', error);
+            let userMessage = 'Error al procesar la suscripción';
+
+            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+            userMessage = 'Error de conexión. Verifica tu internet e intenta nuevamente.';
+            } else if (error.message.includes('404')) {
+            userMessage = 'Servicio temporalmente no disponible. Intenta en unos minutos.';
+            } else if (error.message.includes('500')) {
+            userMessage = 'Error interno del servidor. Nuestro equipo ha sido notificado.';
+            } else if (error.message.length > 0) {
+            userMessage = error.message;
+            }
+
+            this.showError(userMessage);
+        } finally {
+            this.loading = false;
+            this.updateButtonLoading(false);
+            console.log('🏁 Proceso de suscripción finalizado');
         }
-        
-        throw new Error(errorMessage);
-      }
-
-      const responseText = await response.text();
-      console.log('📥 Response body (raw):', responseText);
-
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('❌ Error parsing JSON response:', parseError);
-        throw new Error('Respuesta inválida del servidor');
-      }
-
-      console.log('✅ Response data:', data);
-
-      if (data.success && (data.init_point || data.sandbox_init_point)) {
-        // Determinar URL de checkout
-        const checkoutUrl = data.environment === 'sandbox' || data.environment === 'development' ? 
-          data.sandbox_init_point : 
-          data.init_point;
-
-        if (!checkoutUrl) {
-          throw new Error('No se recibió URL de checkout de MercadoPago');
-        }
-
-        console.log('🔗 URL de checkout:', checkoutUrl);
-        
-        // Guardar datos de la suscripción para posible reintento
-        localStorage.setItem('pendingSubscription', JSON.stringify({
-          userEmail,
-          userName,
-          plan: 'premium',
-          timestamp: Date.now()
-        }));
-        
-        this.showSuccess('¡Suscripción creada exitosamente! Redirigiendo al checkout...');
-        
-        // Redirigir después de un breve delay
-        setTimeout(() => {
-          console.log('🚀 Redirigiendo a MercadoPago...');
-          window.location.href = checkoutUrl;
-        }, 2000);
-        
-      } else {
-        throw new Error(data.message || data.error || 'No se pudo crear la preferencia de pago');
-      }
-
-    } catch (error) {
-      console.error('❌ Error en createSubscription:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      });
-      
-      // Mostrar error más específico al usuario
-      let userMessage = 'Error al procesar la suscripción';
-      
-      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-        userMessage = 'Error de conexión. Verifica tu internet e intenta nuevamente.';
-      } else if (error.message.includes('404')) {
-        userMessage = 'Servicio temporalmente no disponible. Intenta en unos minutos.';
-      } else if (error.message.includes('500')) {
-        userMessage = 'Error interno del servidor. Nuestro equipo ha sido notificado.';
-      } else if (error.message.length > 0) {
-        userMessage = error.message;
-      }
-      
-      this.showError(userMessage);
-      
-    } finally {
-      this.loading = false;
-      this.updateButtonLoading(false);
-      console.log('🏁 Proceso de suscripción finalizado');
     }
-  }
+
 
   // Método para verificar estado de suscripción
   async checkSubscriptionStatus() {
