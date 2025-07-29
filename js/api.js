@@ -126,7 +126,7 @@ class APIClient {
       throw new Error('Email y nombre de usuario son requeridos');
     }
 
-    return await this.makeRequest('/subscription/create', {
+    return await this.makeRequest('api/subscription/create', {
       method: 'POST',
       body: JSON.stringify({ 
         plan: plan,
@@ -138,18 +138,18 @@ class APIClient {
 
   // Método alternativo para mantener compatibilidad con el código existente
   async createSubscriptionLegacy(plan = 'premium') {
-    return await this.makeRequest('/subscription/create', {
+    return await this.makeRequest('api/subscription/create', {
       method: 'POST',
       body: JSON.stringify({ plan })
     });
   }
 
   async checkSubscriptionStatus() {
-    return await this.makeRequest('/subscription/status');
+    return await this.makeRequest('api/subscription/status');
   }
 
   async cancelSubscription() {
-    return await this.makeRequest('/subscription/cancel', {
+    return await this.makeRequest('api/subscription/cancel', {
       method: 'POST'
     });
   }
