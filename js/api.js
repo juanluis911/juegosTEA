@@ -121,20 +121,80 @@ class APIClient {
   // === SUSCRIPCIONES ===
 
   // 🔧 MÉTODO CORREGIDO: Ahora acepta userEmail y userName
-  async createSubscription(userEmail, userName, plan = 'premium') {
-    if (!userEmail || !userName) {
-      throw new Error('Email y nombre de usuario son requeridos');
+  // Método principal para crear suscripción usando apiClient
+async createSubscription() {
+  if (this.loading) {
+    console.warn('⚠️ Operación ya en progreso, ignorando...');
+    return;
+  }
+
+  console.log('🚀 Iniciando proceso de suscripción...');
+
+  const userEmail = document.getElementById('userEmail')?.value?.trim();
+  const userName = document.getElementById('userName')?.value?.trim();
+
+  if (!userEmail || !userName) {
+    this.showError('Por favor completa todos los campos requeridos');
+    return;
+  }
+
+  if (!this.isValidEmail(userEmail)) {
+    this.showError('Por favor ingresa un email válido');
+    return;
+  }
+
+  if (userName.length < 2) {
+    this.showError('El nombre debe tener al menos 2 caracteres');
+    return;
+  }
+
+  try {
+    this.loading = true;
+    this.updateButtonLoading(true);
+
+    const errorDiv = document.getElementById('subscription-error');
+    const successDiv = document.getElementById('subscription-success');
+    if (errorDiv) errorDiv.style.display = 'none';
+    if (successDiv) successDiv.style.display = 'none';
+
+    // ✅ Llamada segura usando apiClient
+    const data = await window.createSubscriptionRequest(userEmail, userName, 'premium');
+
+    if (data.success && (data.init_point || data.sandbox_init_point)) {
+      const checkoutUrl = data.environment === 'sandbox' || data.environment === 'development'
+        ? data.sandbox_init_point
+        : data.init_point;
+
+      if (!checkoutUrl) {
+        throw new Error('No se recibió URL de checkout de MercadoPago');
+      }
+
+      localStorage.setItem('pendingSubscription', JSON.stringify({
+        userEmail,
+        userName,
+        plan: 'premium',
+        timestamp: Date.now()
+      }));
+
+      this.showSuccess('¡Suscripción creada exitosamente! Redirigiendo al checkout...');
+
+      setTimeout(() => {
+        window.location.href = checkoutUrl;
+      }, 2000);
+    } else {
+      throw new Error(data.message || data.error || 'No se pudo crear la preferencia de pago');
     }
 
-    return await this.makeRequest('api/subscription/create', {
-      method: 'POST',
-      body: JSON.stringify({ 
-        plan: plan,
-        userEmail: userEmail,
-        userName: userName
-      })
-    });
+  } catch (error) {
+    console.error('❌ Error en createSubscription:', error);
+    let userMessage = error.message || 'Error al procesar la suscripción';
+    this.showError(userMessage);
+  } finally {
+    this.loading = false;
+    this.updateButtonLoading(false);
   }
+}
+
 
   // Método alternativo para mantener compatibilidad con el código existente
   async createSubscriptionLegacy(plan = 'premium') {
