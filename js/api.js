@@ -158,7 +158,17 @@ async createSubscription() {
     if (successDiv) successDiv.style.display = 'none';
 
     // ✅ Llamada segura usando apiClient
-    const data = await window.createSubscriptionRequest(userEmail, userName, 'premium');
+    const data = await fetch('https://api-juegostea.onrender.com/api/subscription/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            plan: plan,
+            userEmail: userEmail,
+            userName: userName
+          })
+        });
 
     if (data.success && (data.init_point || data.sandbox_init_point)) {
       const checkoutUrl = data.environment === 'sandbox' || data.environment === 'development'
