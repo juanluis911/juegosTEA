@@ -160,6 +160,7 @@
     </script>
 </head>
 <body>
+    
     <!-- Loading Screen -->
     <div class="loading" id="loading">
         <div class="spinner"></div>
@@ -442,11 +443,12 @@
             <p>Una herramienta gratuita y accesible para todos.</p>
         </div>
     </footer>
-
+    
     <!-- JavaScript -->
     <script src="./js/main.js"></script>
     <script src="./js/index.js"></script>
     <script src="./js/auth.js"></script>
+    <script src="./js/subscription.js"></script>
     <script>
         function testRapido() {
             window.location.href = 'test-rapido-autismo.html';
@@ -481,7 +483,32 @@
             console.log('PWA instalada');
             document.getElementById('installButton').style.display = 'none';
         });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Buscar el botón premium y asignar event listener
+            const premiumBtn = document.querySelector('.btn-premium');
+            
+            if (premiumBtn) {
+                // Remover cualquier onclick existente
+                premiumBtn.removeAttribute('onclick');
+                
+                // Agregar event listener
+                premiumBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                console.log('🎯 Botón premium clickeado via event listener');
+                console.log('🔍 authManager:', typeof authManager);
+                console.log('🔍 authManager.showSubscriptionModal:', typeof authManager.showSubscriptionModal);
+                if (typeof authManager !== 'undefined' && authManager.showSubscriptionModal) {
+                    authManager.showSubscriptionModal();
+                } else {
+                    console.error('❌ authManager no disponible');
+                    alert('Sistema no disponible. Recarga la página.');
+                }
+                });
+                
+                console.log('✅ Event listener para botón premium configurado');
+            }
+            });
     </script>
-    <script src="./js/subscription.js"></script>
 </body>
 </html>
