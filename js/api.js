@@ -126,7 +126,7 @@ class APIClient {
       throw new Error('Email y nombre de usuario son requeridos');
     }
 
-    return await this.makeRequest('/subscription/create', {
+    return await this.makeRequest('api/subscription/create', {
       method: 'POST',
       body: JSON.stringify({ 
         plan: plan,
