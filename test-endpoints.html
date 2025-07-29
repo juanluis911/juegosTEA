@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuegoTEA - Test Endpoints</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
+        }
+        
+        .test-button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .test-button:hover {
+            background: #3182ce;
+        }
+        
+        .test-button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        
+        .success {
+            border-left-color: #48bb78;
+        }
+        
+        .error {
+            border-left-color: #f56565;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2d3748;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-ok { background: #48bb78; }
+        .status-error { background: #f56565; }
+        .status-pending { background: #ed8936; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧩 JuegoTEA - Test de Endpoints</h1>
+        
+        <div class="test-section">
+            <h3>🌐 Estado de la API</h3>
+            <p>Verifica la conectividad y estado general de la API</p>
+            <button class="test-button" onclick="testHealth()">Test Health</button>
+            <button class="test-button" onclick="testRoot()">Test Root</button>
+            <button class="test-button" onclick="testCORS()">Test CORS</button>
+            <div id="api-status" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>💳 Test de Suscripción</h3>
+            <p>Prueba el endpoint de creación de suscripciones</p>
+            
+            <div class="form-group">
+                <label for="test-email">Email de prueba:</label>
+                <input type="email" id="test-email" value="test@example.com" placeholder="test@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="test-name">Nombre de prueba:</label>
+                <input type="text" id="test-name" value="Usuario Test" placeholder="Usuario Test">
+            </div>
+            
+            <button class="test-button" onclick="testSubscription()">Test Subscription</button>
+            <button class="test-button" onclick="testSubscriptionStatus()">Test Status</button>
+            <div id="subscription-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔧 Diagnóstico Completo</h3>
+            <p>Ejecuta una serie completa de pruebas de diagnóstico</p>
+            <button class="test-button" onclick="runFullDiagnostic()">Ejecutar Diagnóstico</button>
+            <button class="test-button" onclick="clearResults()">Limpiar Resultados</button>
+            <div id="diagnostic-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Información del Sistema</h3>
+            <div id="system-info">
+                <p><span class="status-indicator status-pending"></span><strong>API URL:</strong> <span id="api-url">Detectando...</span></p>
+                <p><span class="status-indicator status-pending"></span><strong>Frontend URL:</strong> <span id="frontend-url">Detectando...</span></p>
+                <p><span class="status-indicator status-pending"></span><strong>Navegador:</strong> <span id="browser-info">Detectando...</span></p>
+                <p><span class="status-indicator status-pending"></span><strong>Local Storage:</strong> <span id="storage-info">Detectando...</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://api-juegostea.onrender.com';
+        
+        // Inicializar información del sistema
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSystemInfo();
+        });
+        
+        function updateSystemInfo() {
+            document.getElementById('api-url').textContent = API_URL;
+            document.getElementById('frontend-url').textContent = window.location.origin;
+            document.getElementById('browser-info').textContent = navigator.userAgent.split(' ').slice(-2).join(' ');
+            document.getElementById('storage-info').textContent = `${Object.keys(localStorage).length} items`;
+        }
+        
+        function logResult(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = isError ? '❌' : '✅';
+            
+            element.style.display = 'block';
+            element.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            element.scrollTop = element.scrollHeight;
+            
+            // También log en consola
+            console.log(`[TEST] ${message}`);
+        }
+        
+        async function testHealth() {
+            logResult('api-status', 'Probando endpoint /health...');
+            
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                
+                logResult('api-status', `Health Status: ${response.status}`);
+                logResult('api-status', `Response: ${JSON.stringify(data, null, 2)}`);
+                
+                if (response.ok) {
+                    logResult('api-status', 'Health endpoint funcionando correctamente');
+                } else {
+                    logResult('api-status', 'Health endpoint retornó error', true);
+                }
+            } catch (error) {
+                logResult('api-status', `Error en health: ${error.message}`, true);
+            }
+        }
+        
+        async function testRoot() {
+            logResult('api-status', 'Probando endpoint raíz /...');
+            
+            try {
+                const response = await fetch(`${API_URL}/`);
+                const data = await response.json();
+                
+                logResult('api-status', `Root Status: ${response.status}`);
+                logResult('api-status', `Message: ${data.message}`);
+                
+                if (data.endpoints) {
+                    logResult('api-status', `Endpoints disponibles: ${Object.keys(data.endpoints).join(', ')}`);
+                }
+                
+            } catch (error) {
+                logResult('api-status', `Error en root: ${error.message}`, true);
+            }
+        }
+        
+        async function testCORS() {
+            logResult('api-status', 'Probando configuración CORS...');
+            
+            try {
+                const response = await fetch(`${API_URL}/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Origin': window.location.origin,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers')
+                };
+                
+                logResult('api-status', `CORS Headers: ${JSON.stringify(corsHeaders, null, 2)}`);
+                
+                if (response.ok) {
+                    logResult('api-status', 'CORS configurado correctamente');
+                } else {
+                    logResult('api-status', 'Problema con configuración CORS', true);
+                }
+                
+            } catch (error) {
+                logResult('api-status', `Error CORS: ${error.message}`, true);
+            }
+        }
+        
+        async function testSubscription() {
+            const email = document.getElementById('test-email').value;
+            const name = document.getElementById('test-name').value;
+            
+            if (!email || !name) {
+                logResult('subscription-result', 'Por favor completa email y nombre', true);
+                return;
+            }
+            
+            logResult('subscription-result', 'Probando creación de suscripción...');
+            
+            try {
+                const requestData = {
+                    plan: 'premium',
+                    userEmail: email,
+                    userName: name
+                };
+                
+                logResult('subscription-result', `Enviando: ${JSON.stringify(requestData, null, 2)}`);
+                
+                const response = await fetch(`${API_URL}/api/subscription/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                logResult('subscription-result', `Status: ${response.status} ${response.statusText}`);
+                
+                const responseText = await response.text();
+                logResult('subscription-result', `Response Body: ${responseText}`);
+                
+                if (response.ok) {
+                    try {
+                        const data = JSON.parse(responseText);
+                        logResult('subscription-result', 'Suscripción creada exitosamente');
+                        
+                        if (data.init_point || data.sandbox_init_point) {
+                            logResult('subscription-result', 'URLs de checkout recibidas correctamente');
+                        }
+                        
+                    } catch (parseError) {
+                        logResult('subscription-result', `Error parsing JSON: ${parseError.message}`, true);
+                    }
+                } else {
+                    logResult('subscription-result', 'Error en creación de suscripción', true);
+                }
+                
+            } catch (error) {
+                logResult('subscription-result', `Error: ${error.message}`, true);
+            }
+        }
+        
+        async function testSubscriptionStatus() {
+            logResult('subscription-result', 'Probando endpoint de status...');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/subscription/status`);
+                const data = await response.json();
+                
+                logResult('subscription-result', `Status endpoint: ${response.status}`);
+                logResult('subscription-result', `Data: ${JSON.stringify(data, null, 2)}`);
+                
+            } catch (error) {
+                logResult('subscription-result', `Error en status: ${error.message}`, true);
+            }
+        }
+        
+        async function runFullDiagnostic() {
+            logResult('diagnostic-result', '🚀 Iniciando diagnóstico completo...');
+            
+            // Test básico de conectividad
+            logResult('diagnostic-result', '\n=== TEST DE CONECTIVIDAD ===');
+            try {
+                const start = Date.now();
+                const response = await fetch(`${API_URL}/health`);
+                const duration = Date.now() - start;
+                
+                logResult('diagnostic-result', `Tiempo de respuesta: ${duration}ms`);
+                
+                if (response.ok) {
+                    logResult('diagnostic-result', '✅ Conectividad OK');
+                } else {
+                    logResult('diagnostic-result', '❌ Problema de conectividad', true);
+                }
+            } catch (error) {
+                logResult('diagnostic-result', `❌ Sin conectividad: ${error.message}`, true);
+            }
+            
+            // Test de endpoints
+            logResult('diagnostic-result', '\n=== TEST DE ENDPOINTS ===');
+            const endpoints = [
+                { path: '/', method: 'GET', name: 'Root' },
+                { path: '/health', method: 'GET', name: 'Health' },
+                { path: '/api/subscription/status', method: 'GET', name: 'Subscription Status' }
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(`${API_URL}${endpoint.path}`, {
+                        method: endpoint.method
+                    });
+                    
+                    const status = response.ok ? '✅' : '❌';
+                    logResult('diagnostic-result', `${status} ${endpoint.name}: ${response.status}`);
+                    
+                } catch (error) {
+                    logResult('diagnostic-result', `❌ ${endpoint.name}: ${error.message}`, true);
+                }
+            }
+            
+            // Test de navegador
+            logResult('diagnostic-result', '\n=== INFO DEL NAVEGADOR ===');
+            logResult('diagnostic-result', `User Agent: ${navigator.userAgent}`);
+            logResult('diagnostic-result', `Online: ${navigator.onLine ? 'Sí' : 'No'}`);
+            logResult('diagnostic-result', `Cookies habilitadas: ${navigator.cookieEnabled ? 'Sí' : 'No'}`);
+            logResult('diagnostic-result', `Lenguaje: ${navigator.language}`);
+            
+            // Test de almacenamiento
+            logResult('diagnostic-result', '\n=== ALMACENAMIENTO LOCAL ===');
+            try {
+                localStorage.setItem('test', 'ok');
+                localStorage.removeItem('test');
+                logResult('diagnostic-result', '✅ LocalStorage funcional');
+            } catch (error) {
+                logResult('diagnostic-result', '❌ LocalStorage bloqueado', true);
+            }
+            
+            logResult('diagnostic-result', '\n🏁 Diagnóstico completado');
+        }
+        
+        function clearResults() {
+            const resultElements = document.querySelectorAll('.result');
+            resultElements.forEach(el => {
+                el.textContent = '';
+                el.style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>

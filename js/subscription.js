@@ -1,149 +1,37 @@
-// js/subscription.js - Integrado con APIClient corregido
-
 class SubscriptionManager {
   constructor() {
-    // Usar el APIClient en lugar de URLs directas
-    this.apiClient = window.apiClient || new APIClient();
     this.loading = false;
+    this.apiUrl = 'https://api-juegostea.onrender.com';
+    this.init();
+  }
+
+  init() {
+    console.log('🔧 Inicializando SubscriptionManager');
+    console.log('🌐 API URL:', this.apiUrl);
     
-    console.log('🌐 SubscriptionManager usando APIClient');
+    // Verificar conectividad de la API
+    this.checkAPIHealth();
   }
 
-  // Crear suscripción usando APIClient
-  async createSubscription() {
-    if (this.loading) {
-      console.warn('⚠️ Ya hay una petición en proceso');
-      return;
-    }
-
-    const userEmail = document.getElementById('userEmail')?.value.trim();
-    const userName = document.getElementById('userName')?.value.trim();
-
-    // Validaciones del lado del cliente
-    if (!userEmail || !userName) {
-      this.showError('Por favor completa todos los campos');
-      return;
-    }
-
-    if (!this.isValidEmail(userEmail)) {
-      this.showError('Por favor ingresa un email válido');
-      return;
-    }
-
+  // Verificar salud de la API
+  async checkAPIHealth() {
     try {
-      this.loading = true;
-      this.updateButtonLoading(true);
-
-      console.log('📤 Creando suscripción para:', { userEmail, userName });
-
-      // Usar el APIClient en lugar de fetch directo
-      const response = await this.apiClient.createSubscription(userEmail, userName, 'premium');
-
-      console.log('✅ Subscription response:', response);
-
-      if (response.success && (response.init_point || response.sandbox_init_point)) {
-        // Determinar qué URL usar según el ambiente
-        const checkoutUrl = response.environment === 'sandbox' ? 
-          response.sandbox_init_point : 
-          response.init_point;
-
-        console.log('🔗 Redirigiendo a checkout:', checkoutUrl);
-        
-        // Mostrar mensaje de éxito
-        this.showSuccess('¡Suscripción creada! Redirigiendo al checkout...');
-        
-        // Redirigir después de un breve delay
-        setTimeout(() => {
-          window.location.href = checkoutUrl;
-        }, 1500);
-        
-      } else {
-        throw new Error(response.message || 'No se pudo crear la preferencia de pago');
-      }
-
-    } catch (error) {
-      console.error('❌ Error creando suscripción:', error);
-      this.showError(error.message || 'Error al procesar la suscripción');
-    } finally {
-      this.loading = false;
-      this.updateButtonLoading(false);
-    }
-  }
-
-  // Método alternativo usando fetch directo (fallback)
-  async createSubscriptionFallback() {
-    if (this.loading) return;
-
-    const userEmail = document.getElementById('userEmail')?.value.trim();
-    const userName = document.getElementById('userName')?.value.trim();
-
-    if (!userEmail || !userName) {
-      this.showError('Por favor completa todos los campos');
-      return;
-    }
-
-    if (!this.isValidEmail(userEmail)) {
-      this.showError('Por favor ingresa un email válido');
-      return;
-    }
-
-    try {
-      this.loading = true;
-      this.updateButtonLoading(true);
-
-      // URL directa como fallback
-      const apiUrl = 'https://api-juegostea.onrender.com';
-      const endpoint = `${apiUrl}/subscription/create`;
-      
-      console.log('📤 Fallback: Enviando request a:', endpoint);
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
+      console.log('🔍 Verificando salud de la API...');
+      const response = await fetch(`${this.apiUrl}/health`, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          plan: 'premium',
-          userEmail: userEmail,
-          userName: userName
-        })
-      });
-
-      if (!response.ok) {
-        let errorMessage = `Error ${response.status}: ${response.statusText}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.error || errorData.message || errorMessage;
-        } catch (e) {
-          console.error('Error parsing error response:', e);
         }
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-      console.log('✅ Fallback response:', data);
-
-      if (data.success && (data.init_point || data.sandbox_init_point)) {
-        const checkoutUrl = data.environment === 'sandbox' ? 
-          data.sandbox_init_point : 
-          data.init_point;
-
-        this.showSuccess('¡Suscripción creada! Redirigiendo al checkout...');
-        
-        setTimeout(() => {
-          window.location.href = checkoutUrl;
-        }, 1500);
+      });
+      
+      if (response.ok) {
+        const healthData = await response.json();
+        console.log('✅ API está funcionando:', healthData);
       } else {
-        throw new Error(data.message || 'No se pudo crear la preferencia de pago');
+        console.warn('⚠️ API respondió con error:', response.status, response.statusText);
       }
-
     } catch (error) {
-      console.error('❌ Error en fallback:', error);
-      this.showError(error.message || 'Error al procesar la suscripción');
-    } finally {
-      this.loading = false;
-      this.updateButtonLoading(false);
+      console.error('❌ Error verificando API:', error);
     }
   }
 
@@ -153,244 +41,367 @@ class SubscriptionManager {
     return emailRegex.test(email);
   }
 
-  // Actualizar estado del botón
-  updateButtonLoading(isLoading) {
-    const button = document.getElementById('subscriptionButton');
-    if (!button) return;
-
-    if (isLoading) {
-      button.disabled = true;
-      button.innerHTML = `
-        <span class="loading-spinner"></span>
-        Procesando...
-      `;
-      button.classList.add('loading');
-    } else {
-      button.disabled = false;
-      button.innerHTML = '💳 Suscribirse a Premium';
-      button.classList.remove('loading');
-    }
-  }
-
   // Mostrar mensajes de error
   showError(message) {
-    console.error('❌', message);
-    this.showMessage(message, 'error');
+    console.error('❌ Error:', message);
+    
+    // Crear o actualizar el elemento de error
+    let errorDiv = document.getElementById('subscription-error');
+    if (!errorDiv) {
+      errorDiv = document.createElement('div');
+      errorDiv.id = 'subscription-error';
+      errorDiv.style.cssText = `
+        background: #fed7d7;
+        border: 1px solid #f56565;
+        color: #c53030;
+        padding: 12px;
+        border-radius: 8px;
+        margin: 10px 0;
+        display: block;
+        animation: slideIn 0.3s ease-out;
+      `;
+      
+      // Insertar después del formulario o en el modal
+      const form = document.querySelector('.subscription-form, .modal-content');
+      if (form) {
+        form.appendChild(errorDiv);
+      }
+    }
+    
+    errorDiv.innerHTML = `
+      <strong>⚠️ Error:</strong> ${message}
+      <button onclick="this.parentElement.style.display='none'" 
+              style="float: right; background: none; border: none; color: #c53030; cursor: pointer;">✕</button>
+    `;
+    errorDiv.style.display = 'block';
+    
+    // Auto-ocultar después de 8 segundos
+    setTimeout(() => {
+      if (errorDiv) errorDiv.style.display = 'none';
+    }, 8000);
   }
 
   // Mostrar mensajes de éxito
   showSuccess(message) {
-    console.log('✅', message);
-    this.showMessage(message, 'success');
-  }
-
-  // Sistema de mensajes unificado
-  showMessage(message, type = 'info') {
-    // Remover mensajes anteriores
-    const existingMessage = document.querySelector('.subscription-message');
-    if (existingMessage) {
-      existingMessage.remove();
-    }
-
-    // Crear nuevo mensaje
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `subscription-message ${type}`;
-    messageDiv.innerHTML = `
-      <div class="message-content">
-        <span class="message-icon">${type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️'}</span>
-        <span class="message-text">${message}</span>
-      </div>
-    `;
-
-    // Insertar en la página
-    const form = document.querySelector('.subscription-form') || 
-                 document.querySelector('.premium-section') ||
-                 document.querySelector('main');
-                 
-    if (form) {
-      form.appendChild(messageDiv);
-      
-      // Auto-remover después de 5 segundos (excepto errores)
-      if (type !== 'error') {
-        setTimeout(() => {
-          if (messageDiv.parentNode) {
-            messageDiv.remove();
-          }
-        }, 5000);
-      }
-    }
-
-    // También mostrar en consola
-    const logMethod = type === 'error' ? console.error : console.log;
-    logMethod(`${type.toUpperCase()}: ${message}`);
-  }
-
-  // Verificar estado de suscripción usando APIClient
-  async checkSubscriptionStatus() {
-    try {
-      const response = await this.apiClient.checkSubscriptionStatus();
-      return response;
-    } catch (error) {
-      console.error('❌ Error verificando suscripción:', error);
-      return { success: false, status: 'unknown' };
-    }
-  }
-
-  // Test de conectividad
-  async testConnection() {
-    try {
-      console.log('🔍 Probando conexión con la API...');
-      
-      if (this.apiClient && typeof this.apiClient.testConnection === 'function') {
-        const result = await this.apiClient.testConnection();
-        console.log('🔗 Resultado del test:', result);
-        return result;
-      } else {
-        console.warn('⚠️ APIClient no disponible, usando fallback');
-        return { success: false, error: 'APIClient no disponible' };
-      }
-    } catch (error) {
-      console.error('❌ Error en test de conexión:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  // Inicializar eventos y funcionalidad
-  async init() {
-    console.log('🔄 Inicializando SubscriptionManager...');
+    console.log('✅ Éxito:', message);
     
-    // Test de conectividad inicial
-    const connectionTest = await this.testConnection();
-    if (!connectionTest.success) {
-      console.warn('⚠️ Problema de conectividad:', connectionTest.error);
-      this.showMessage('Problema de conexión detectado. Usando modo fallback.', 'info');
+    let successDiv = document.getElementById('subscription-success');
+    if (!successDiv) {
+      successDiv = document.createElement('div');
+      successDiv.id = 'subscription-success';
+      successDiv.style.cssText = `
+        background: #c6f6d5;
+        border: 1px solid #48bb78;
+        color: #2f855a;
+        padding: 12px;
+        border-radius: 8px;
+        margin: 10px 0;
+        display: block;
+        animation: slideIn 0.3s ease-out;
+      `;
+      
+      const form = document.querySelector('.subscription-form, .modal-content');
+      if (form) {
+        form.appendChild(successDiv);
+      }
     }
+    
+    successDiv.innerHTML = `
+      <strong>✅ Éxito:</strong> ${message}
+    `;
+    successDiv.style.display = 'block';
+  }
 
-    // Eventos del formulario
-    const button = document.getElementById('subscriptionButton');
+  // Actualizar estado de botón de carga
+  updateButtonLoading(loading) {
+    const button = document.querySelector('.subscribe-btn, .btn-premium');
     if (button) {
-      button.addEventListener('click', async (e) => {
-        e.preventDefault();
-        
-        // Intentar con APIClient primero, luego fallback
-        try {
-          await this.createSubscription();
-        } catch (error) {
-          console.warn('⚠️ Error con APIClient, intentando fallback...');
-          await this.createSubscriptionFallback();
-        }
-      });
-    } else {
-      console.warn('⚠️ Botón de suscripción no encontrado');
+      if (loading) {
+        button.disabled = true;
+        button.innerHTML = '⏳ Procesando...';
+        button.style.opacity = '0.7';
+        button.style.cursor = 'not-allowed';
+      } else {
+        button.disabled = false;
+        button.innerHTML = '🚀 Obtener Premium';
+        button.style.opacity = '1';
+        button.style.cursor = 'pointer';
+      }
+    }
+  }
+
+  // Método principal para crear suscripción
+  async createSubscription() {
+    if (this.loading) {
+      console.warn('⚠️ Operación ya en progreso, ignorando...');
+      return;
     }
 
-    // Verificar estado inicial de suscripción
-    this.checkSubscriptionStatus().then(status => {
-      console.log('📊 Estado de suscripción inicial:', status);
+    console.log('🚀 Iniciando proceso de suscripción...');
+
+    // Obtener datos del formulario
+    const userEmail = document.getElementById('userEmail')?.value?.trim();
+    const userName = document.getElementById('userName')?.value?.trim();
+
+    console.log('📋 Datos del formulario:', {
+      userEmail: userEmail ? userEmail.substring(0, 3) + '***' : 'vacío',
+      userName: userName ? userName.substring(0, 3) + '***' : 'vacío'
     });
 
-    console.log('✅ SubscriptionManager inicializado');
+    // Validaciones
+    if (!userEmail || !userName) {
+      this.showError('Por favor completa todos los campos requeridos');
+      return;
+    }
+
+    if (!this.isValidEmail(userEmail)) {
+      this.showError('Por favor ingresa un email válido');
+      return;
+    }
+
+    if (userName.length < 2) {
+      this.showError('El nombre debe tener al menos 2 caracteres');
+      return;
+    }
+
+    try {
+      this.loading = true;
+      this.updateButtonLoading(true);
+
+      // Limpiar mensajes anteriores
+      const errorDiv = document.getElementById('subscription-error');
+      const successDiv = document.getElementById('subscription-success');
+      if (errorDiv) errorDiv.style.display = 'none';
+      if (successDiv) successDiv.style.display = 'none';
+
+      console.log('📤 Enviando request a la API...');
+      
+      // Construir URL correctamente (sin doble slash)
+      const endpoint = `${this.apiUrl}/api/subscription/create`;
+      console.log('🎯 Endpoint:', endpoint);
+
+      const requestData = {
+        plan: 'premium',
+        userEmail: userEmail,
+        userName: userName
+      };
+
+      console.log('📦 Datos de request:', {
+        ...requestData,
+        userEmail: userEmail.substring(0, 3) + '***'
+      });
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      });
+
+      console.log('📡 Response status:', response.status, response.statusText);
+      console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+
+      if (!response.ok) {
+        let errorMessage = `Error ${response.status}: ${response.statusText}`;
+        
+        try {
+          const errorText = await response.text();
+          console.error('❌ Error response body:', errorText);
+          
+          if (errorText) {
+            try {
+              const errorData = JSON.parse(errorText);
+              errorMessage = errorData.error || errorData.message || errorMessage;
+              
+              if (errorData.details) {
+                errorMessage += ` (${errorData.details})`;
+              }
+            } catch (parseError) {
+              console.warn('⚠️ No se pudo parsear error como JSON:', parseError);
+              errorMessage = errorText.substring(0, 200) + (errorText.length > 200 ? '...' : '');
+            }
+          }
+        } catch (textError) {
+          console.error('❌ Error leyendo response text:', textError);
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const responseText = await response.text();
+      console.log('📥 Response body (raw):', responseText);
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('❌ Error parsing JSON response:', parseError);
+        throw new Error('Respuesta inválida del servidor');
+      }
+
+      console.log('✅ Response data:', data);
+
+      if (data.success && (data.init_point || data.sandbox_init_point)) {
+        // Determinar URL de checkout
+        const checkoutUrl = data.environment === 'sandbox' || data.environment === 'development' ? 
+          data.sandbox_init_point : 
+          data.init_point;
+
+        if (!checkoutUrl) {
+          throw new Error('No se recibió URL de checkout de MercadoPago');
+        }
+
+        console.log('🔗 URL de checkout:', checkoutUrl);
+        
+        // Guardar datos de la suscripción para posible reintento
+        localStorage.setItem('pendingSubscription', JSON.stringify({
+          userEmail,
+          userName,
+          plan: 'premium',
+          timestamp: Date.now()
+        }));
+        
+        this.showSuccess('¡Suscripción creada exitosamente! Redirigiendo al checkout...');
+        
+        // Redirigir después de un breve delay
+        setTimeout(() => {
+          console.log('🚀 Redirigiendo a MercadoPago...');
+          window.location.href = checkoutUrl;
+        }, 2000);
+        
+      } else {
+        throw new Error(data.message || data.error || 'No se pudo crear la preferencia de pago');
+      }
+
+    } catch (error) {
+      console.error('❌ Error en createSubscription:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      
+      // Mostrar error más específico al usuario
+      let userMessage = 'Error al procesar la suscripción';
+      
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        userMessage = 'Error de conexión. Verifica tu internet e intenta nuevamente.';
+      } else if (error.message.includes('404')) {
+        userMessage = 'Servicio temporalmente no disponible. Intenta en unos minutos.';
+      } else if (error.message.includes('500')) {
+        userMessage = 'Error interno del servidor. Nuestro equipo ha sido notificado.';
+      } else if (error.message.length > 0) {
+        userMessage = error.message;
+      }
+      
+      this.showError(userMessage);
+      
+    } finally {
+      this.loading = false;
+      this.updateButtonLoading(false);
+      console.log('🏁 Proceso de suscripción finalizado');
+    }
+  }
+
+  // Método para verificar estado de suscripción
+  async checkSubscriptionStatus() {
+    try {
+      console.log('🔍 Verificando estado de suscripción...');
+      
+      const response = await fetch(`${this.apiUrl}/api/subscription/status`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const statusData = await response.json();
+        console.log('✅ Estado de suscripción:', statusData);
+        return statusData;
+      } else {
+        console.warn('⚠️ Error verificando estado:', response.status);
+        return null;
+      }
+    } catch (error) {
+      console.error('❌ Error verificando estado de suscripción:', error);
+      return null;
+    }
+  }
+
+  // Método para reintentar suscripción
+  async retrySubscription() {
+    const pendingData = localStorage.getItem('pendingSubscription');
+    
+    if (pendingData) {
+      try {
+        const data = JSON.parse(pendingData);
+        console.log('🔄 Reintentando suscripción con datos guardados...');
+        
+        // Rellenar formulario con datos guardados
+        const emailField = document.getElementById('userEmail');
+        const nameField = document.getElementById('userName');
+        
+        if (emailField) emailField.value = data.userEmail;
+        if (nameField) nameField.value = data.userName;
+        
+        // Intentar crear suscripción nuevamente
+        await this.createSubscription();
+        
+      } catch (error) {
+        console.error('❌ Error reintentando suscripción:', error);
+        this.showError('Error al reintentar. Por favor llena el formulario nuevamente.');
+      }
+    } else {
+      console.warn('⚠️ No hay datos de suscripción para reintentar');
+      this.showError('No hay datos de suscripción pendiente');
+    }
   }
 }
 
-// Estilos para los mensajes (mejorados)
-const messageStyles = `
-  .subscription-message {
-    margin: 15px 0;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: 1px solid;
-    font-size: 14px;
-    animation: slideIn 0.3s ease-out;
-    position: relative;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-
-  .subscription-message.error {
-    background-color: #fee;
-    border-color: #fcc;
-    color: #c33;
-  }
-
-  .subscription-message.success {
-    background-color: #efe;
-    border-color: #cfc;
-    color: #3c3;
-  }
-
-  .subscription-message.info {
-    background-color: #eef;
-    border-color: #ccf;
-    color: #33c;
-  }
-
-  .message-content {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .loading-spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 2px solid #333;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .loading {
-    opacity: 0.7;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-
-  #subscriptionButton {
-    transition: all 0.3s ease;
-  }
-
-  #subscriptionButton:hover:not(.loading) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  }
-`;
-
-// Inyectar estilos mejorados
-if (!document.querySelector('#subscription-styles')) {
-  const style = document.createElement('style');
-  style.id = 'subscription-styles';
-  style.textContent = messageStyles;
-  document.head.appendChild(style);
-}
-
-// Crear instancia global
-const subscriptionManager = new SubscriptionManager();
+// === INICIALIZACIÓN GLOBAL ===
+let subscriptionManager;
 
 // Inicializar cuando el DOM esté listo
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => subscriptionManager.init());
-} else {
-  subscriptionManager.init();
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🎮 DOM cargado, inicializando SubscriptionManager...');
+  subscriptionManager = new SubscriptionManager();
+  
+  // Verificar si hay parámetros de retry en la URL
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('retry') === 'true') {
+    console.log('🔄 Detectado parámetro de retry, intentando reanudar...');
+    setTimeout(() => {
+      if (subscriptionManager) {
+        subscriptionManager.retrySubscription();
+      }
+    }, 1000);
+  }
+});
+
+// Función global para botones onclick
+function createSubscription() {
+  console.log('🎯 createSubscription() llamada globalmente');
+  if (subscriptionManager) {
+    subscriptionManager.createSubscription();
+  } else {
+    console.error('❌ SubscriptionManager no está inicializado');
+    alert('Error: Sistema no inicializado. Recarga la página.');
+  }
 }
 
-// Exportar para uso en otros módulos
-if (typeof window !== 'undefined') {
-  window.subscriptionManager = subscriptionManager;
+// Función global para retry
+function retrySubscription() {
+  console.log('🔄 retrySubscription() llamada globalmente');
+  if (subscriptionManager) {
+    subscriptionManager.retrySubscription();
+  } else {
+    console.error('❌ SubscriptionManager no está inicializado');
+  }
+}
+
+// Exportar para uso en módulos si es necesario
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = SubscriptionManager;
 }
