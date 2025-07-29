@@ -1,7 +1,7 @@
 class SubscriptionManager {
   constructor() {
     this.loading = false;
-    this.apiUrl = 'https://api-juegostea.onrender.com/api';
+    this.apiUrl = 'https://api-juegostea.onrender.com/api/';
     this.init();
   }
 
