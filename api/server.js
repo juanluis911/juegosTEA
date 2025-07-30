@@ -1,4 +1,4 @@
-// ⚡ JuegoTEA API Server - Configuración completa y corregida
+// ⚡ JuegoTEA API Server - Configuración mejorada con logging completo
 // 🧩 Plataforma educativa para niños con TEA
 
 require('dotenv').config();
@@ -13,20 +13,57 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-console.log('\n🚀 Iniciando JuegoTEA API Server...');
-console.log(`📦 Entorno: ${process.env.NODE_ENV || 'development'}`);
-console.log(`🌐 Puerto: ${PORT}`);
+// === FUNCIÓN DE LOGGING MEJORADA ===
+function log(level, requestId, message, data = null) {
+  const timestamp = new Date().toISOString();
+  const logPrefix = {
+    info: '📋',
+    success: '✅',
+    warning: '⚠️',
+    error: '❌',
+    debug: '🔍',
+    mercadopago: '💳',
+    server: '🚀',
+    webhook: '🔔',
+    validation: '🛡️'
+  };
+
+  const prefix = logPrefix[level] || '📝';
+  console.log(`${prefix} [${timestamp}] [${requestId || 'SYSTEM'}] ${message}`);
+  
+  if (data) {
+    console.log(`   📊 Data:`, typeof data === 'object' ? JSON.stringify(data, null, 2) : data);
+  }
+}
+
+// === INICIALIZACIÓN DEL SERVIDOR ===
+log('server', 'INIT', 'Iniciando JuegoTEA API Server...');
+log('info', 'INIT', `Entorno: ${process.env.NODE_ENV || 'development'}`);
+log('info', 'INIT', `Puerto: ${PORT}`);
+
+// === MIDDLEWARE DE REQUEST ID ===
+app.use((req, res, next) => {
+  req.requestId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  log('info', req.requestId, `${req.method} ${req.originalUrl}`, {
+    ip: req.ip,
+    userAgent: req.get('User-Agent')?.substring(0, 100)
+  });
+  next();
+});
+
+// === MIDDLEWARE BÁSICO ===
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 
 // === VALIDACIÓN Y CONFIGURACIÓN DE MERCADOPAGO ===
 function validateMercadoPagoConfig() {
   const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
   
-  console.log('🔍 Verificando configuración de MercadoPago...');
-  console.log('💡 Token presente:', !!accessToken);
-  console.log('💡 Tipo de token:', accessToken ? (accessToken.startsWith('TEST') ? 'SANDBOX' : 'PRODUCTION') : 'NINGUNO');
+  log('debug', 'CONFIG', 'Verificando configuración de MercadoPago...');
+  log('debug', 'CONFIG', `Token presente: ${!!accessToken}`);
   
   if (!accessToken) {
-    console.error('❌ MERCADOPAGO_ACCESS_TOKEN no está configurado');
+    log('error', 'CONFIG', 'MERCADOPAGO_ACCESS_TOKEN no está configurado');
     return {
       valid: false,
       error: 'Token de acceso de MercadoPago no configurado',
@@ -34,8 +71,14 @@ function validateMercadoPagoConfig() {
     };
   }
   
+  // Validar formato del token
+  const tokenType = accessToken.startsWith('TEST-') ? 'SANDBOX' : 
+                   accessToken.startsWith('APP_USR-') ? 'PRODUCTION' : 'UNKNOWN';
+  
+  log('debug', 'CONFIG', `Tipo de token: ${tokenType}`);
+  
   if (accessToken.length < 20) {
-    console.error('❌ Token de MercadoPago parece inválido (muy corto)');
+    log('error', 'CONFIG', 'Token de MercadoPago parece inválido (muy corto)');
     return {
       valid: false,
       error: 'Token de MercadoPago inválido',
@@ -43,8 +86,12 @@ function validateMercadoPagoConfig() {
     };
   }
   
-  console.log('✅ Configuración de MercadoPago válida');
-  return { valid: true };
+  if (tokenType === 'UNKNOWN') {
+    log('warning', 'CONFIG', 'Formato de token no reconocido, pero procederá');
+  }
+  
+  log('success', 'CONFIG', 'Configuración de MercadoPago válida');
+  return { valid: true, tokenType };
 }
 
 // === INICIALIZACIÓN DE MERCADOPAGO ===
@@ -55,8 +102,10 @@ try {
   const mpValidation = validateMercadoPagoConfig();
   
   if (mpValidation.valid) {
+    log('debug', 'MP-INIT', 'Importando SDK de MercadoPago...');
     const { MercadoPagoConfig, Preference } = require('mercadopago');
     
+    log('debug', 'MP-INIT', 'Creando cliente de MercadoPago...');
     mercadopagoClient = new MercadoPagoConfig({
       accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
       options: {
@@ -65,14 +114,20 @@ try {
       }
     });
     
-    mercadopagoConfig = { valid: true };
-    console.log('🎉 MercadoPago inicializado correctamente');
+    mercadopagoConfig = { valid: true, tokenType: mpValidation.tokenType };
+    log('success', 'MP-INIT', 'MercadoPago inicializado correctamente', {
+      tokenType: mpValidation.tokenType,
+      timeout: 5000
+    });
   } else {
     mercadopagoConfig = mpValidation;
-    console.warn('⚠️ MercadoPago NO inicializado:', mpValidation.error);
+    log('warning', 'MP-INIT', 'MercadoPago NO inicializado', mpValidation.error);
   }
 } catch (error) {
-  console.error('❌ Error inicializando MercadoPago:', error.message);
+  log('error', 'MP-INIT', 'Error inicializando MercadoPago', {
+    message: error.message,
+    stack: error.stack
+  });
   mercadopagoConfig = { 
     valid: false, 
     error: 'Error de inicialización', 
@@ -100,65 +155,47 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Permitir requests sin origin (mobile apps, postman, etc.)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
     } else {
-      console.warn(`🚫 CORS bloqueado para origin: ${origin}`);
-      return callback(new Error('No permitido por CORS'), false);
+      log('warning', 'CORS', `Origen no permitido: ${origin}`);
+      callback(new Error('No permitido por CORS'));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['X-Request-ID']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // === RATE LIMITING ===
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // máximo 100 requests por IP
+  max: 100, // máximo 100 requests por ventana
   message: {
-    error: 'Demasiados requests desde esta IP',
-    retryAfter: '15 minutos'
+    success: false,
+    error: 'Demasiadas peticiones',
+    details: 'Intenta de nuevo en 15 minutos'
   },
   standardHeaders: true,
-  legacyHeaders: false
-});
-app.use(limiter);
-
-// === PARSING DE BODY ===
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// === MIDDLEWARE DE REQUEST ID ===
-app.use((req, res, next) => {
-  req.requestId = Math.random().toString(36).substr(2, 9);
-  res.setHeader('X-Request-ID', req.requestId);
-  
-  const timestamp = new Date().toISOString();
-  console.log(`📥 [${req.requestId}] ${req.method} ${req.originalUrl} - ${req.ip} - ${timestamp}`);
-  
-  next();
+  legacyHeaders: false,
 });
 
-// === ENDPOINT DE INFORMACIÓN GENERAL ===
+app.use('/api/', limiter);
+
+// === ENDPOINT RAÍZ ===
 app.get('/', (req, res) => {
+  log('info', req.requestId, 'Acceso a endpoint raíz');
   res.json({
     name: 'JuegoTEA API',
     version: '1.0.0',
-    description: 'API backend para plataforma educativa de juegos para niños con TEA',
-    status: 'running',
-    timestamp: new Date().toISOString(),
+    description: 'API para plataforma educativa de niños con TEA',
+    status: 'operational',
     endpoints: {
       health: '/health',
       subscription_create: '/api/subscription/create',
       subscription_status: '/api/subscription/status',
-      subscription_webhook: '/api/subscription/webhook'
+      webhook: '/api/subscription/webhook'
     },
-    environment: process.env.NODE_ENV || 'development',
     mercadopago_status: mercadopagoConfig?.valid ? 'configured' : 'not_configured',
     cors_origins: allowedOrigins,
     requestId: req.requestId
@@ -167,6 +204,8 @@ app.get('/', (req, res) => {
 
 // === ENDPOINT DE SALUD ===
 app.get('/health', (req, res) => {
+  log('debug', req.requestId, 'Health check solicitado');
+  
   const healthStatus = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -191,23 +230,26 @@ app.get('/health', (req, res) => {
     }];
   }
 
+  log('success', req.requestId, 'Health check completado', healthStatus);
   res.json(healthStatus);
 });
 
 // === ENDPOINT CREAR SUSCRIPCIÓN ===
 app.post('/api/subscription/create', async (req, res) => {
   try {
-    console.log(`🚀 [${req.requestId}] Iniciando creación de suscripción...`);
-    console.log(`📋 [${req.requestId}] Body recibido:`, JSON.stringify(req.body, null, 2));
+    log('mercadopago', req.requestId, 'Iniciando creación de suscripción...');
+    log('debug', req.requestId, 'Body recibido', req.body);
 
     // ❌ VERIFICAR CONFIGURACIÓN DE MERCADOPAGO PRIMERO
-    console.log(`🔍 [${req.requestId}] Verificando configuración de MercadoPago...`);
-    console.log(`🔍 [${req.requestId}] Configuración válida: ${mercadopagoConfig?.valid}`);
-    console.log(`🔍 [${req.requestId}] Token de acceso: ${process.env.MERCADOPAGO_ACCESS_TOKEN}`);
-    console.log(`🔍 [${req.requestId}] Entorno: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔍 [${req.requestId}] mercadopagoClient ${mercadopagoClient}`);
+    log('validation', req.requestId, 'Verificando configuración de MercadoPago...', {
+      configValid: mercadopagoConfig?.valid,
+      clientExists: !!mercadopagoClient,
+      tokenType: mercadopagoConfig?.tokenType,
+      environment: process.env.NODE_ENV || 'development'
+    });
+
     if (!mercadopagoClient || !mercadopagoConfig?.valid) {
-      console.error(`❌ [${req.requestId}] MercadoPago no está configurado`);
+      log('error', req.requestId, 'MercadoPago no está configurado', mercadopagoConfig);
       return res.status(503).json({
         success: false,
         error: 'Servicio de pagos no disponible',
@@ -224,11 +266,30 @@ app.post('/api/subscription/create', async (req, res) => {
     const { userEmail, userName, plan = 'premium' } = req.body;
 
     // Validaciones de entrada
+    log('validation', req.requestId, 'Validando datos de entrada...', {
+      userEmail: !!userEmail,
+      userName: !!userName,
+      plan
+    });
+
     if (!userEmail || !userName) {
+      log('error', req.requestId, 'Datos requeridos faltantes');
       return res.status(400).json({
         success: false,
         error: 'Datos requeridos faltantes',
         details: 'userEmail y userName son obligatorios',
+        requestId: req.requestId
+      });
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userEmail)) {
+      log('error', req.requestId, 'Email inválido', userEmail);
+      return res.status(400).json({
+        success: false,
+        error: 'Email inválido',
+        details: 'El formato del email no es válido',
         requestId: req.requestId
       });
     }
@@ -246,6 +307,7 @@ app.post('/api/subscription/create', async (req, res) => {
 
     const selectedPlan = plans[plan];
     if (!selectedPlan) {
+      log('error', req.requestId, `Plan no válido: ${plan}`);
       return res.status(400).json({
         success: false,
         error: 'Plan no válido',
@@ -254,14 +316,16 @@ app.post('/api/subscription/create', async (req, res) => {
       });
     }
 
-    console.log(`💰 [${req.requestId}] Plan seleccionado:`, selectedPlan);
+    log('success', req.requestId, 'Plan seleccionado', selectedPlan);
 
     // Generar referencia externa única
     const externalReference = `juegotea_${plan}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    log('debug', req.requestId, `Referencia externa generada: ${externalReference}`);
 
     // Crear fecha de expiración (1 hora)
     const expirationDate = new Date();
     expirationDate.setHours(expirationDate.getHours() + 1);
+    log('debug', req.requestId, `Fecha de expiración: ${expirationDate.toISOString()}`);
 
     // ✅ CONFIGURACIÓN DE PREFERENCIA MEJORADA
     const preferenceData = {
@@ -296,23 +360,30 @@ app.post('/api/subscription/create', async (req, res) => {
       }
     };
 
-    console.log(`📝 [${req.requestId}] Datos de preferencia:`, JSON.stringify(preferenceData, null, 2));
+    log('debug', req.requestId, 'Datos de preferencia preparados', preferenceData);
 
     // ✅ CREAR PREFERENCIA CON MANEJO DE ERRORES MEJORADO
     try {
+      log('mercadopago', req.requestId, 'Importando clase Preference...');
       const { Preference } = require('mercadopago');
+      
+      log('mercadopago', req.requestId, 'Creando instancia de Preference...');
       const preference = new Preference(mercadopagoClient);
       
-      console.log(`⏳ [${req.requestId}] Enviando solicitud a MercadoPago...`);
+      log('mercadopago', req.requestId, 'Enviando solicitud a MercadoPago...', {
+        accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN?.substring(0, 20) + '...',
+        environment: mercadopagoConfig.tokenType
+      });
       
       const result = await preference.create({
         body: preferenceData
       });
 
-      console.log(`✅ [${req.requestId}] Preferencia creada exitosamente:`, {
+      log('success', req.requestId, 'Preferencia creada exitosamente', {
         id: result.id,
         init_point: result.init_point,
-        sandbox_init_point: result.sandbox_init_point
+        sandbox_init_point: result.sandbox_init_point,
+        status: result.status
       });
 
       // Respuesta exitosa
@@ -323,6 +394,7 @@ app.post('/api/subscription/create', async (req, res) => {
         init_point: result.init_point,
         sandbox_init_point: result.sandbox_init_point,
         environment: process.env.NODE_ENV || 'development',
+        token_type: mercadopagoConfig.tokenType,
         plan: selectedPlan,
         user: {
           email: userEmail,
@@ -333,13 +405,15 @@ app.post('/api/subscription/create', async (req, res) => {
         requestId: req.requestId
       };
 
+      log('success', req.requestId, 'Respuesta enviada al cliente', responseData);
       res.json(responseData);
 
     } catch (mpError) {
-      console.error(`❌ [${req.requestId}] Error de MercadoPago:`, {
+      log('error', req.requestId, 'Error de MercadoPago', {
         message: mpError.message,
         status: mpError.status,
-        cause: mpError.cause
+        cause: mpError.cause,
+        stack: mpError.stack
       });
 
       return res.status(502).json({
@@ -347,16 +421,18 @@ app.post('/api/subscription/create', async (req, res) => {
         error: 'Error del proveedor de pagos',
         details: 'MercadoPago devolvió un error',
         mp_error: process.env.NODE_ENV === 'development' ? mpError.message : 'Error de conexión con el proveedor',
+        mp_status: mpError.status,
         requestId: req.requestId,
         troubleshooting: {
           message: 'Si el error persiste, verifica tus credenciales de MercadoPago',
-          check_token: 'El token debe ser válido y tener permisos de creación de preferencias'
+          check_token: 'El token debe ser válido y tener permisos de creación de preferencias',
+          check_environment: 'Verifica si estás usando el token correcto para el entorno'
         }
       });
     }
 
   } catch (error) {
-    console.error(`❌ [${req.requestId}] Error crítico:`, {
+    log('error', req.requestId, 'Error crítico en creación de suscripción', {
       message: error.message,
       stack: error.stack
     });
@@ -374,41 +450,59 @@ app.post('/api/subscription/create', async (req, res) => {
 // === WEBHOOK DE MERCADOPAGO ===
 app.post('/api/subscription/webhook', async (req, res) => {
   try {
-    console.log(`🔔 [${req.requestId}] Webhook recibido de MercadoPago`);
-    console.log(`🔔 [${req.requestId}] Query params:`, req.query);
-    console.log(`🔔 [${req.requestId}] Body:`, JSON.stringify(req.body, null, 2));
+    log('webhook', req.requestId, 'Webhook recibido de MercadoPago', {
+      query: req.query,
+      headers: {
+        'content-type': req.get('content-type'),
+        'user-agent': req.get('user-agent'),
+        'x-forwarded-for': req.get('x-forwarded-for')
+      }
+    });
     
     const { topic, id } = req.query;
     
     if (!topic || !id) {
-      console.warn(`⚠️ [${req.requestId}] Webhook sin topic o id válido`);
+      log('warning', req.requestId, 'Webhook sin topic o id válido', { topic, id });
       return res.status(400).json({
         success: false,
         error: 'Webhook inválido: faltan parámetros topic o id'
       });
     }
     
+    log('webhook', req.requestId, `Procesando webhook - Topic: ${topic}, ID: ${id}`);
+    
     if (topic === 'payment') {
-      console.log(`💳 [${req.requestId}] Procesando notificación de pago: ${id}`);
+      log('mercadopago', req.requestId, `Procesando notificación de pago: ${id}`);
       
       // TODO: Implementar verificación del pago
-      // 1. Usar el SDK de MercadoPago para obtener detalles del pago
-      // 2. Verificar el estado del pago (approved, rejected, pending, etc.)
-      // 3. Actualizar base de datos con el estado de la suscripción
-      // 4. Enviar notificación al usuario si es necesario
-      
-      console.log(`✅ [${req.requestId}] Webhook procesado correctamente`);
+      try {
+        // Aquí deberías obtener los detalles del pago usando el SDK
+        log('debug', req.requestId, 'TODO: Obtener detalles del pago desde MercadoPago');
+        log('debug', req.requestId, 'TODO: Verificar estado del pago');
+        log('debug', req.requestId, 'TODO: Actualizar base de datos');
+        log('debug', req.requestId, 'TODO: Enviar notificación al usuario');
+        
+      } catch (paymentError) {
+        log('error', req.requestId, 'Error procesando pago', paymentError);
+      }
     }
     
-    res.status(200).json({ 
+    const response = { 
       received: true,
       topic: topic,
       id: id,
-      timestamp: new Date().toISOString()
-    });
+      timestamp: new Date().toISOString(),
+      requestId: req.requestId
+    };
+    
+    log('success', req.requestId, 'Webhook procesado correctamente', response);
+    res.status(200).json(response);
     
   } catch (error) {
-    console.error(`❌ [${req.requestId}] Error en webhook:`, error);
+    log('error', req.requestId, 'Error en webhook', {
+      message: error.message,
+      stack: error.stack
+    });
     res.status(500).json({ 
       error: 'Error procesando webhook',
       requestId: req.requestId
@@ -418,6 +512,7 @@ app.post('/api/subscription/webhook', async (req, res) => {
 
 // === ENDPOINT DE ESTADO DE SUSCRIPCIÓN ===
 app.get('/api/subscription/status', (req, res) => {
+  log('info', req.requestId, 'Consultando estado de suscripción');
   // TODO: Implementar verificación de estado de suscripción
   res.json({
     success: true,
@@ -430,10 +525,12 @@ app.get('/api/subscription/status', (req, res) => {
 // === ENDPOINT DE TEST (SOLO DESARROLLO) ===
 if (process.env.NODE_ENV !== 'production') {
   app.get('/api/test', (req, res) => {
+    log('debug', req.requestId, 'Acceso a endpoint de testing');
     res.json({
       message: 'Endpoint de testing - Solo disponible en desarrollo',
       environment: process.env.NODE_ENV,
       mercadopago_configured: !!mercadopagoClient,
+      mercadopago_token_type: mercadopagoConfig?.tokenType || 'not_configured',
       timestamp: new Date().toISOString(),
       test_data: {
         sample_subscription: {
@@ -441,16 +538,35 @@ if (process.env.NODE_ENV !== 'production') {
           userEmail: 'test@example.com',
           userName: 'Test User'
         }
-      }
+      },
+      requestId: req.requestId
     });
   });
 }
+
+// === MANEJO DE RUTAS NO ENCONTRADAS ===
+app.use('*', (req, res) => {
+  log('warning', req.requestId, `Ruta no encontrada: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    success: false,
+    error: 'Endpoint no encontrado',
+    message: `La ruta ${req.method} ${req.originalUrl} no existe`,
+    available_endpoints: [
+      'GET /',
+      'GET /health',
+      'POST /api/subscription/create',
+      'GET /api/subscription/status',
+      'POST /api/subscription/webhook'
+    ],
+    requestId: req.requestId
+  });
+});
 
 // === MANEJO GLOBAL DE ERRORES ===
 app.use((err, req, res, next) => {
   const requestId = req.requestId || 'unknown';
   
-  console.error(`💥 [${requestId}] Error no controlado:`, {
+  log('error', requestId, 'Error no controlado', {
     message: err.message,
     stack: err.stack,
     url: req.originalUrl,
@@ -470,116 +586,77 @@ app.use((err, req, res, next) => {
   });
 });
 
-// === HANDLER 404 ===
-app.use('*', (req, res) => {
-  const requestId = req.requestId || Math.random().toString(36).substr(2, 9);
-  
-  console.warn(`🔍 [${requestId}] Ruta no encontrada: ${req.method} ${req.originalUrl}`);
-  
-  res.status(404).json({ 
-    success: false,
-    error: 'Endpoint no encontrado',
-    path: req.originalUrl,
-    method: req.method,
-    timestamp: new Date().toISOString(),
-    requestId: requestId,
-    availableEndpoints: [
-      'GET / - Información de la API',
-      'GET /health - Estado del servidor',
-      'POST /api/subscription/create - Crear suscripción',
-      'GET /api/subscription/status - Estado de suscripción',
-      'POST /api/subscription/webhook - Webhook de MercadoPago'
-    ],
-    documentation: 'https://github.com/tu-usuario/juegotea/blob/main/api/README.md'
-  });
-});
-
-// === MANEJO DE SEÑALES DE SISTEMA ===
-process.on('SIGTERM', () => {
-  console.log('🛑 Señal SIGTERM recibida, cerrando servidor gracefully...');
-  server.close(() => {
-    console.log('✅ Servidor HTTP cerrado correctamente');
-    process.exit(0);
-  });
-});
-
-process.on('SIGINT', () => {
-  console.log('🛑 Señal SIGINT recibida (Ctrl+C), cerrando servidor...');
-  server.close(() => {
-    console.log('✅ Servidor HTTP cerrado correctamente');
-    process.exit(0);
-  });
-});
-
-// === MANEJO DE ERRORES DE PROCESO ===
-process.on('uncaughtException', (error) => {
-  console.error('💥 Excepción no capturada:', error);
-  process.exit(1);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('💥 Promise rechazada no manejada en:', promise);
-  console.error('💥 Razón:', reason);
-  process.exit(1);
-});
-
 // === INICIAR SERVIDOR ===
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log('\n' + '='.repeat(80));
-  console.log('🧩 JUEGOTEA API - SERVIDOR INICIADO CORRECTAMENTE');
-  console.log('='.repeat(80));
-  console.log(`🚀 Puerto: ${PORT}`);
-  console.log(`🌐 URL: https://api-juegostea.onrender.com`);
-  console.log(`🛠️ Entorno: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`⏰ Iniciado: ${new Date().toLocaleString()}`);
-  console.log(`💳 MercadoPago: ${mercadopagoConfig?.valid ? '✅ Configurado' : '❌ No configurado'}`);
-  console.log(`🧠 Memoria: ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)} MB`);
-  console.log(`📊 Node.js: ${process.version}`);
-  console.log('='.repeat(80));
-  console.log('📋 ENDPOINTS DISPONIBLES:');
-  console.log('   GET  / - Información general de la API');
-  console.log('   GET  /health - Estado de salud del servidor');
-  console.log('   POST /api/subscription/create - Crear nueva suscripción');
-  console.log('   GET  /api/subscription/status - Verificar estado de suscripción');
-  console.log('   POST /api/subscription/webhook - Webhook de MercadoPago');
+const server = app.listen(PORT, () => {
+  log('server', 'STARTUP', '='.repeat(80));
+  log('server', 'STARTUP', `🎯 JuegoTEA API Server iniciado exitosamente`);
+  log('server', 'STARTUP', `🌐 Servidor escuchando en puerto ${PORT}`);
+  log('server', 'STARTUP', `🔧 Entorno: ${process.env.NODE_ENV || 'development'}`);
+  log('server', 'STARTUP', `💳 MercadoPago: ${mercadopagoConfig?.valid ? '✅ Configurado' : '❌ No configurado'}`);
+  log('server', 'STARTUP', `🧠 Memoria: ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)} MB`);
+  log('server', 'STARTUP', `📊 Node.js: ${process.version}`);
+  log('server', 'STARTUP', '='.repeat(80));
+  log('server', 'STARTUP', '📋 ENDPOINTS DISPONIBLES:');
+  log('server', 'STARTUP', '   GET  / - Información general de la API');
+  log('server', 'STARTUP', '   GET  /health - Estado de salud del servidor');
+  log('server', 'STARTUP', '   POST /api/subscription/create - Crear nueva suscripción');
+  log('server', 'STARTUP', '   GET  /api/subscription/status - Verificar estado de suscripción');
+  log('server', 'STARTUP', '   POST /api/subscription/webhook - Webhook de MercadoPago');
   if (process.env.NODE_ENV !== 'production') {
-    console.log('   GET  /api/test - Endpoint de testing (solo desarrollo)');
+    log('server', 'STARTUP', '   GET  /api/test - Endpoint de testing (solo desarrollo)');
   }
-  console.log('='.repeat(80));
-  console.log('🌍 CORS CONFIGURADO PARA:');
-  console.log('   ✅ https://juegostea.onrender.com');
-  console.log('   ✅ http://localhost:3000');
-  console.log('   ✅ http://127.0.0.1:5500');
-  console.log('='.repeat(80));
+  log('server', 'STARTUP', '='.repeat(80));
+  log('server', 'STARTUP', '🌍 CORS CONFIGURADO PARA:');
+  allowedOrigins.forEach(origin => {
+    log('server', 'STARTUP', `   ✅ ${origin}`);
+  });
+  log('server', 'STARTUP', '='.repeat(80));
   
   // Advertencias importantes
   if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
-    console.log('⚠️  ADVERTENCIA CRÍTICA:');
-    console.log('   🔐 MERCADOPAGO_ACCESS_TOKEN no configurado');
-    console.log('   💳 Los pagos NO funcionarán hasta configurar esta variable');
-    console.log('   📝 Configúrala en las variables de entorno de Render');
-    console.log('='.repeat(80));
+    log('warning', 'STARTUP', '⚠️  ADVERTENCIA CRÍTICA:');
+    log('warning', 'STARTUP', '   🔐 MERCADOPAGO_ACCESS_TOKEN no configurado');
+    log('warning', 'STARTUP', '   💳 Los pagos NO funcionarán hasta configurar esta variable');
+    log('warning', 'STARTUP', '   📝 Configúrala en las variables de entorno de Render');
+    log('server', 'STARTUP', '='.repeat(80));
   }
   
-  console.log('✅ Servidor listo para recibir peticiones');
-  console.log('🎯 Monitoreo activo de requests iniciado');
-  console.log('='.repeat(80) + '\n');
+  log('success', 'STARTUP', '✅ Servidor listo para recibir peticiones');
+  log('info', 'STARTUP', '🎯 Monitoreo activo de requests iniciado');
+  log('server', 'STARTUP', '='.repeat(80) + '\n');
 });
 
 // === MANEJO DE ERRORES DEL SERVIDOR ===
 server.on('error', (error) => {
   if (error.code === 'EADDRINUSE') {
-    console.error(`❌ Error: Puerto ${PORT} ya está en uso`);
-    console.error('💡 Solución: Cambia el puerto o detén el proceso que lo está usando');
+    log('error', 'SERVER', `Puerto ${PORT} ya está en uso`);
+    log('error', 'SERVER', 'Solución: Cambia el puerto o detén el proceso que lo está usando');
     process.exit(1);
   } else if (error.code === 'EACCES') {
-    console.error(`❌ Error: Sin permisos para usar el puerto ${PORT}`);
-    console.error('💡 Solución: Usa un puerto mayor a 1024 o ejecuta con sudo');
+    log('error', 'SERVER', `Sin permisos para usar el puerto ${PORT}`);
+    log('error', 'SERVER', 'Solución: Usa un puerto mayor a 1024 o ejecuta con sudo');
     process.exit(1);
   } else {
-    console.error('❌ Error crítico del servidor:', error);
+    log('error', 'SERVER', 'Error crítico del servidor', error);
     process.exit(1);
   }
+});
+
+// === MANEJO DE CIERRE GRACEFUL ===
+process.on('SIGTERM', () => {
+  log('warning', 'SHUTDOWN', 'Recibida señal SIGTERM, cerrando servidor...');
+  server.close(() => {
+    log('success', 'SHUTDOWN', 'Servidor cerrado correctamente');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  log('warning', 'SHUTDOWN', 'Recibida señal SIGINT, cerrando servidor...');
+  server.close(() => {
+    log('success', 'SHUTDOWN', 'Servidor cerrado correctamente');
+    process.exit(0);
+  });
 });
 
 // Exportar app para testing
