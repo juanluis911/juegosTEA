@@ -261,9 +261,10 @@ app.post('/api/subscription/webhook', async (req, res) => {
       }
     });
     
-    const { data, type } = req.query;
-    console.log('🔍 Webhook data:', data, 'Type:', type);
-    if (!data || !type) {
+    const type  = req.query.type;
+    const id = req.query.data.id;
+    console.log('🔍 Webhook data:', id, 'Type:', type);
+    if (!id || !type) {
       log('warning', req.requestId, 'Webhook sin topic o id válido', { topic, id });
       return res.status(400).json({
         success: false,
@@ -271,7 +272,7 @@ app.post('/api/subscription/webhook', async (req, res) => {
       });
     }
     
-    log('webhook', req.requestId, `Procesando webhook - Topic: ${topic}, ID: ${id}`);
+    log('webhook', req.requestId, `Procesando webhook - Topic: ${type}, ID: ${id}`);
     
     if (type === 'subscription_authorized_payment' && mercadopagoConfig.valid) {
       try {
@@ -279,9 +280,9 @@ app.post('/api/subscription/webhook', async (req, res) => {
         const { Payment } = require('mercadopago');
         const payment = new Payment(mercadopagoClient);
         
-        log('payment', req.requestId, `Obteniendo detalles del pago: ${data.id}`);
+        log('payment', req.requestId, `Obteniendo detalles del pago: ${id}`);
         
-        const paymentDetails = await payment.get({ id: data.id });
+        const paymentDetails = await payment.get({ id: id });
         log('payment', paymentDetails);
         log('payment', req.requestId, 'Detalles del pago obtenidos', {
           id: paymentDetails.id,
