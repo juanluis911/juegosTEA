@@ -262,7 +262,7 @@ app.post('/api/subscription/webhook', async (req, res) => {
     });
     
     const type  = req.query.type;
-    const id = req.query.['data.id'];
+    const id = req.query['data.id'];
     console.log('🔍 Webhook data:', id, 'Type:', type);
     if (!id || !type) {
       log('warning', req.requestId, 'Webhook sin topic o id válido', { topic, id });
