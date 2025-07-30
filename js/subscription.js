@@ -179,6 +179,7 @@ class SubscriptionManager {
             console.log('✅ Respuesta recibida desde apiClient:', data);
 
             if (data.success && (data.init_point || data.sandbox_init_point)) {
+            console.log('🎉 Suscripción creada exitosamente:', data);
             const checkoutUrl = data.environment === 'sandbox' || data.environment === 'development'
                 ? data.sandbox_init_point
                 : data.init_point;
@@ -198,7 +199,7 @@ class SubscriptionManager {
 
             setTimeout(() => {
                 console.log('🚀 Redirigiendo a MercadoPago...');
-                window.location.href = checkoutUrl;
+                window.open(checkoutUrl, '_blank');
             }, 2000);
             } else {
             throw new Error(data.message || data.error || 'No se pudo crear la preferencia de pago');
