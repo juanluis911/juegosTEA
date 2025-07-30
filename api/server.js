@@ -26,7 +26,7 @@ const SUBSCRIPTION_PLANS = {
     id: 'juegotea_premium',
     title: 'JuegoTEA Premium',
     description: 'Acceso completo a todos los juegos y funcionalidades premium',
-    unit_price: 49, // 
+    unit_price: 5, // 
     currency_id: 'MXN',
     duration_days: 30
   },
