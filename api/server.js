@@ -251,48 +251,123 @@ app.use('/api/', limiter);
 // === WEBHOOK DE MERCADOPAGO MEJORADO ===
 app.post('/api/subscription/webhook', async (req, res) => {
   try {
-    log('webhook', req.requestId, 'Webhook recibido de MercadoPago', {
+    // === LOG INICIAL COMPLETO ===
+    log('webhook', req.requestId, '🔔 WEBHOOK RECIBIDO DE MERCADOPAGO', {
+      method: req.method,
+      url: req.originalUrl,
       query: req.query,
+      body: req.body,
       headers: {
         'content-type': req.get('content-type'),
         'user-agent': req.get('user-agent'),
-        'x-signature': req.get('x-signature'),
-        'x-request-id': req.get('x-request-id')
+        'x-signature': req.get('x-signature') ? req.get('x-signature').substring(0, 50) + '...' : 'NO PRESENTE',
+        'x-request-id': req.get('x-request-id') || 'NO PRESENTE',
+        'host': req.get('host'),
+        'origin': req.get('origin'),
+        'referer': req.get('referer')
       }
     });
     
-    const { data, type } = req.query;
+    // === EXTRAER Y VALIDAR PARÁMETROS ===
+    const { data, type, topic, id } = req.query;
     
-    if (!data || !type) {
-      log('warning', req.requestId, 'Webhook sin topic o id válido', { topic, id });
+    log('debug', req.requestId, '📋 PARÁMETROS EXTRAÍDOS', {
+      data: data,
+      type: type,
+      topic: topic,
+      id: id,
+      query_keys: Object.keys(req.query),
+      query_full: req.query
+    });
+    
+    // CORREGIR LÓGICA: Usar las variables correctas
+    let paymentId = null;
+    let eventType = null;
+    
+    // Detectar el formato del webhook
+    if (data && type) {
+      // Formato nuevo: ?data=123&type=payment
+      paymentId = typeof data === 'object' ? data.id : data;
+      eventType = type;
+      log('info', req.requestId, '🆕 FORMATO NUEVO DETECTADO', { paymentId, eventType });
+    } else if (topic && id) {
+      // Formato viejo: ?topic=payment&id=123
+      paymentId = id;
+      eventType = topic;
+      log('info', req.requestId, '🔄 FORMATO VIEJO DETECTADO', { paymentId, eventType });
+    } else {
+      log('error', req.requestId, '❌ PARÁMETROS INVÁLIDOS', {
+        data, type, topic, id,
+        message: 'No se encontraron parámetros válidos en el webhook'
+      });
       return res.status(400).json({
         success: false,
-        error: 'Webhook inválido: faltan parámetros topic o id'
+        error: 'Webhook inválido: faltan parámetros requeridos',
+        expected_formats: [
+          '?data=123&type=payment',
+          '?topic=payment&id=123'
+        ],
+        received: req.query,
+        requestId: req.requestId
       });
     }
     
-    log('webhook', req.requestId, `Procesando webhook - Topic: ${topic}, ID: ${id}`);
+    log('webhook', req.requestId, `🎯 PROCESANDO WEBHOOK - Tipo: ${eventType}, ID: ${paymentId}`);
     
-    if (type === 'subscription_authorized_payment' && mercadopagoConfig.valid) {
+    // === VERIFICAR CONFIGURACIÓN DE MERCADOPAGO ===
+    if (!mercadopagoConfig.valid) {
+      log('error', req.requestId, '❌ MERCADOPAGO NO CONFIGURADO', {
+        config: mercadopagoConfig,
+        token_present: !!process.env.MERCADOPAGO_ACCESS_TOKEN,
+        token_preview: process.env.MERCADOPAGO_ACCESS_TOKEN ? 
+          process.env.MERCADOPAGO_ACCESS_TOKEN.substring(0, 20) + '...' : 'NO_PRESENTE'
+      });
+      
+      return res.status(200).json({ 
+        received: true,
+        error: 'MercadoPago no configurado pero webhook recibido',
+        timestamp: new Date().toISOString(),
+        requestId: req.requestId
+      });
+    }
+    
+    // === PROCESAR DIFERENTES TIPOS DE EVENTOS ===
+    const validPaymentEvents = ['payment', 'subscription_authorized_payment'];
+    
+    if (validPaymentEvents.includes(eventType)) {
+      log('payment', req.requestId, `💰 PROCESANDO EVENTO DE PAGO: ${eventType}`);
+      
       try {
-        // Obtener detalles del pago desde MercadoPago
+        // === IMPORTAR Y CONFIGURAR MERCADOPAGO ===
+        log('debug', req.requestId, '📦 IMPORTANDO PAYMENT DE MERCADOPAGO');
         const { Payment } = require('mercadopago');
+        
+        log('debug', req.requestId, '🔧 CREANDO INSTANCIA DE PAYMENT', {
+          client_configured: !!mercadopagoClient,
+          payment_id: paymentId
+        });
         const payment = new Payment(mercadopagoClient);
         
-        log('payment', req.requestId, `Obteniendo detalles del pago: ${data.id}`);
+        // === OBTENER DETALLES DEL PAGO ===
+        log('payment', req.requestId, `🔍 OBTENIENDO DETALLES DEL PAGO: ${paymentId}`);
         
-        const paymentDetails = await payment.get({ id: data.id });
+        const paymentDetails = await payment.get({ id: paymentId });
         
-        log('payment', req.requestId, 'Detalles del pago obtenidos', {
+        log('payment', req.requestId, '✅ DETALLES DEL PAGO OBTENIDOS', {
           id: paymentDetails.id,
           status: paymentDetails.status,
           status_detail: paymentDetails.status_detail,
           external_reference: paymentDetails.external_reference,
           transaction_amount: paymentDetails.transaction_amount,
-          payer_email: paymentDetails.payer?.email
+          currency_id: paymentDetails.currency_id,
+          payment_method_id: paymentDetails.payment_method_id,
+          payer_email: paymentDetails.payer?.email,
+          date_created: paymentDetails.date_created,
+          date_approved: paymentDetails.date_approved,
+          date_last_updated: paymentDetails.date_last_updated
         });
         
-        // Guardar información del pago
+        // === PREPARAR DATOS PARA GUARDAR ===
         const paymentData = {
           payment_id: paymentDetails.id,
           status: paymentDetails.status,
@@ -306,80 +381,158 @@ app.post('/api/subscription/webhook', async (req, res) => {
           date_created: paymentDetails.date_created,
           date_approved: paymentDetails.date_approved,
           webhook_received_at: new Date().toISOString(),
+          webhook_type: eventType,
           raw_data: paymentDetails
         };
         
+        log('debug', req.requestId, '💾 DATOS PREPARADOS PARA GUARDAR', {
+          payment_id: paymentData.payment_id,
+          status: paymentData.status,
+          amount: paymentData.transaction_amount,
+          email: paymentData.payer_email
+        });
+        
+        // === GUARDAR PAGO ===
+        log('db', req.requestId, '💾 GUARDANDO PAGO EN BASE DE DATOS...');
         const saved = await savePayment(paymentData);
         
         if (saved) {
-          log('success', req.requestId, 'Pago guardado en base de datos');
+          log('success', req.requestId, '✅ PAGO GUARDADO EN BASE DE DATOS');
           
-          // Si el pago fue aprobado, actualizar suscripción
+          // === PROCESAR SUSCRIPCIÓN SI ESTÁ APROBADO ===
           if (paymentDetails.status === 'approved' && paymentDetails.payer?.email) {
+            log('info', req.requestId, '🎯 PAGO APROBADO - PROCESANDO SUSCRIPCIÓN', {
+              email: paymentDetails.payer.email,
+              payment_status: paymentDetails.status
+            });
+            
+            // Extraer información del plan desde external_reference
+            let planInfo = { plan: 'premium', duration_days: 30 };
+            if (paymentDetails.external_reference) {
+              log('debug', req.requestId, '🔍 ANALIZANDO EXTERNAL_REFERENCE', {
+                external_reference: paymentDetails.external_reference
+              });
+              
+              const refParts = paymentDetails.external_reference.split('_');
+              if (refParts.length >= 2) {
+                const planFromRef = refParts[1];
+                if (planFromRef === 'annual') {
+                  planInfo = { plan: 'annual', duration_days: 365 };
+                  log('info', req.requestId, '📅 PLAN ANUAL DETECTADO');
+                }
+              }
+            }
+            
             const subscriptionData = {
               status: 'active',
-              plan: 'premium', // Extraer del external_reference si es necesario
+              plan: planInfo.plan,
               payment_id: paymentDetails.id,
               amount_paid: paymentDetails.transaction_amount,
               currency: paymentDetails.currency_id,
               payment_method: paymentDetails.payment_method_id,
               activated_at: new Date().toISOString(),
-              expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 días
+              expires_at: new Date(Date.now() + planInfo.duration_days * 24 * 60 * 60 * 1000).toISOString(),
               external_reference: paymentDetails.external_reference
             };
             
+            log('debug', req.requestId, '📋 DATOS DE SUSCRIPCIÓN PREPARADOS', {
+              email: paymentDetails.payer.email,
+              plan: subscriptionData.plan,
+              expires_at: subscriptionData.expires_at,
+              duration_days: planInfo.duration_days
+            });
+            
+            // === ACTUALIZAR SUSCRIPCIÓN ===
+            log('db', req.requestId, '💾 ACTUALIZANDO SUSCRIPCIÓN...');
             const subscriptionUpdated = await updateSubscription(
               paymentDetails.payer.email, 
               subscriptionData
             );
             
             if (subscriptionUpdated) {
-              log('success', req.requestId, 'Suscripción activada', {
+              log('success', req.requestId, '🎉 SUSCRIPCIÓN ACTIVADA EXITOSAMENTE', {
                 email: paymentDetails.payer.email,
-                plan: subscriptionData.plan
+                plan: subscriptionData.plan,
+                expires_at: subscriptionData.expires_at
+              });
+            } else {
+              log('error', req.requestId, '❌ ERROR ACTUALIZANDO SUSCRIPCIÓN', {
+                email: paymentDetails.payer.email
               });
             }
+          } else {
+            log('warning', req.requestId, '⚠️ PAGO NO PROCESADO PARA SUSCRIPCIÓN', {
+              status: paymentDetails.status,
+              has_email: !!paymentDetails.payer?.email,
+              reason: paymentDetails.status !== 'approved' ? 'Estado no aprobado' : 'Sin email de pagador'
+            });
           }
+        } else {
+          log('error', req.requestId, '❌ ERROR GUARDANDO PAGO EN BASE DE DATOS');
         }
         
       } catch (paymentError) {
-        log('error', req.requestId, 'Error procesando pago', {
+        log('error', req.requestId, '❌ ERROR PROCESANDO PAGO', {
           message: paymentError.message,
+          stack: paymentError.stack,
           cause: paymentError.cause,
-          id: id
+          payment_id: paymentId,
+          event_type: eventType,
+          error_code: paymentError.code,
+          error_status: paymentError.status
         });
         
         // Aún así respondemos OK para evitar que MercadoPago reintente
         return res.status(200).json({ 
           received: true,
           error: 'Error procesando pago pero webhook recibido',
+          error_details: paymentError.message,
+          payment_id: paymentId,
+          event_type: eventType,
           timestamp: new Date().toISOString(),
           requestId: req.requestId
         });
       }
+    } else {
+      log('warning', req.requestId, '⚠️ TIPO DE EVENTO NO SOPORTADO', {
+        event_type: eventType,
+        supported_types: validPaymentEvents,
+        action: 'Webhook recibido pero no procesado'
+      });
     }
     
+    // === RESPUESTA EXITOSA ===
     const response = { 
       received: true,
-      topic: topic,
-      id: id,
-      processed: topic === 'payment',
+      event_type: eventType,
+      payment_id: paymentId,
+      processed: validPaymentEvents.includes(eventType),
       timestamp: new Date().toISOString(),
       requestId: req.requestId
     };
     
-    log('success', req.requestId, 'Webhook procesado correctamente', response);
+    log('success', req.requestId, '🎉 WEBHOOK PROCESADO CORRECTAMENTE', response);
     res.status(200).json(response);
     
   } catch (error) {
-    log('error', req.requestId, 'Error en webhook', {
+    log('error', req.requestId, '💥 ERROR GENERAL EN WEBHOOK', {
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
+      name: error.name,
+      code: error.code,
+      status: error.status,
+      url: req.originalUrl,
+      method: req.method,
+      query: req.query,
+      body: req.body,
+      timestamp: new Date().toISOString()
     });
     
     // Importante: siempre responder 200 para que MercadoPago no reintente
     res.status(200).json({ 
       error: 'Error procesando webhook pero recibido',
+      error_message: error.message,
+      error_type: error.name,
       requestId: req.requestId,
       timestamp: new Date().toISOString()
     });
