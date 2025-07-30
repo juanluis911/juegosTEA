@@ -1,5 +1,7 @@
 services:
   # Backend API Service
+  - agent: 
+  - authtoken: 2wQBdNgEGCNTOsLvtGglJQNLclp_6NHxWDY4xLPjUiMZmSLrm
   - type: web
     name: juegotea-api
     env: node

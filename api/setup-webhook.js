@@ -61,42 +61,80 @@ async function setupWebhook() {
   console.log(`🔔 Webhook URL: ${webhookUrl}\n`);
   
   try {
-    // 1. Listar webhooks existentes
+    // 1. Primero intentar con la API más reciente
     console.log('🔍 Verificando webhooks existentes...');
     
-    const listResponse = await makeRequest(
-      'https://api.mercadopago.com/v1/webhooks',
-      'GET',
-      {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      }
-    );
+    let listResponse;
+    let apiVersion = 'v1';
     
-    if (listResponse.status === 200 && listResponse.data.results) {
-      console.log(`📋 Webhooks encontrados: ${listResponse.data.results.length}`);
-      
-      // Verificar si ya existe un webhook para nuestra URL
-      const existingWebhook = listResponse.data.results.find(
-        webhook => webhook.url === webhookUrl
-      );
-      
-      if (existingWebhook) {
-        console.log('✅ Webhook ya existe:', {
-          id: existingWebhook.id,
-          url: existingWebhook.url,
-          events: existingWebhook.events,
-          status: existingWebhook.status
-        });
+    // Intentar diferentes endpoints de la API
+    const apiEndpoints = [
+      'https://api.mercadopago.com/v1/webhooks',
+      'https://api.mercadopago.com/webhooks',
+      'https://api.mercadopago.com/v1/applications/webhooks'
+    ];
+    
+    for (const endpoint of apiEndpoints) {
+      try {
+        console.log(`   🔄 Probando endpoint: ${endpoint}`);
+        listResponse = await makeRequest(
+          endpoint,
+          'GET',
+          {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        );
         
-        if (existingWebhook.status === 'active') {
-          console.log('🎯 El webhook ya está activo y configurado correctamente');
-          return;
+        if (listResponse.status === 200) {
+          console.log(`   ✅ Endpoint funcional: ${endpoint}`);
+          apiVersion = endpoint;
+          break;
+        } else if (listResponse.status === 404) {
+          console.log(`   ❌ Endpoint no encontrado: ${endpoint}`);
+          continue;
+        } else {
+          console.log(`   ⚠️  Endpoint devolvió ${listResponse.status}: ${endpoint}`);
         }
+      } catch (error) {
+        console.log(`   ❌ Error en endpoint ${endpoint}:`, error.message);
+        continue;
       }
     }
     
-    // 2. Crear nuevo webhook
+    if (!listResponse || listResponse.status !== 200) {
+      console.log('❌ No se pudo acceder a la API de webhooks');
+      console.log('💡 Posibles soluciones:');
+      console.log('   1. Verifica que tu token de acceso sea válido');
+      console.log('   2. Verifica que tengas permisos para crear webhooks');
+      console.log('   3. Configura el webhook manualmente desde el panel web');
+      console.log('   4. Revisa la documentación actualizada de MercadoPago');
+      return;
+    }
+    
+    const webhooks = listResponse.data.results || listResponse.data || [];
+    console.log(`📋 Webhooks encontrados: ${webhooks.length}`);
+    
+    // Verificar si ya existe un webhook para nuestra URL
+    const existingWebhook = webhooks.find(
+      webhook => webhook.url === webhookUrl
+    );
+    
+    if (existingWebhook) {
+      console.log('✅ Webhook ya existe:', {
+        id: existingWebhook.id,
+        url: existingWebhook.url,
+        events: existingWebhook.events,
+        status: existingWebhook.status
+      });
+      
+      if (existingWebhook.status === 'active') {
+        console.log('🎯 El webhook ya está activo y configurado correctamente');
+        return;
+      }
+    }
+    
+    // 2. Crear nuevo webhook usando el endpoint que funcionó
     console.log('🆕 Creando nuevo webhook...');
     
     const webhookData = {
@@ -106,7 +144,7 @@ async function setupWebhook() {
     };
     
     const createResponse = await makeRequest(
-      'https://api.mercadopago.com/v1/webhooks',
+      apiVersion,
       'POST',
       {
         'Authorization': `Bearer ${accessToken}`,
