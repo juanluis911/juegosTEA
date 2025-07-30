@@ -204,6 +204,8 @@ app.post('/api/subscription/create', async (req, res) => {
     console.log(`🔍 [${req.requestId}] Verificando configuración de MercadoPago...`);
     console.log(`🔍 [${req.requestId}] Configuración válida: ${mercadopagoConfig?.valid}`);
     console.log(`🔍 [${req.requestId}] Token de acceso: ${process.env.MERCADOPAGO_ACCESS_TOKEN}`);
+    console.log(`🔍 [${req.requestId}] Entorno: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔍 [${req.requestId}] mercadopagoClient ${mercadopagoClient}`);
     if (!mercadopagoClient || !mercadopagoConfig?.valid) {
       console.error(`❌ [${req.requestId}] MercadoPago no está configurado`);
       return res.status(503).json({
