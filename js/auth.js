@@ -34,7 +34,7 @@ class AuthManager {
       
       // POR AHORA: Simular usuario para testing
       this.currentUser = {
-        uid: 'test-user-' + Date.now(),
+        uid: 'provicional-' + Date.now(),
         email: 'usuario@test.com',
         name: 'Usuario de Prueba',
         picture: 'https://via.placeholder.com/40'
